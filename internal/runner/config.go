@@ -7,26 +7,30 @@ import (
 	"github.com/Shopify/yaml"
 )
 
+// ConfigDefaultFilename containing configuration
 const ConfigDefaultFilename = "notify.conf"
 
+// ConfigFile structure
+//nolint:maligned // used once
 type ConfigFile struct {
 	BIID string `yaml:"burp_biid,omitempty"`
 	// Slack
-	SlackWebHookUrl string `yaml:"slack_webhook_url,omitempty"`
+	SlackWebHookURL string `yaml:"slack_webhook_url,omitempty"`
 	SlackUsername   string `yaml:"slack_username,omitempty"`
 	SlackChannel    string `yaml:"slack_channel,omitempty"`
 	Slack           bool   `yaml:"slack,omitempty"`
 
 	// Discord
-	DiscordWebHookUrl       string `yaml:"discord_webhook_url,omitempty"`
+	DiscordWebHookURL       string `yaml:"discord_webhook_url,omitempty"`
 	DiscordWebHookUsername  string `yaml:"discord_username,omitempty"`
-	DiscordWebHookAvatarUrl string `yaml:"discord_avatar,omitempty"`
+	DiscordWebHookAvatarURL string `yaml:"discord_avatar,omitempty"`
 	Discord                 bool   `yaml:"discord,omitempty"`
 	Interval                int    `yaml:"interval,omitempty"`
 	HTTPMessage             string `yaml:"http_message,omitempty"`
 	DNSMessage              string `yaml:"dns_message,omitempty"`
 }
 
+// GetConfigDirectory from the system
 func GetConfigDirectory() (string, error) {
 	var config string
 
@@ -45,6 +49,7 @@ func GetConfigDirectory() (string, error) {
 	return config, nil
 }
 
+// CheckConfigExists in the specified path
 func CheckConfigExists(configPath string) bool {
 	if _, err := os.Stat(configPath); err == nil {
 		return true
@@ -54,6 +59,7 @@ func CheckConfigExists(configPath string) bool {
 	return false
 }
 
+// MarshalWrite to location
 func (c *ConfigFile) MarshalWrite(file string) error {
 	f, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
@@ -63,10 +69,13 @@ func (c *ConfigFile) MarshalWrite(file string) error {
 	// Indent the spaces too
 	enc := yaml.NewEncoder(f)
 	err = enc.Encode(&c)
+
+	//nolint:errcheck // silent fail
 	f.Close()
 	return err
 }
 
+// UnmarshalRead the config file from location
 func UnmarshalRead(file string) (ConfigFile, error) {
 	config := ConfigFile{}
 
@@ -75,6 +84,7 @@ func UnmarshalRead(file string) (ConfigFile, error) {
 		return config, err
 	}
 	err = yaml.NewDecoder(f).Decode(&config)
+	//nolint:errcheck // silent fail
 	f.Close()
 	return config, err
 }

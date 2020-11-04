@@ -19,23 +19,25 @@ const (
 	defaultDNSMessage  = "The collaborator server received a DNS lookup of type {{type}} for the domain name {{domain}} from {{from}} at {{time}}:\n```{{request}}```"
 )
 
+// Runner contains the internal logic of the program
 type Runner struct {
 	options    *Options
 	burpcollab *collaborator.BurpCollaborator
 	notifier   *notify.Notify
 }
 
+// NewRunner instance
 func NewRunner(options *Options) (*Runner, error) {
 	burpcollab := collaborator.NewBurpCollaborator()
 
 	notifier, err := notify.NewWithOptions(&notify.Options{
-		SlackWebHookUrl:         options.SlackWebHookUrl,
+		SlackWebHookURL:         options.SlackWebHookURL,
 		SlackUsername:           options.SlackUsername,
 		SlackChannel:            options.SlackChannel,
 		Slack:                   options.Slack,
-		DiscordWebHookUrl:       options.DiscordWebHookUrl,
+		DiscordWebHookURL:       options.DiscordWebHookURL,
 		DiscordWebHookUsername:  options.DiscordWebHookUsername,
-		DiscordWebHookAvatarUrl: options.DiscordWebHookAvatarUrl,
+		DiscordWebHookAvatarURL: options.DiscordWebHookAvatarURL,
 		Discord:                 options.Discord,
 	})
 	if err != nil {
@@ -45,6 +47,7 @@ func NewRunner(options *Options) (*Runner, error) {
 	return &Runner{options: options, burpcollab: burpcollab, notifier: notifier}, nil
 }
 
+// Run polling and notification
 func (r *Runner) Run() error {
 	// If stdin is present pass everything to webhooks and exit
 	if hasStdin() {
@@ -52,6 +55,7 @@ func (r *Runner) Run() error {
 		for br.Scan() {
 			msg := br.Text()
 			gologger.Printf(msg)
+			//nolint:errcheck // silent fail
 			r.notifier.SendNotification(msg)
 		}
 		os.Exit(0)
@@ -89,10 +93,12 @@ func (r *Runner) Run() error {
 	pollTime := time.Duration(r.options.Interval) * time.Second
 	for {
 		time.Sleep(pollTime)
+		//nolint:errcheck // silent fail
 		r.burpcollab.Poll()
 
 		for _, httpresp := range r.burpcollab.RespBuffer {
-			for _, resp := range httpresp.Responses {
+			for i := range httpresp.Responses {
+				resp := httpresp.Responses[i]
 				var at int64
 				at, _ = strconv.ParseInt(resp.Time, 10, 64)
 				atTime := time.Unix(0, at*int64(time.Millisecond))
@@ -107,6 +113,8 @@ func (r *Runner) Run() error {
 
 					msg := rr.Replace(r.options.HTTPMessage)
 					gologger.Printf(msg)
+
+					//nolint:errcheck // silent fail
 					r.notifier.SendNotification(msg)
 				}
 				if resp.Protocol == "dns" {
@@ -119,6 +127,8 @@ func (r *Runner) Run() error {
 					)
 					msg := rr.Replace(r.options.DNSMessage)
 					gologger.Printf(msg)
+
+					//nolint:errcheck // silent fail
 					r.notifier.SendNotification(msg)
 				}
 			}
@@ -128,6 +138,7 @@ func (r *Runner) Run() error {
 	}
 }
 
+// Close the runner instance
 func (r *Runner) Close() {
 	r.burpcollab.Empty()
 }

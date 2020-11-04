@@ -5,6 +5,7 @@ import (
 	"github.com/projectdiscovery/retryablehttp-go"
 )
 
+// Notify handles the notification engine
 type Notify struct {
 	options       *Options
 	client        *retryablehttp.Client
@@ -12,11 +13,13 @@ type Notify struct {
 	discordClient *DiscordClient
 }
 
+// New notify instance
 func New() (*Notify, error) {
-	retryablehttp := retryablehttp.NewClient(retryablehttp.DefaultOptionsSingle)
-	return &Notify{client: retryablehttp}, nil
+	retryhttp := retryablehttp.NewClient(retryablehttp.DefaultOptionsSingle)
+	return &Notify{client: retryhttp}, nil
 }
 
+// NewWithOptions create a new instance of notify with options
 func NewWithOptions(options *Options) (*Notify, error) {
 	notifier, err := New()
 	if err != nil {
@@ -24,20 +27,21 @@ func NewWithOptions(options *Options) (*Notify, error) {
 	}
 	SlackClient := &SlackClient{
 		client:     notifier.client,
-		WebHookUrl: options.SlackWebHookUrl,
+		WebHookURL: options.SlackWebHookURL,
 		UserName:   options.SlackUsername,
 		Channel:    options.SlackUsername,
 		TimeOut:    DefaultSlackTimeout,
 	}
 	discordClient := &DiscordClient{
 		client:     notifier.client,
-		WebHookUrl: options.DiscordWebHookUrl,
+		WebHookURL: options.DiscordWebHookURL,
 		UserName:   options.DiscordWebHookUsername,
-		Avatar:     options.DiscordWebHookAvatarUrl,
+		Avatar:     options.DiscordWebHookAvatarURL,
 	}
 	return &Notify{options: options, slackClient: SlackClient, discordClient: discordClient}, nil
 }
 
+// SendNotification to registered webhooks
 func (n *Notify) SendNotification(message string) error {
 	// strip unsupported color control chars
 	message = stripansi.Strip(message)
