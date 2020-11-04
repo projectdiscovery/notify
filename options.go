@@ -1,15 +1,17 @@
 package notify
 
+// Options of internal webhooks
+//nolint:maligned // used once
 type Options struct {
 	// Slack
-	SlackWebHookUrl string
+	SlackWebHookURL string
 	SlackUsername   string
 	SlackChannel    string
 	Slack           bool
 
 	// Discord
-	DiscordWebHookUrl       string
+	DiscordWebHookURL       string
 	DiscordWebHookUsername  string
-	DiscordWebHookAvatarUrl string
+	DiscordWebHookAvatarURL string
 	Discord                 bool
 }

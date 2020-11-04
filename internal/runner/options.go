@@ -10,15 +10,17 @@ import (
 	"github.com/projectdiscovery/gologger"
 )
 
+// Options of the internal runner
+//nolint:maligned // used once
 type Options struct {
 	BIID                    string
-	SlackWebHookUrl         string
+	SlackWebHookURL         string
 	SlackUsername           string
 	SlackChannel            string
 	Slack                   bool
-	DiscordWebHookUrl       string
+	DiscordWebHookURL       string
 	DiscordWebHookUsername  string
-	DiscordWebHookAvatarUrl string
+	DiscordWebHookAvatarURL string
 	Discord                 bool
 	Verbose                 bool
 	NoColor                 bool
@@ -31,17 +33,18 @@ type Options struct {
 	DNSMessage              string
 }
 
+// ParseConfigFileOrOptions combining all settings
 func ParseConfigFileOrOptions() *Options {
 	options := &Options{}
 
 	flag.StringVar(&options.BIID, "biid", "", "burp collaborator unique id")
-	flag.StringVar(&options.SlackWebHookUrl, "slack-webhook-url", "", "Slack Webhook URL")
+	flag.StringVar(&options.SlackWebHookURL, "slack-webhook-url", "", "Slack Webhook URL")
 	flag.StringVar(&options.SlackUsername, "slack-username", "", "Slack Username")
 	flag.StringVar(&options.SlackChannel, "slack-channel", "", "Slack Channel")
 	flag.BoolVar(&options.Slack, "slack", false, "Enable Slack")
-	flag.StringVar(&options.DiscordWebHookUrl, "discord-webhook-url", "", "Discord Webhook URL")
+	flag.StringVar(&options.DiscordWebHookURL, "discord-webhook-url", "", "Discord Webhook URL")
 	flag.StringVar(&options.DiscordWebHookUsername, "discord-username", "", "Discord Username")
-	flag.StringVar(&options.DiscordWebHookAvatarUrl, "discord-channel", "", "Discord Channel")
+	flag.StringVar(&options.DiscordWebHookAvatarURL, "discord-channel", "", "Discord Channel")
 	flag.BoolVar(&options.Discord, "discord", false, "Enable Discord")
 	flag.BoolVar(&options.Silent, "silent", false, "Don't print the banner")
 	flag.BoolVar(&options.Version, "version", false, "Show version of notify")
@@ -108,13 +111,17 @@ func (options *Options) writeDefaultConfig() {
 
 	var dummyConfig ConfigFile
 	dummyConfig.BIID = "123456798"
-	dummyConfig.SlackWebHookUrl = "https://a.b.c/slack"
+	dummyConfig.SlackWebHookURL = "https://a.b.c/slack"
+	//nolint:goconst // test data
 	dummyConfig.SlackUsername = "test"
+	//nolint:goconst // test data
 	dummyConfig.SlackChannel = "test"
 	dummyConfig.Slack = true
-	dummyConfig.DiscordWebHookUrl = "https://a.b.c/discord"
+	dummyConfig.DiscordWebHookURL = "https://a.b.c/discord"
+	//nolint:goconst // test data
 	dummyConfig.DiscordWebHookUsername = "test"
-	dummyConfig.DiscordWebHookAvatarUrl = "test"
+	//nolint:goconst // test data
+	dummyConfig.DiscordWebHookAvatarURL = "test"
 	dummyConfig.Discord = true
 	dummyConfig.Interval = 2
 	dummyConfig.HTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n" +
@@ -147,17 +154,21 @@ func (options *Options) writeDefaultConfig() {
 	}
 	sc := bufio.NewScanner(origFile)
 	for sc.Scan() {
+		//nolint:errcheck // silent fail
 		tmpFile.WriteString("# " + sc.Text() + "\n")
 	}
-
+	//nolint:errcheck // silent fail
 	origFile.Close()
 	tmpFileName := tmpFile.Name()
+	//nolint:errcheck // silent fail
 	tmpFile.Close()
+	//nolint:errcheck // silent fail
 	os.Rename(tmpFileName, configFile)
 
 	gologger.Infof("Configuration file saved to %s\n", configFile)
 }
 
+// MergeFromConfig with existing options
 func (options *Options) MergeFromConfig(configFileName string, ignoreError bool) {
 	configFile, err := UnmarshalRead(configFileName)
 	if err != nil {
@@ -171,8 +182,8 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	if configFile.BIID != "" && !options.InterceptBIID {
 		options.BIID = configFile.BIID
 	}
-	if configFile.SlackWebHookUrl != "" {
-		options.SlackWebHookUrl = configFile.SlackWebHookUrl
+	if configFile.SlackWebHookURL != "" {
+		options.SlackWebHookURL = configFile.SlackWebHookURL
 	}
 	if configFile.SlackUsername != "" {
 		options.SlackUsername = configFile.SlackUsername
@@ -183,14 +194,14 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	if configFile.Slack {
 		options.Slack = configFile.Slack
 	}
-	if configFile.DiscordWebHookUrl != "" {
-		options.DiscordWebHookUrl = configFile.DiscordWebHookUrl
+	if configFile.DiscordWebHookURL != "" {
+		options.DiscordWebHookURL = configFile.DiscordWebHookURL
 	}
 	if configFile.DiscordWebHookUsername != "" {
 		options.DiscordWebHookUsername = configFile.DiscordWebHookUsername
 	}
-	if configFile.DiscordWebHookAvatarUrl != "" {
-		options.DiscordWebHookAvatarUrl = configFile.DiscordWebHookAvatarUrl
+	if configFile.DiscordWebHookAvatarURL != "" {
+		options.DiscordWebHookAvatarURL = configFile.DiscordWebHookAvatarURL
 	}
 	if configFile.Discord {
 		options.Discord = configFile.Discord

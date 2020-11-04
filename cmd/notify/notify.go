@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-
 	options := runner.ParseConfigFileOrOptions()
 
 	notifyRunner, err := runner.NewRunner(options)
