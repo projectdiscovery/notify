@@ -18,6 +18,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/projectdiscovery/collaborator v0.0.0-20201104193903-c438f879bbc0 h1:/gKK0LVQAlo1MoEhUbcu+jAIXMwIY32GnxORNR9BjX8=
 github.com/projectdiscovery/collaborator v0.0.0-20201104193903-c438f879bbc0/go.mod h1:pT+nfywyhy3cJacTU6PLUbE/uHqabzoN4xp4DcF9qoY=
+github.com/projectdiscovery/collaborator v0.0.0-20201106005431-f17a55c8e0c6 h1:aga6pwPao5uQZu6HUT0yU4UnJfnYLVaSZZbYwsPypOI=
+github.com/projectdiscovery/collaborator v0.0.0-20201106005431-f17a55c8e0c6/go.mod h1:pT+nfywyhy3cJacTU6PLUbE/uHqabzoN4xp4DcF9qoY=
 github.com/projectdiscovery/gologger v1.0.1 h1:FzoYQZnxz9DCvSi/eg5A6+ET4CQ0CDUs27l6Exr8zMQ=
 github.com/projectdiscovery/gologger v1.0.1/go.mod h1:Ok+axMqK53bWNwDSU1nTNwITLYMXMdZtRc8/y1c7sWE=
 github.com/projectdiscovery/retryablehttp-go v1.0.1 h1:V7wUvsZNq1Rcz7+IlcyoyQlNwshuwptuBVYWw9lx8RE=
