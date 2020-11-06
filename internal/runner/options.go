@@ -215,6 +215,15 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	if configFile.Discord {
 		options.Discord = configFile.Discord
 	}
+	if configFile.TelegramAPIKey != "" {
+		options.TelegramAPIKey = configFile.TelegramAPIKey
+	}
+	if configFile.TelegramChatID != "" {
+		options.TelegramChatID = configFile.TelegramChatID
+	}
+	if configFile.Telegram {
+		options.Telegram = configFile.Telegram
+	}
 	if configFile.HTTPMessage != "" {
 		options.HTTPMessage = configFile.HTTPMessage
 	}
