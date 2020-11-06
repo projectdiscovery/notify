@@ -3,7 +3,7 @@ builds:
       main: cmd/notify/notify.go
       goos:
         - linux
-        # - windows
+        - windows
         - darwin
       goarch:
         - amd64
@@ -16,6 +16,6 @@ archives:
       format: tar.gz
       replacements:
           darwin: macOS
-      # format_overrides:
-      #    - goos: windows
-      #      format: zip
+      format_overrides:
+        - goos: windows
+          format: zip

@@ -30,8 +30,6 @@ type Options struct {
 	Silent                  bool
 	Version                 bool
 	Interval                int
-	InterceptBIID           bool
-	InterceptBIIDTimeout    int
 	HTTPMessage             string
 	DNSMessage              string
 }
@@ -57,8 +55,6 @@ func ParseConfigFileOrOptions() *Options {
 	flag.BoolVar(&options.Verbose, "v", false, "Show Verbose output")
 	flag.BoolVar(&options.NoColor, "no-color", false, "Don't Use colors in output")
 	flag.IntVar(&options.Interval, "interval", 2, "Polling interval in seconds")
-	flag.BoolVar(&options.InterceptBIID, "intercept-biid", false, "Automatic BIID intercept")
-	flag.IntVar(&options.InterceptBIIDTimeout, "intercept-biid-timeout", 120, "Automatic BIID intercept Timeout")
 	flag.StringVar(&options.HTTPMessage, "message-http", defaultHTTPMessage, "HTTP Message")
 	flag.StringVar(&options.DNSMessage, "message-dns", defaultDNSMessage, "DNS Message")
 
@@ -188,7 +184,7 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 		gologger.Fatalf("Could not read configuration file %s: %s\n", configFileName, err)
 	}
 
-	if configFile.BIID != "" && !options.InterceptBIID {
+	if configFile.BIID != "" {
 		options.BIID = configFile.BIID
 	}
 	if configFile.SlackWebHookURL != "" {
