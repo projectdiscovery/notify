@@ -14,4 +14,9 @@ type Options struct {
 	DiscordWebHookUsername  string
 	DiscordWebHookAvatarURL string
 	Discord                 bool
+
+	// Telegram
+	TelegramAPIKey string
+	TelegramChatID string
+	Telegram       bool
 }

@@ -7,10 +7,11 @@ import (
 
 // Notify handles the notification engine
 type Notify struct {
-	options       *Options
-	client        *retryablehttp.Client
-	slackClient   *SlackClient
-	discordClient *DiscordClient
+	options        *Options
+	client         *retryablehttp.Client
+	slackClient    *SlackClient
+	discordClient  *DiscordClient
+	telegramClient *TelegramClient
 }
 
 // New notify instance
@@ -38,7 +39,12 @@ func NewWithOptions(options *Options) (*Notify, error) {
 		UserName:   options.DiscordWebHookUsername,
 		Avatar:     options.DiscordWebHookAvatarURL,
 	}
-	return &Notify{options: options, slackClient: SlackClient, discordClient: discordClient}, nil
+	telegramClient := &TelegramClient{
+		client: notifier.client,
+		apiKEY: options.TelegramAPIKey,
+		chatID: options.TelegramChatID,
+	}
+	return &Notify{options: options, slackClient: SlackClient, discordClient: discordClient, telegramClient: telegramClient}, nil
 }
 
 // SendNotification to registered webhooks
@@ -54,6 +60,13 @@ func (n *Notify) SendNotification(message string) error {
 
 	if n.options.Discord {
 		err := n.discordClient.SendInfo(message)
+		if err != nil {
+			return err
+		}
+	}
+
+	if n.options.Telegram {
+		err := n.telegramClient.SendInfo(message)
 		if err != nil {
 			return err
 		}

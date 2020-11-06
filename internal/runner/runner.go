@@ -39,6 +39,9 @@ func NewRunner(options *Options) (*Runner, error) {
 		DiscordWebHookUsername:  options.DiscordWebHookUsername,
 		DiscordWebHookAvatarURL: options.DiscordWebHookAvatarURL,
 		Discord:                 options.Discord,
+		TelegramAPIKey:          options.TelegramAPIKey,
+		TelegramChatID:          options.TelegramChatID,
+		Telegram:                options.Telegram,
 	})
 	if err != nil {
 		return nil, err

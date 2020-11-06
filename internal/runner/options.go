@@ -22,6 +22,9 @@ type Options struct {
 	DiscordWebHookUsername  string
 	DiscordWebHookAvatarURL string
 	Discord                 bool
+	TelegramAPIKey          string
+	TelegramChatID          string
+	Telegram                bool
 	Verbose                 bool
 	NoColor                 bool
 	Silent                  bool
@@ -46,6 +49,9 @@ func ParseConfigFileOrOptions() *Options {
 	flag.StringVar(&options.DiscordWebHookUsername, "discord-username", "", "Discord Username")
 	flag.StringVar(&options.DiscordWebHookAvatarURL, "discord-channel", "", "Discord Channel")
 	flag.BoolVar(&options.Discord, "discord", false, "Enable Discord")
+	flag.StringVar(&options.TelegramAPIKey, "telegram-api-key", "", "Telegram API Key")
+	flag.StringVar(&options.TelegramChatID, "telegram-chat-id", "", "Telegram Chat ID")
+	flag.BoolVar(&options.Telegram, "telegram", false, "Enable Telegram")
 	flag.BoolVar(&options.Silent, "silent", false, "Don't print the banner")
 	flag.BoolVar(&options.Version, "version", false, "Show version of notify")
 	flag.BoolVar(&options.Verbose, "v", false, "Show Verbose output")
@@ -123,6 +129,9 @@ func (options *Options) writeDefaultConfig() {
 	//nolint:goconst // test data
 	dummyConfig.DiscordWebHookAvatarURL = "test"
 	dummyConfig.Discord = true
+	dummyConfig.TelegramAPIKey = "123456879"
+	dummyConfig.TelegramChatID = "123"
+	dummyConfig.Telegram = true
 	dummyConfig.Interval = 2
 	dummyConfig.HTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n" +
 		"```\n" +
