@@ -32,7 +32,7 @@ func main() {
 	}()
 
 	if os.Getuid() != 0 {
-		gologger.Printf("Command may fail as the program is not running as root and unable to access raw sockets")
+		gologger.Fatalf("The program is not running as root and unable to access raw sockets")
 	}
 	gologger.Printf("Attempting to intercept BIID")
 	// otherwise attempt to retrieve it
