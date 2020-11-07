@@ -32,13 +32,16 @@ func main() {
 	}()
 
 	if os.Getuid() != 0 {
-		gologger.Warningf("Command may fail as the program is not running as root and unable to access raw sockets")
+		gologger.Printf("Command may fail as the program is not running as root and unable to access raw sockets")
 	}
 	gologger.Printf("Attempting to intercept BIID")
 	// otherwise attempt to retrieve it
-	InterceptedBiid, err := biid.Intercept(time.Duration(options.InterceptBIIDTimeout) * time.Second)
+	interceptedBiid, err := biid.Intercept(time.Duration(options.InterceptBIIDTimeout) * time.Second)
 	if err != nil {
 		gologger.Fatalf("%s", err)
 	}
-	gologger.Printf("BIID found, using: %s", InterceptedBiid)
+	if interceptedBiid == "" {
+		gologger.Fatalf("BIID not found")
+	}
+	gologger.Printf("BIID found: %s", interceptedBiid)
 }
