@@ -7,7 +7,7 @@ require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/miekg/dns v1.1.35 // indirect
-	github.com/projectdiscovery/collaborator v0.0.0-20201106184551-efd6773a9479
+	github.com/projectdiscovery/collaborator v0.0.0-20201107213304-6ecca25af99b
 	github.com/projectdiscovery/gologger v1.0.1
 	github.com/projectdiscovery/retryablehttp-go v1.0.1
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
