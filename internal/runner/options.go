@@ -101,15 +101,17 @@ func (options *Options) configureOutput() {
 func (options *Options) writeDefaultConfig() {
 	configFile, err := getDefaultConfigFile()
 	if err != nil {
-		gologger.Warningf("Could not get default configuration file: %s\n", err)
+		gologger.Printf("Could not get default configuration file: %s\n", err)
 	}
 
 	if fileExists(configFile) {
+		gologger.Printf("Found existing config file: %s\n", configFile)
 		return
 	}
 
 	// Skip config file creation if run as root to avoid permission issues
 	if os.Getuid() == 0 {
+		gologger.Printf("Running as root, skipping config file write to avoid permissions issues: %s\n", configFile)
 		return
 	}
 
@@ -144,20 +146,20 @@ func (options *Options) writeDefaultConfig() {
 
 	err = dummyConfig.MarshalWrite(configFile)
 	if err != nil {
-		gologger.Warningf("Could not write configuration file to %s: %s\n", configFile, err)
+		gologger.Printf("Could not write configuration file to %s: %s\n", configFile, err)
 		return
 	}
 
 	// turn all lines into comments
 	origFile, err := os.Open(configFile)
 	if err != nil {
-		gologger.Warningf("Could not process temporary file: %s\n", err)
+		gologger.Printf("Could not process temporary file: %s\n", err)
 		return
 	}
 	tmpFile, err := ioutil.TempFile("", "")
 	if err != nil {
 		log.Println(err)
-		gologger.Warningf("Could not process temporary file: %s\n", err)
+		gologger.Printf("Could not process temporary file: %s\n", err)
 		return
 	}
 	sc := bufio.NewScanner(origFile)
@@ -173,7 +175,7 @@ func (options *Options) writeDefaultConfig() {
 	//nolint:errcheck // silent fail
 	os.Rename(tmpFileName, configFile)
 
-	gologger.Infof("Configuration file saved to %s\n", configFile)
+	gologger.Printf("Configuration file saved to %s\n", configFile)
 }
 
 // MergeFromConfig with existing options
@@ -181,7 +183,7 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	configFile, err := UnmarshalRead(configFileName)
 	if err != nil {
 		if ignoreError {
-			gologger.Warningf("Could not read configuration file %s: %s\n", configFileName, err)
+			gologger.Printf("Could not read configuration file %s - ignoring error: %s\n", configFileName, err)
 			return
 		}
 		gologger.Fatalf("Could not read configuration file %s: %s\n", configFileName, err)
