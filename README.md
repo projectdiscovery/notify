@@ -38,7 +38,7 @@ Notify is an helper utility written in Go that allows you to pull results from b
 
 - 💥 Automatic Burp Collaborator BIID interception.
 - 💥 Burp Collaborator Slack / Discord notification support.
-- 💥 General purpose Slack / Discord notification support from any tool.
+- 💥 Redirect output of any tool to Slack / Discord / Telegram. 
 
 # Usage
 
@@ -85,63 +85,44 @@ Download latest binary from https://github.com/projectdiscovery/notify/releases
 
 Notify requires **go1.14+** to install successfully. Run the following command to get the repo -
 
+Installing Notify -
+
 ```sh
 ▶ GO111MODULE=on go get -u -v github.com/projectdiscovery/notify/cmd/notify
 ```
 
+Installing Intercept - 
+
+```sh
+▶ GO111MODULE=on go get -u -v github.com/projectdiscovery/notify/cmd/intercept
+```
+
 ### From Github
+
+Installing Notify -
 
 ```sh
 ▶ git clone https://github.com/projectdiscovery/notify.git; cd notify/cmd/notify; go build; mv notify /usr/local/bin/; notify -version
 ```
 
-# Intercept BIID
-
-- Run notify as root `notify -intercept-biid`
-- Open Burp Suite => Project Options => Misc
-- Tick `Pull Over HTTP`
-- Generate **new** collaborator link.
-- Notify should be able to automatically intercept the BIID and incoming connections. 
+Installing Intercept - 
 
 ```sh
-sudo notify -intercept-biid                                    
-Attempting to intercept BIID
-BIID found, using: 123456789
+▶ git clone https://github.com/projectdiscovery/notify.git; cd notify/cmd/intercept; go build; mv intercept /usr/local/bin/;
 ```
 
-# Config File
-The default config file should be located in `$HOME/.config/notify/notify.conf` and has the following contents:
+# Intercept BIID
 
-```yaml
-burp_biid: 132465789
-# Slack
-slack: true
-slack_webhook_url: https://a.b.c
-slack_username: test
-slack_channel: test
+- Run intercept as root `sudo intercept`
+- Open Burp Suite => Project Options => Misc
+- Tick `Pull Over HTTP`
+- Generate **new** collaborator, click on **Poll now**. 
+- Intercept will capture `biid` that can be used with `notify`
 
-# Discord
-discord: true
-discord_webhook_url: https://a.b.c
-discord_username: test
-discord_avatar: https://a.b.c/avatar
-
-# General Settings
-interval: 2 # seconds
-
-http_message: |
-    The collaborator server received an {{protocol}} request from {{from}} at {{time}}:
-    ```http
-    {{request}}
-
-    {{response}}
-    ```
-
-dns_message: |
-    The collaborator server received a DNS lookup of type {{type}} for the domain name {{domain}} from {{from}} at {{time}}:
-    ```
-    {{request}}
-    ```
+```sh
+sudo ./intercept
+Attempting to intercept BIID
+BIID found: o%2JREfoFxWfdk4i1VOvPQiX96MfpZ7qlZ6kXiGeHbjvJ%3d
 ```
 
 # Running notify
@@ -178,6 +159,14 @@ Similarly to slack, in order to use discord
 ▶ notify -biid 132456789 -discord -discord-webhook-url https://a.b.c -discord-username notify-bot
 ```
 
+## Telegram notification
+
+Similarly to slack, in order to use discord
+
+```sh
+▶ notify -biid 132456789 -telegram -telegram-api-key 119489xxxx-:AAF4OV9 -telegram-chat-id 1231434
+```
+
 ## Using notify with other tools
 
 Notify also supports piping output of any tool and send it over discord/slack channel as notification.
@@ -200,7 +189,49 @@ Following command will enumerate subdomains using [SubFinder](https://github.com
 subfinder -d intigriti.com | httpx | nuclei -t files | notify
 ```
 
-In similar manner, output (stdout) of any tool can be piped to **notify** for posting data into slack/discord. 
+In similar manner, output (stdout) of any tool can be piped to **notify** for posting data into slack/discord.
+
+# Config File
+The default config file should be located in `$HOME/.config/notify/notify.conf` and has the following contents:
+
+```yaml
+burp_biid: 132465789
+# Slack
+slack: true
+slack_webhook_url: https://a.b.c
+slack_username: test
+slack_channel: test
+
+# Discord
+discord: true
+discord_webhook_url: https://a.b.c
+discord_username: test
+discord_avatar: https://a.b.c/avatar
+
+# Telegram
+telegram: true
+telegram_apikey: 119489xxxx-:AAF4OV9cdCEzq3tQ3aMtVyzHaRV3a1M7Ow4
+telegram_chat_id: 36808xxxx
+
+# General Settings
+interval: 2 # seconds
+
+http_message: |
+    The collaborator server received an {{protocol}} request from {{from}} at {{time}}:
+
+    ```http
+    {{request}}
+
+    {{response}}
+    ```
+
+dns_message: |
+    The collaborator server received a DNS lookup of type {{type}} for the domain name {{domain}} from {{from}} at {{time}}:
+
+    ```
+    {{request}}
+    ```
+``` 
 
 
 📋 Notes
@@ -208,6 +239,7 @@ In similar manner, output (stdout) of any tool can be piped to **notify** for po
 - You can obtain the **biid** with wireshark on any platform and configure it within the config file.
 - Burp collaborator server allow to fetch results only for once, so if you are using this, you will **not** see results in burp collaborator window.
 - Config file has priority over CLI arguments.
+- Telegram notifcation does not support burp collaborator.
 
 ## Reference:- 
 
