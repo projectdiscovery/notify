@@ -22,13 +22,14 @@ type Options struct {
 	DiscordWebHookUsername  string
 	DiscordWebHookAvatarURL string
 	Discord                 bool
+	TelegramAPIKey          string
+	TelegramChatID          string
+	Telegram                bool
 	Verbose                 bool
 	NoColor                 bool
 	Silent                  bool
 	Version                 bool
 	Interval                int
-	InterceptBIID           bool
-	InterceptBIIDTimeout    int
 	HTTPMessage             string
 	DNSMessage              string
 }
@@ -46,13 +47,14 @@ func ParseConfigFileOrOptions() *Options {
 	flag.StringVar(&options.DiscordWebHookUsername, "discord-username", "", "Discord Username")
 	flag.StringVar(&options.DiscordWebHookAvatarURL, "discord-channel", "", "Discord Channel")
 	flag.BoolVar(&options.Discord, "discord", false, "Enable Discord")
+	flag.StringVar(&options.TelegramAPIKey, "telegram-api-key", "", "Telegram API Key")
+	flag.StringVar(&options.TelegramChatID, "telegram-chat-id", "", "Telegram Chat ID")
+	flag.BoolVar(&options.Telegram, "telegram", false, "Enable Telegram")
 	flag.BoolVar(&options.Silent, "silent", false, "Don't print the banner")
 	flag.BoolVar(&options.Version, "version", false, "Show version of notify")
 	flag.BoolVar(&options.Verbose, "v", false, "Show Verbose output")
 	flag.BoolVar(&options.NoColor, "no-color", false, "Don't Use colors in output")
 	flag.IntVar(&options.Interval, "interval", 2, "Polling interval in seconds")
-	flag.BoolVar(&options.InterceptBIID, "intercept-biid", false, "Automatic BIID intercept")
-	flag.IntVar(&options.InterceptBIIDTimeout, "intercept-biid-timeout", 120, "Automatic BIID intercept Timeout")
 	flag.StringVar(&options.HTTPMessage, "message-http", defaultHTTPMessage, "HTTP Message")
 	flag.StringVar(&options.DNSMessage, "message-dns", defaultDNSMessage, "DNS Message")
 
@@ -123,6 +125,9 @@ func (options *Options) writeDefaultConfig() {
 	//nolint:goconst // test data
 	dummyConfig.DiscordWebHookAvatarURL = "test"
 	dummyConfig.Discord = true
+	dummyConfig.TelegramAPIKey = "123456879"
+	dummyConfig.TelegramChatID = "123"
+	dummyConfig.Telegram = true
 	dummyConfig.Interval = 2
 	dummyConfig.HTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n" +
 		"```\n" +
@@ -179,7 +184,7 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 		gologger.Fatalf("Could not read configuration file %s: %s\n", configFileName, err)
 	}
 
-	if configFile.BIID != "" && !options.InterceptBIID {
+	if configFile.BIID != "" {
 		options.BIID = configFile.BIID
 	}
 	if configFile.SlackWebHookURL != "" {
@@ -205,6 +210,15 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	}
 	if configFile.Discord {
 		options.Discord = configFile.Discord
+	}
+	if configFile.TelegramAPIKey != "" {
+		options.TelegramAPIKey = configFile.TelegramAPIKey
+	}
+	if configFile.TelegramChatID != "" {
+		options.TelegramChatID = configFile.TelegramChatID
+	}
+	if configFile.Telegram {
+		options.Telegram = configFile.Telegram
 	}
 	if configFile.HTTPMessage != "" {
 		options.HTTPMessage = configFile.HTTPMessage

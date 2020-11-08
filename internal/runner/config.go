@@ -25,9 +25,15 @@ type ConfigFile struct {
 	DiscordWebHookUsername  string `yaml:"discord_username,omitempty"`
 	DiscordWebHookAvatarURL string `yaml:"discord_avatar,omitempty"`
 	Discord                 bool   `yaml:"discord,omitempty"`
-	Interval                int    `yaml:"interval,omitempty"`
-	HTTPMessage             string `yaml:"http_message,omitempty"`
-	DNSMessage              string `yaml:"dns_message,omitempty"`
+
+	// Telegram
+	TelegramAPIKey string `yaml:"telegram_apikey,omitempty"`
+	TelegramChatID string `yaml:"telegram_chat_id,omitempty"`
+	Telegram       bool   `yaml:"telegram,omitempty"`
+
+	Interval    int    `yaml:"interval,omitempty"`
+	HTTPMessage string `yaml:"http_message,omitempty"`
+	DNSMessage  string `yaml:"dns_message,omitempty"`
 }
 
 // GetConfigDirectory from the system

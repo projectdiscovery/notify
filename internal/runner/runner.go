@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/projectdiscovery/collaborator"
-	colbiid "github.com/projectdiscovery/collaborator/biid"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify"
 )
@@ -39,6 +38,9 @@ func NewRunner(options *Options) (*Runner, error) {
 		DiscordWebHookUsername:  options.DiscordWebHookUsername,
 		DiscordWebHookAvatarURL: options.DiscordWebHookAvatarURL,
 		Discord:                 options.Discord,
+		TelegramAPIKey:          options.TelegramAPIKey,
+		TelegramChatID:          options.TelegramChatID,
+		Telegram:                options.Telegram,
 	})
 	if err != nil {
 		return nil, err
@@ -66,19 +68,6 @@ func (r *Runner) Run() error {
 	if r.options.BIID != "" {
 		gologger.Printf("Using BIID: %s", r.options.BIID)
 		r.burpcollab.AddBIID(r.options.BIID)
-	} else if r.options.InterceptBIID {
-		if os.Getuid() != 0 {
-			gologger.Warningf("Command may fail as the program is not running as root and unable to access raw sockets")
-		}
-		gologger.Printf("Attempting to intercept BIID")
-		// otherwise attempt to retrieve it
-		biid, err := colbiid.Intercept(time.Duration(r.options.InterceptBIIDTimeout) * time.Second)
-		if err != nil {
-			return err
-		}
-		gologger.Printf("BIID found, using: %s", biid)
-		r.options.BIID = biid
-		r.burpcollab.AddBIID(biid)
 	}
 
 	if r.options.BIID == "" {
