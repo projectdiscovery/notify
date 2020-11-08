@@ -16,6 +16,7 @@ import (
 const (
 	defaultHTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n```\n{{request}}\n{{response}}```"
 	defaultDNSMessage  = "The collaborator server received a DNS lookup of type {{type}} for the domain name {{domain}} from {{from}} at {{time}}:\n```{{request}}```"
+	defaultCLIMessage  = "{{data}}"
 )
 
 // Runner contains the internal logic of the program
@@ -56,6 +57,10 @@ func (r *Runner) Run() error {
 		br := bufio.NewScanner(os.Stdin)
 		for br.Scan() {
 			msg := br.Text()
+			rr := strings.NewReplacer(
+				"{{data}}", msg,
+			)
+			msg = rr.Replace(r.options.CLIMessage)
 			gologger.Printf(msg)
 			//nolint:errcheck // silent fail
 			r.notifier.SendNotification(msg)

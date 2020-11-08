@@ -32,6 +32,7 @@ type Options struct {
 	Interval                int
 	HTTPMessage             string
 	DNSMessage              string
+	CLIMessage              string
 }
 
 // ParseConfigFileOrOptions combining all settings
@@ -57,6 +58,7 @@ func ParseConfigFileOrOptions() *Options {
 	flag.IntVar(&options.Interval, "interval", 2, "Polling interval in seconds")
 	flag.StringVar(&options.HTTPMessage, "message-http", defaultHTTPMessage, "HTTP Message")
 	flag.StringVar(&options.DNSMessage, "message-dns", defaultDNSMessage, "DNS Message")
+	flag.StringVar(&options.CLIMessage, "message-cli", defaultCLIMessage, "CLI Message")
 
 	flag.Parse()
 
@@ -138,6 +140,7 @@ func (options *Options) writeDefaultConfig() {
 		"```\n" +
 		"{{request}}\n" +
 		"```"
+	dummyConfig.CLIMessage = "{{data}}"
 
 	err = dummyConfig.MarshalWrite(configFile)
 	if err != nil {
@@ -225,6 +228,9 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	}
 	if configFile.DNSMessage != "" {
 		options.DNSMessage = configFile.DNSMessage
+	}
+	if configFile.CLIMessage != "" {
+		options.CLIMessage = configFile.CLIMessage
 	}
 	if configFile.Interval > 0 {
 		options.Interval = configFile.Interval
