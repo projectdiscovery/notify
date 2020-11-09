@@ -241,9 +241,10 @@ dns_message: |
 - Config file has priority over CLI arguments.
 - Telegram notifcation does not support burp collaborator.
 
-## Reference:- 
+## References:- 
 
-- [Creating slack webhook](https://slack.com/intl/en-it/help/articles/115005265063-Incoming-webhooks-for-Slack).
-- [Creating discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
+- [Creating Slack webhook](https://slack.com/intl/en-it/help/articles/115005265063-Incoming-webhooks-for-Slack)
+- [Creating Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
+- [Creating Telegram bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
 
 Notify is made with 🖤 by the [projectdiscovery](https://projectdiscovery.io) team.
