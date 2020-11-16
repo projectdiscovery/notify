@@ -12,6 +12,7 @@ import (
 	"github.com/projectdiscovery/gologger"
 )
 
+// Options to handle intercept
 type Options struct {
 	InterceptBIIDTimeout int
 }
