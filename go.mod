@@ -9,7 +9,7 @@ require (
 	github.com/projectdiscovery/collaborator v0.0.1
 	github.com/projectdiscovery/gologger v1.0.1
 	github.com/projectdiscovery/retryablehttp-go v1.0.1
-	golang.org/x/crypto v0.0.0-20201116153603-4be66e5b6582 // indirect
+	golang.org/x/crypto v0.0.0-20201117144127-c1f2f97bffc9 // indirect
 	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect
-	golang.org/x/sys v0.0.0-20201116194326-cc9327a14d48 // indirect
+	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
 )
