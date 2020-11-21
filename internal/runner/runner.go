@@ -17,6 +17,7 @@ const (
 	defaultHTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n```\n{{request}}\n{{response}}```"
 	defaultDNSMessage  = "The collaborator server received a DNS lookup of type {{type}} for the domain name {{domain}} from {{from}} at {{time}}:\n```{{request}}```"
 	defaultCLIMessage  = "{{data}}"
+	defaultSMTPMessage = "{{data}}"
 )
 
 // Runner contains the internal logic of the program
@@ -42,6 +43,9 @@ func NewRunner(options *Options) (*Runner, error) {
 		TelegramAPIKey:          options.TelegramAPIKey,
 		TelegramChatID:          options.TelegramChatID,
 		Telegram:                options.Telegram,
+		SMTP:                    options.SMTP,
+		SMTPProviders:           options.SMTPProviders,
+		SMTPCC:                  options.SMTPCC,
 	})
 	if err != nil {
 		return nil, err

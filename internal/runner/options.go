@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/notify"
 )
 
 // Options of the internal runner
@@ -25,6 +26,9 @@ type Options struct {
 	TelegramAPIKey          string
 	TelegramChatID          string
 	Telegram                bool
+	SMTP                    bool
+	SMTPProviders           []notify.SMTPProvider
+	SMTPCC                  []string
 	Verbose                 bool
 	NoColor                 bool
 	Silent                  bool
@@ -33,6 +37,7 @@ type Options struct {
 	HTTPMessage             string
 	DNSMessage              string
 	CLIMessage              string
+	SMTPMessage             string
 }
 
 // ParseConfigFileOrOptions combining all settings
@@ -59,6 +64,7 @@ func ParseConfigFileOrOptions() *Options {
 	flag.StringVar(&options.HTTPMessage, "message-http", defaultHTTPMessage, "HTTP Message")
 	flag.StringVar(&options.DNSMessage, "message-dns", defaultDNSMessage, "DNS Message")
 	flag.StringVar(&options.CLIMessage, "message-cli", defaultCLIMessage, "CLI Message")
+	flag.StringVar(&options.SMTPMessage, "message-smtp", defaultSMTPMessage, "SMTP Message")
 
 	flag.Parse()
 
@@ -132,6 +138,14 @@ func (options *Options) writeDefaultConfig() {
 	dummyConfig.TelegramAPIKey = "123456879"
 	dummyConfig.TelegramChatID = "123"
 	dummyConfig.Telegram = true
+	dummyConfig.SMTPProviders = append(dummyConfig.SMTPProviders, notify.SMTPProvider{
+		AuthenticationType: "basic",
+		Server:             "smtp.server.something:25",
+		Username:           "myusername@oremail.address",
+		Password:           "mysecretpassword",
+	})
+	dummyConfig.SMTPCC = append(dummyConfig.SMTPCC, "receiver@email.address")
+	dummyConfig.SMTP = true
 	dummyConfig.Interval = 2
 	dummyConfig.HTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n" +
 		"```\n" +
@@ -143,6 +157,7 @@ func (options *Options) writeDefaultConfig() {
 		"{{request}}\n" +
 		"```"
 	dummyConfig.CLIMessage = "{{data}}"
+	dummyConfig.SMTPMessage = "{{data}}"
 
 	err = dummyConfig.MarshalWrite(configFile)
 	if err != nil {
@@ -225,6 +240,15 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	if configFile.Telegram {
 		options.Telegram = configFile.Telegram
 	}
+	if len(configFile.SMTPProviders) > 0 {
+		options.SMTPProviders = configFile.SMTPProviders
+	}
+	if len(configFile.SMTPCC) > 0 {
+		options.SMTPCC = configFile.SMTPCC
+	}
+	if configFile.SMTP {
+		options.SMTP = configFile.SMTP
+	}
 	if configFile.HTTPMessage != "" {
 		options.HTTPMessage = configFile.HTTPMessage
 	}
@@ -233,6 +257,9 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	}
 	if configFile.CLIMessage != "" {
 		options.CLIMessage = configFile.CLIMessage
+	}
+	if configFile.SMTPMessage != "" {
+		options.SMTPMessage = configFile.SMTPMessage
 	}
 	if configFile.Interval > 0 {
 		options.Interval = configFile.Interval

@@ -12,6 +12,7 @@ type Notify struct {
 	slackClient    *SlackClient
 	discordClient  *DiscordClient
 	telegramClient *TelegramClient
+	smtpClient     *SMTPClient
 }
 
 // New notify instance
@@ -44,7 +45,12 @@ func NewWithOptions(options *Options) (*Notify, error) {
 		apiKEY: options.TelegramAPIKey,
 		chatID: options.TelegramChatID,
 	}
-	return &Notify{options: options, slackClient: SlackClient, discordClient: discordClient, telegramClient: telegramClient}, nil
+	smtpClient := &SMTPClient{
+		Providers: options.SMTPProviders,
+		CC:        options.SMTPCC,
+	}
+
+	return &Notify{options: options, slackClient: SlackClient, discordClient: discordClient, telegramClient: telegramClient, smtpClient: smtpClient}, nil
 }
 
 // SendNotification to registered webhooks
@@ -67,6 +73,13 @@ func (n *Notify) SendNotification(message string) error {
 
 	if n.options.Telegram {
 		err := n.telegramClient.SendInfo(message)
+		if err != nil {
+			return err
+		}
+	}
+
+	if n.options.SMTP {
+		err := n.smtpClient.SendInfo(message)
 		if err != nil {
 			return err
 		}
