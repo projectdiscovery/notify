@@ -63,8 +63,8 @@ func ParseConfigFileOrOptions() *Options {
 	flag.IntVar(&options.Interval, "interval", 2, "Polling interval in seconds")
 	flag.StringVar(&options.HTTPMessage, "message-http", defaultHTTPMessage, "HTTP Message")
 	flag.StringVar(&options.DNSMessage, "message-dns", defaultDNSMessage, "DNS Message")
-	flag.StringVar(&options.CLIMessage, "message-cli", defaultCLIMessage, "CLI Message")
 	flag.StringVar(&options.SMTPMessage, "message-smtp", defaultSMTPMessage, "SMTP Message")
+	flag.StringVar(&options.CLIMessage, "message-cli", defaultCLIMessage, "CLI Message")
 
 	flag.Parse()
 
@@ -156,8 +156,13 @@ func (options *Options) writeDefaultConfig() {
 		"```\n" +
 		"{{request}}\n" +
 		"```"
+	dummyConfig.SMTPMessage = "The collaborator server received an SMTP connection from IP address {{from}} at {{time}}.\n" +
+		"The email details were:\n\n" +
+		"From:\n{{sender}}\n\n" +
+		"To:\n{{recipients}}\n\n" +
+		"Message:\n{{message}}\n\n" +
+		"SMTP Conversation:\n{{conversation}}"
 	dummyConfig.CLIMessage = "{{data}}"
-	dummyConfig.SMTPMessage = "{{data}}"
 
 	err = dummyConfig.MarshalWrite(configFile)
 	if err != nil {
@@ -255,11 +260,11 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	if configFile.DNSMessage != "" {
 		options.DNSMessage = configFile.DNSMessage
 	}
-	if configFile.CLIMessage != "" {
-		options.CLIMessage = configFile.CLIMessage
-	}
 	if configFile.SMTPMessage != "" {
 		options.SMTPMessage = configFile.SMTPMessage
+	}
+	if configFile.CLIMessage != "" {
+		options.CLIMessage = configFile.CLIMessage
 	}
 	if configFile.Interval > 0 {
 		options.Interval = configFile.Interval

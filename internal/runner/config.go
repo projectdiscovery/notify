@@ -40,8 +40,8 @@ type ConfigFile struct {
 	Interval    int    `yaml:"interval,omitempty"`
 	HTTPMessage string `yaml:"http_message,omitempty"`
 	DNSMessage  string `yaml:"dns_message,omitempty"`
-	CLIMessage  string `yaml:"cli_message,omitempty"`
 	SMTPMessage string `yaml:"smtp_message,omitempty"`
+	CLIMessage  string `yaml:"cli_message,omitempty"`
 }
 
 // GetConfigDirectory from the system
