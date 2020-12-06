@@ -2,47 +2,42 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
+	"strings"
 
-	"github.com/projectdiscovery/collaborator/biid"
+	"github.com/elazarl/goproxy"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/proxify"
 )
 
 // Options to handle intercept
 type Options struct {
-	InterceptBIIDTimeout int
+	ListenAddress string
 }
 
 func main() {
 	var options Options
-	flag.IntVar(&options.InterceptBIIDTimeout, "intercept-biid-timeout", 600, "Automatic BIID intercept Timeout")
+	flag.StringVar(&options.ListenAddress, "listen-address", ":8888", "Listen Port")
 
-	// Setup close handler
-	go func() {
-		c := make(chan os.Signal)
-		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-		go func() {
-			<-c
-			fmt.Println("\r- Ctrl+C pressed in Terminal")
-			os.Exit(0)
-		}()
-	}()
+	gologger.Printf("Starting Intercepting Proxy")
+	proxy := proxify.NewProxy(&proxify.Options{
+		ListenAddr: options.ListenAddress,
+		// Verbose:    true,
+		OnRequestCallback: func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			if req.Host == "polling.burpcollaborator.net" && strings.HasSuffix(req.URL.Path, "/burpresults") {
+				interceptedBiid := req.URL.Query().Get("biid")
+				if interceptedBiid != "" {
+					gologger.Printf("BIID found: %s", interceptedBiid)
+					os.Exit(0)
+				}
+			}
+			return req, nil
+		},
+		OnResponseCallback: func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
+			return resp
+		},
+	})
 
-	if os.Getuid() != 0 {
-		gologger.Fatalf("The program is not running as root and unable to access raw sockets")
-	}
-	gologger.Printf("Attempting to intercept BIID")
-	// otherwise attempt to retrieve it
-	interceptedBiid, err := biid.Intercept(time.Duration(options.InterceptBIIDTimeout) * time.Second)
-	if err != nil {
-		gologger.Fatalf("%s", err)
-	}
-	if interceptedBiid == "" {
-		gologger.Fatalf("BIID not found")
-	}
-	gologger.Printf("BIID found: %s", interceptedBiid)
+	gologger.Printf("%s", proxy.Run())
 }
