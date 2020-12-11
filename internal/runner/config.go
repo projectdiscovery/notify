@@ -4,8 +4,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/Shopify/yaml"
 	"github.com/projectdiscovery/notify"
+	"gopkg.in/yaml.v2"
 )
 
 // ConfigDefaultFilename containing configuration
