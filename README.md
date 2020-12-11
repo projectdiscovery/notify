@@ -113,9 +113,11 @@ Installing Intercept -
 
 # Intercept BIID
 
-- Run intercept as root `sudo intercept`
+- Run intercept `intercept`
 - Open Burp Suite => Project Options => Misc
 - Tick `Pull Over HTTP`
+- Go to Options => Connections => Upstream Proxy Servers
+- Add `localhost:8888` (or the custom intercept listening port) as upstream proxy
 - Generate **new** collaborator, click on **Poll now**. 
 - Intercept will capture `biid` that can be used with `notify`
 
