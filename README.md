@@ -88,13 +88,13 @@ Notify requires **go1.14+** to install successfully. Run the following command t
 Installing Notify -
 
 ```sh
-▶ GO111MODULE=on go get -u -v github.com/projectdiscovery/notify/cmd/notify
+▶ GO111MODULE=on go get -v github.com/projectdiscovery/notify/cmd/notify
 ```
 
 Installing Intercept - 
 
 ```sh
-▶ GO111MODULE=on go get -u -v github.com/projectdiscovery/notify/cmd/intercept
+▶ GO111MODULE=on go get -v github.com/projectdiscovery/notify/cmd/intercept
 ```
 
 ### From Github
