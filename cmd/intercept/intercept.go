@@ -20,7 +20,7 @@ func main() {
 	var options Options
 	flag.StringVar(&options.ListenAddress, "listen-address", ":8888", "Listen Port")
 
-	gologger.Printf("Starting Intercepting Proxy")
+	gologger.Print().Msgf("Starting Intercepting Proxy")
 	proxy := proxify.NewProxy(&proxify.Options{
 		ListenAddr: options.ListenAddress,
 		// Verbose:    true,
@@ -28,7 +28,7 @@ func main() {
 			if req.Host == "polling.burpcollaborator.net" && strings.HasSuffix(req.URL.Path, "/burpresults") {
 				interceptedBiid := req.URL.Query().Get("biid")
 				if interceptedBiid != "" {
-					gologger.Printf("BIID found: %s", interceptedBiid)
+					gologger.Print().Msgf("BIID found: %s", interceptedBiid)
 					os.Exit(0)
 				}
 			}
@@ -39,5 +39,5 @@ func main() {
 		},
 	})
 
-	gologger.Printf("%s", proxy.Run())
+	gologger.Print().Msgf("%s", proxy.Run())
 }

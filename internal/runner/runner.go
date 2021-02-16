@@ -65,7 +65,7 @@ func (r *Runner) Run() error {
 				"{{data}}", msg,
 			)
 			msg = rr.Replace(r.options.CLIMessage)
-			gologger.Printf(msg)
+			gologger.Print().Msgf(msg)
 			//nolint:errcheck // silent fail
 			r.notifier.SendNotification(msg)
 		}
@@ -75,7 +75,7 @@ func (r *Runner) Run() error {
 	// otherwise works as long term collaborator poll and notify via webhook
 	// If BIID passed via cli
 	if r.options.BIID != "" {
-		gologger.Printf("Using BIID: %s", r.options.BIID)
+		gologger.Print().Msgf("Using BIID: %s", r.options.BIID)
 		r.burpcollab.AddBIID(r.options.BIID)
 	}
 
@@ -111,7 +111,7 @@ func (r *Runner) Run() error {
 					)
 
 					msg := rr.Replace(r.options.HTTPMessage)
-					gologger.Printf(msg)
+					gologger.Print().Msgf(msg)
 
 					//nolint:errcheck // silent fail
 					r.notifier.SendNotification(msg)
@@ -124,7 +124,7 @@ func (r *Runner) Run() error {
 						"{{request}}", resp.Data.RawRequestDecoded,
 					)
 					msg := rr.Replace(r.options.DNSMessage)
-					gologger.Printf(msg)
+					gologger.Print().Msgf(msg)
 
 					//nolint:errcheck // silent fail
 					r.notifier.SendNotification(msg)
@@ -138,7 +138,7 @@ func (r *Runner) Run() error {
 						"{{conversation}}", resp.Data.ConversationDecoded,
 					)
 					msg := rr.Replace(r.options.SMTPMessage)
-					gologger.Printf(msg)
+					gologger.Print().Msgf(msg)
 
 					//nolint:errcheck // silent fail
 					r.notifier.SendNotification(msg)
