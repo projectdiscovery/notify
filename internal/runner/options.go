@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
 	"github.com/projectdiscovery/notify"
 )
@@ -97,10 +98,9 @@ func (options *Options) configureOutput() {
 	if options.Verbose {
 		gologger.DefaultLogger.SetMaxLevel(levels.LevelVerbose)
 	}
-	// Not used
-	// if options.NoColor {
-	// 	gologger.UseColors = false
-	// }
+	if options.NoColor {
+		gologger.DefaultLogger.SetFormatter(formatter.NewCLI(true))
+	}
 	if options.Silent {
 		gologger.DefaultLogger.SetMaxLevel(levels.LevelSilent)
 	}
