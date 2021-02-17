@@ -115,7 +115,7 @@ Installing Intercept -
 
 - Run intercept as root `sudo intercept`
 - Open Burp Suite => Project Options => Misc
-- Tick `Pull Over HTTP`
+- Tick `Poll over unencrypted HTTP` (in v2020.12.1)
 - Generate **new** collaborator, click on **Poll now**. 
 - Intercept will capture `biid` that can be used with `notify`
 
@@ -239,7 +239,7 @@ dns_message: |
 - You can obtain the **biid** with wireshark on any platform and configure it within the config file.
 - Burp collaborator server allow to fetch results only for once, so if you are using this, you will **not** see results in burp collaborator window.
 - Config file has priority over CLI arguments.
-- Telegram notifcation does not support burp collaborator.
+- Telegram notification does not support burp collaborator.
 
 ## References:- 
 
