@@ -50,7 +50,7 @@ func (sm *SMTPClient) SendInfo(message string) (err error) {
 
 		err := smtp.SendMail(provider.Server, auth, provider.Username, sm.CC, []byte(message))
 		if err != nil {
-			gologger.Errorf("%s\n", err)
+			gologger.Fatal().Msgf("%s\n", err)
 			return err
 		}
 	}

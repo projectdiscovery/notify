@@ -8,6 +8,8 @@ import (
 	"os"
 
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/gologger/formatter"
+	"github.com/projectdiscovery/gologger/levels"
 	"github.com/projectdiscovery/notify"
 )
 
@@ -75,14 +77,14 @@ func ParseConfigFileOrOptions() *Options {
 	options.writeDefaultConfig()
 
 	if options.Version {
-		gologger.Infof("Current Version: %s\n", Version)
+		gologger.Info().Msgf("Current Version: %s\n", Version)
 		os.Exit(0)
 	}
 
 	// If a config file is provided, merge the options
 	defaultConfigPath, err := getDefaultConfigFile()
 	if err != nil {
-		gologger.Errorf("Program exiting: %s\n", err)
+		gologger.Error().Msgf("Program exiting: %s\n", err)
 	}
 	options.MergeFromConfig(defaultConfigPath, true)
 
@@ -94,30 +96,30 @@ func ParseConfigFileOrOptions() *Options {
 
 func (options *Options) configureOutput() {
 	if options.Verbose {
-		gologger.MaxLevel = gologger.Verbose
+		gologger.DefaultLogger.SetMaxLevel(levels.LevelVerbose)
 	}
 	if options.NoColor {
-		gologger.UseColors = false
+		gologger.DefaultLogger.SetFormatter(formatter.NewCLI(true))
 	}
 	if options.Silent {
-		gologger.MaxLevel = gologger.Silent
+		gologger.DefaultLogger.SetMaxLevel(levels.LevelSilent)
 	}
 }
 
 func (options *Options) writeDefaultConfig() {
 	configFile, err := getDefaultConfigFile()
 	if err != nil {
-		gologger.Printf("Could not get default configuration file: %s\n", err)
+		gologger.Print().Msgf("Could not get default configuration file: %s\n", err)
 	}
 
 	if fileExists(configFile) {
-		gologger.Printf("Found existing config file: %s\n", configFile)
+		gologger.Print().Msgf("Found existing config file: %s\n", configFile)
 		return
 	}
 
 	// Skip config file creation if run as root to avoid permission issues
 	if os.Getuid() == 0 {
-		gologger.Printf("Running as root, skipping config file write to avoid permissions issues: %s\n", configFile)
+		gologger.Print().Msgf("Running as root, skipping config file write to avoid permissions issues: %s\n", configFile)
 		return
 	}
 
@@ -166,20 +168,20 @@ func (options *Options) writeDefaultConfig() {
 
 	err = dummyConfig.MarshalWrite(configFile)
 	if err != nil {
-		gologger.Printf("Could not write configuration file to %s: %s\n", configFile, err)
+		gologger.Print().Msgf("Could not write configuration file to %s: %s\n", configFile, err)
 		return
 	}
 
 	// turn all lines into comments
 	origFile, err := os.Open(configFile)
 	if err != nil {
-		gologger.Printf("Could not process temporary file: %s\n", err)
+		gologger.Print().Msgf("Could not process temporary file: %s\n", err)
 		return
 	}
 	tmpFile, err := ioutil.TempFile("", "")
 	if err != nil {
 		log.Println(err)
-		gologger.Printf("Could not process temporary file: %s\n", err)
+		gologger.Print().Msgf("Could not process temporary file: %s\n", err)
 		return
 	}
 	sc := bufio.NewScanner(origFile)
@@ -195,7 +197,7 @@ func (options *Options) writeDefaultConfig() {
 	//nolint:errcheck // silent fail
 	os.Rename(tmpFileName, configFile)
 
-	gologger.Printf("Configuration file saved to %s\n", configFile)
+	gologger.Print().Msgf("Configuration file saved to %s\n", configFile)
 }
 
 // MergeFromConfig with existing options
@@ -203,10 +205,10 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	configFile, err := UnmarshalRead(configFileName)
 	if err != nil {
 		if ignoreError {
-			gologger.Printf("Could not read configuration file %s - ignoring error: %s\n", configFileName, err)
+			gologger.Print().Msgf("Could not read configuration file %s - ignoring error: %s\n", configFileName, err)
 			return
 		}
-		gologger.Fatalf("Could not read configuration file %s: %s\n", configFileName, err)
+		gologger.Print().Msgf("Could not read configuration file %s: %s\n", configFileName, err)
 	}
 
 	if configFile.BIID != "" {
