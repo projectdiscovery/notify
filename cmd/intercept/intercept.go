@@ -21,7 +21,7 @@ func main() {
 	flag.StringVar(&options.ListenAddress, "listen-address", ":8888", "Listen Port")
 
 	gologger.Print().Msgf("Starting Intercepting Proxy")
-	proxy := proxify.NewProxy(&proxify.Options{
+	proxy, err := proxify.NewProxy(&proxify.Options{
 		ListenAddr: options.ListenAddress,
 		// Verbose:    true,
 		OnRequestCallback: func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
@@ -38,6 +38,9 @@ func main() {
 			return resp
 		},
 	})
+	if err != nil {
+		gologger.Fatal().Msgf("%s\n", err)
+	}
 
 	gologger.Print().Msgf("%s", proxy.Run())
 }
