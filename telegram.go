@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"net/url"
 
 	"github.com/projectdiscovery/retryablehttp-go"
 )
@@ -14,7 +15,7 @@ import (
 // DefaultTelegraTimeout to conclude operations
 const (
 	DefaultTelegraTimeout = 5 * time.Second
-	Endpoint              = "https://api.telegram.org/bot{{apikey}}/sendMessage?chat_id={{chatid}}&text={{message}}"
+	Endpoint              = "https://api.telegram.org/bot{{apikey}}/sendMessage?chat_id={{chatid}}&text={{message}}&parse_mode=Markdown"
 )
 
 // TelegramClient handling webhooks
@@ -34,7 +35,7 @@ func (dc *TelegramClient) sendHTTPRequest(message string) error {
 	r := strings.NewReplacer(
 		"{{apikey}}", dc.apiKEY,
 		"{{chatid}}", dc.chatID,
-		"{{message}}", message,
+		"{{message}}", url.QueryEscape(message),
 	)
 	URL := r.Replace(Endpoint)
 	req, err := retryablehttp.NewRequest(http.MethodGet, URL, nil)
