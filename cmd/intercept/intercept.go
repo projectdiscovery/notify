@@ -22,8 +22,8 @@ func main() {
 
 	gologger.Print().Msgf("Starting Intercepting Proxy")
 	proxy, err := proxify.NewProxy(&proxify.Options{
-		ListenAddr: options.ListenAddress,
-		// Verbose:    true,
+		ListenAddr:    options.ListenAddress,
+		CertCacheSize: 256,
 		OnRequestCallback: func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			if req.Host == "polling.burpcollaborator.net" && strings.HasSuffix(req.URL.Path, "/burpresults") {
 				interceptedBiid := req.URL.Query().Get("biid")
