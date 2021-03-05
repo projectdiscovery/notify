@@ -1,13 +1,14 @@
-package notify
+package engine
 
 import (
 	"github.com/acarl005/stripansi"
+	"github.com/projectdiscovery/notify/pkg/types"
 	"github.com/projectdiscovery/retryablehttp-go"
 )
 
 // Notify handles the notification engine
 type Notify struct {
-	options        *Options
+	options        *types.Options
 	client         *retryablehttp.Client
 	slackClient    *SlackClient
 	discordClient  *DiscordClient
@@ -22,7 +23,7 @@ func New() (*Notify, error) {
 }
 
 // NewWithOptions create a new instance of notify with options
-func NewWithOptions(options *Options) (*Notify, error) {
+func NewWithOptions(options *types.Options) (*Notify, error) {
 	notifier, err := New()
 	if err != nil {
 		return nil, err

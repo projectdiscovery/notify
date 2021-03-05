@@ -1,10 +1,11 @@
-package notify
+package engine
 
 import (
 	"net/smtp"
 	"time"
 
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/notify/pkg/types"
 )
 
 // DefaultTelegraTimeout to conclude operations
@@ -28,7 +29,7 @@ type SMTPProvider struct {
 
 // TelegramClient handling webhooks
 type SMTPClient struct {
-	Providers []SMTPProvider
+	Providers []types.SMTPProvider
 	CC        []string
 	TimeOut   time.Duration
 }

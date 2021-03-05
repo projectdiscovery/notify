@@ -6,6 +6,8 @@ github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d h1:licZJFw2RwpH
 github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d/go.mod h1:asat636LX7Bqt5lYEZ27JNDcqxfjdBQuJ/MM4CN/Lzo=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
+github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08 h1:ox2F0PSMlrAAiAdknSRMDrAr8mfxPCfSZolH+/qQnyQ=
+github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08/go.mod h1:pCxVEbcm3AMg7ejXyorUXi6HQCzOIBf7zEDVPtw0/U4=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -106,6 +108,8 @@ github.com/projectdiscovery/dsl v0.0.2 h1:7UysmR2d9CUbmNta8OFYA990FBlc/G7P6s7oNZ
 github.com/projectdiscovery/dsl v0.0.2/go.mod h1:LMhpgZjWJ8NfZokFhzyu1blLWhUutCtNA9C6bH80WOo=
 github.com/projectdiscovery/fastdialer v0.0.5 h1:wTeZRPFED1VQRcw5aGoeZ6UlhJ6Cra/Jqw2Wi5kPuis=
 github.com/projectdiscovery/fastdialer v0.0.5/go.mod h1:m20Ls/JratRO8wSSpvOMIKu4aFDh9c5zwCH8+5JO0nA=
+github.com/projectdiscovery/goflags v0.0.2 h1:4vB5+mA41xgW6V1y4YD1A+iI8Kq68iTTny50XuSYKdo=
+github.com/projectdiscovery/goflags v0.0.2/go.mod h1:Ae1mJ5MIIqjys0lFe3GiMZ10Z8VLaxkYJ1ySA4Zv8HA=
 github.com/projectdiscovery/gologger v1.1.3 h1:rKWZW2QUigRV1jnlWwWJbJRvz8b+T/+bB5qemDGGBJU=
 github.com/projectdiscovery/gologger v1.1.3/go.mod h1:jdXflz3TLB8bcVNzb0v26TztI9KPz8Lr4BVdUhNUs6E=
 github.com/projectdiscovery/gologger v1.1.4 h1:qWxGUq7ukHWT849uGPkagPKF3yBPYAsTtMKunQ8O2VI=

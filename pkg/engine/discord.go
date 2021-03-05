@@ -1,4 +1,4 @@
-package notify
+package engine
 
 // From https://dev.to/arunx2/simple-slack-notification-with-golang-55i2
 

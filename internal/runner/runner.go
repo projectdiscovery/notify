@@ -10,7 +10,8 @@ import (
 
 	"github.com/projectdiscovery/collaborator"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/notify"
+	"github.com/projectdiscovery/notify/pkg/engine"
+	"github.com/projectdiscovery/notify/pkg/types"
 )
 
 const (
@@ -22,31 +23,16 @@ const (
 
 // Runner contains the internal logic of the program
 type Runner struct {
-	options    *Options
+	options    *types.Options
 	burpcollab *collaborator.BurpCollaborator
-	notifier   *notify.Notify
+	notifier   *engine.Notify
 }
 
 // NewRunner instance
-func NewRunner(options *Options) (*Runner, error) {
+func NewRunner(options *types.Options) (*Runner, error) {
 	burpcollab := collaborator.NewBurpCollaborator()
 
-	notifier, err := notify.NewWithOptions(&notify.Options{
-		SlackWebHookURL:         options.SlackWebHookURL,
-		SlackUsername:           options.SlackUsername,
-		SlackChannel:            options.SlackChannel,
-		Slack:                   options.Slack,
-		DiscordWebHookURL:       options.DiscordWebHookURL,
-		DiscordWebHookUsername:  options.DiscordWebHookUsername,
-		DiscordWebHookAvatarURL: options.DiscordWebHookAvatarURL,
-		Discord:                 options.Discord,
-		TelegramAPIKey:          options.TelegramAPIKey,
-		TelegramChatID:          options.TelegramChatID,
-		Telegram:                options.Telegram,
-		SMTP:                    options.SMTP,
-		SMTPProviders:           options.SMTPProviders,
-		SMTPCC:                  options.SMTPCC,
-	})
+	notifier, err := engine.NewWithOptions(options)
 	if err != nil {
 		return nil, err
 	}
