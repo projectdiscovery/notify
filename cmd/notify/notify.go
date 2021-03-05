@@ -47,6 +47,7 @@ func main() {
 
 func readConfig() {
 	set := goflags.New()
+	set.Marshal = true
 	set.SetDescription(`Notify is a general notification tool`)
 	set.StringVar(&cfgFile, "config", "", "Notify configuration file")
 	set.StringVar(&options.BIID, "biid", "", "burp collaborator unique id")

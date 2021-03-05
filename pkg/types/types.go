@@ -25,6 +25,16 @@ type Options struct {
 	SMTPCC        []string       `yaml:"smtp_cc,omitempty"`
 	SMTP          bool           `yaml:"smtp,omitempty"`
 
+	// Pushover
+	Pushover         bool     `yaml:"pushover,omitempty"`
+	PushoverApiToken string   `yaml:"pushover_api_token,omitempty"`
+	UserKey          string   `yaml:"pushover_user_key,omitempty"`
+	PushoverDevices  []string `yaml:"pushover_devices,omitempty"`
+
+	// Teams
+	Teams           bool   `yaml:"teams,omitempty"`
+	TeamsWebHookURL string `yaml:"teams_webhook_url,omitempty"`
+
 	Verbose     bool
 	NoColor     bool
 	Silent      bool
@@ -38,8 +48,8 @@ type Options struct {
 }
 
 type SMTPProvider struct {
-	Server             string `yaml:"smtp_server,omitempty"`
-	Username           string `yaml:"smtp_username,omitempty"`
-	Password           string `yaml:"smtp_password,omitempty"`
-	AuthenticationType string `yaml:"smtp_authentication_type,omitempty"`
+	Server      string `yaml:"smtp_server,omitempty"`
+	Username    string `yaml:"smtp_username,omitempty"`
+	Password    string `yaml:"smtp_password,omitempty"`
+	FromAddress string `yaml:"from_address,omitempty"`
 }

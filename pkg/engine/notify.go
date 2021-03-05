@@ -1,57 +1,28 @@
 package engine
 
 import (
+	"errors"
+	"fmt"
+	"strings"
+
 	"github.com/acarl005/stripansi"
+	"github.com/containrrr/shoutrrr"
 	"github.com/projectdiscovery/notify/pkg/types"
-	"github.com/projectdiscovery/retryablehttp-go"
 )
 
 // Notify handles the notification engine
 type Notify struct {
-	options        *types.Options
-	client         *retryablehttp.Client
-	slackClient    *SlackClient
-	discordClient  *DiscordClient
-	telegramClient *TelegramClient
-	smtpClient     *SMTPClient
+	options *types.Options
 }
 
 // New notify instance
 func New() (*Notify, error) {
-	retryhttp := retryablehttp.NewClient(retryablehttp.DefaultOptionsSingle)
-	return &Notify{client: retryhttp}, nil
+	return &Notify{}, nil
 }
 
 // NewWithOptions create a new instance of notify with options
 func NewWithOptions(options *types.Options) (*Notify, error) {
-	notifier, err := New()
-	if err != nil {
-		return nil, err
-	}
-	SlackClient := &SlackClient{
-		client:     notifier.client,
-		WebHookURL: options.SlackWebHookURL,
-		UserName:   options.SlackUsername,
-		Channel:    options.SlackUsername,
-		TimeOut:    DefaultSlackTimeout,
-	}
-	discordClient := &DiscordClient{
-		client:     notifier.client,
-		WebHookURL: options.DiscordWebHookURL,
-		UserName:   options.DiscordWebHookUsername,
-		Avatar:     options.DiscordWebHookAvatarURL,
-	}
-	telegramClient := &TelegramClient{
-		client: notifier.client,
-		apiKEY: options.TelegramAPIKey,
-		chatID: options.TelegramChatID,
-	}
-	smtpClient := &SMTPClient{
-		Providers: options.SMTPProviders,
-		CC:        options.SMTPCC,
-	}
-
-	return &Notify{options: options, slackClient: SlackClient, discordClient: discordClient, telegramClient: telegramClient, smtpClient: smtpClient}, nil
+	return &Notify{options: options}, nil
 }
 
 // SendNotification to registered webhooks
@@ -59,28 +30,59 @@ func (n *Notify) SendNotification(message string) error {
 	// strip unsupported color control chars
 	message = stripansi.Strip(message)
 	if n.options.Slack {
-		err := n.slackClient.SendInfo(message)
+		slackTokens := strings.TrimPrefix(n.options.SlackWebHookURL, "https://hooks.slack.com/services/")
+		url := fmt.Sprintf("slack://%s", slackTokens)
+		err := shoutrrr.Send(url, message)
 		if err != nil {
 			return err
 		}
 	}
 
 	if n.options.Discord {
-		err := n.discordClient.SendInfo(message)
+		discordTokens := strings.TrimPrefix(n.options.DiscordWebHookURL, "https://discord.com/api/webhooks/")
+		tokens := strings.Split(discordTokens, "/")
+		if len(tokens) != 2 {
+			return errors.New("Wrong discord configuration")
+		}
+		webhookID, token := tokens[0], tokens[1]
+		url := fmt.Sprintf("discord://%s@%s", token, webhookID)
+		err := shoutrrr.Send(url, message)
 		if err != nil {
 			return err
 		}
 	}
 
 	if n.options.Telegram {
-		err := n.telegramClient.SendInfo(message)
+		url := fmt.Sprintf("telegram://%s@telegram?channels=%s", n.options.TelegramAPIKey, n.options.TelegramChatID)
+		err := shoutrrr.Send(url, message)
 		if err != nil {
 			return err
 		}
 	}
 
 	if n.options.SMTP {
-		err := n.smtpClient.SendInfo(message)
+		for _, provider := range n.options.SMTPProviders {
+			url := fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s", provider.Username, provider.Password, provider.Server, provider.FromAddress, strings.Join(n.options.SMTPCC, ","))
+			err := shoutrrr.Send(url, message)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	if n.options.Pushover {
+		url := fmt.Sprintf("pushover://shoutrrr:apiToken@userKey/?devices=device1[,device2, ...]", n.options.PushoverApiToken, n.options.UserKey, strings.Join(n.options.PushoverDevices, ","))
+		err := shoutrrr.Send(url, message)
+		if err != nil {
+			return err
+		}
+	}
+
+	if n.options.Teams {
+		teamsTokens := strings.TrimPrefix(n.options.TeamsWebHookURL, "https://outlook.office.com/webhook/")
+		teamsTokens = strings.ReplaceAll(teamsTokens, "IncomingWebhook/", "")
+		url := fmt.Sprintf("teams://%s", teamsTokens)
+		err := shoutrrr.Send(url, message)
 		if err != nil {
 			return err
 		}
