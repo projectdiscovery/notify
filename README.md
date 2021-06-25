@@ -73,6 +73,10 @@ This will display help for the tool. Here are all the switches it supports.
 
 # Installation Instructions
 
+## Dependencies (libpcap)
+
+``sudo apt-get install libpcap-dev``
+
 ### From Binary
 
 The installation is easy. You can download the pre-built binaries for your platform from the [releases](https://github.com/projectdiscovery/notify/releases/) page. Extract them using tar, move it to your `$PATH`and you're ready to go.
