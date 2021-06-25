@@ -1,6 +1,6 @@
 package notify
 
-// Options of internal webhooks
+// Options of internal notifications
 //nolint:maligned // used once
 type Options struct {
 	// Slack
@@ -19,4 +19,9 @@ type Options struct {
 	TelegramAPIKey string
 	TelegramChatID string
 	Telegram       bool
+
+	// SMTP
+	SMTP          bool
+	SMTPProviders []SMTPProvider
+	SMTPCC        []string
 }

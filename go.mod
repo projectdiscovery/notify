@@ -1,15 +1,13 @@
 module github.com/projectdiscovery/notify
 
-go 1.14
+go 1.15
 
 require (
-	github.com/Shopify/yaml v2.1.0+incompatible
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
-	github.com/projectdiscovery/collaborator v0.0.1
-	github.com/projectdiscovery/gologger v1.0.1
+	github.com/elazarl/goproxy v0.0.0-20210110162100-a92cc753f88e
+	github.com/projectdiscovery/collaborator v0.0.2
+	github.com/projectdiscovery/gologger v1.1.4
+	github.com/projectdiscovery/proxify v0.0.4-0.20210217225554-5384e02d9d06
 	github.com/projectdiscovery/retryablehttp-go v1.0.1
-	golang.org/x/crypto v0.0.0-20201116153603-4be66e5b6582 // indirect
-	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect
-	golang.org/x/sys v0.0.0-20201116194326-cc9327a14d48 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 )

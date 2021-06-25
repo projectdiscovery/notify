@@ -16,6 +16,7 @@ import (
 const (
 	defaultHTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n```\n{{request}}\n{{response}}```"
 	defaultDNSMessage  = "The collaborator server received a DNS lookup of type {{type}} for the domain name {{domain}} from {{from}} at {{time}}:\n```{{request}}```"
+	defaultSMTPMessage = "The collaborator server received an SMTP connection from IP address {{from}} at {{time}}\n\nThe email details were:\n\nFrom:\n{{sender}}\n\nTo:\n{{recipients}}\n\nMessage:\n{{message}}\n\nSMTP Conversation:\n{{conversation}}"
 	defaultCLIMessage  = "{{data}}"
 )
 
@@ -42,6 +43,9 @@ func NewRunner(options *Options) (*Runner, error) {
 		TelegramAPIKey:          options.TelegramAPIKey,
 		TelegramChatID:          options.TelegramChatID,
 		Telegram:                options.Telegram,
+		SMTP:                    options.SMTP,
+		SMTPProviders:           options.SMTPProviders,
+		SMTPCC:                  options.SMTPCC,
 	})
 	if err != nil {
 		return nil, err
@@ -61,7 +65,7 @@ func (r *Runner) Run() error {
 				"{{data}}", msg,
 			)
 			msg = rr.Replace(r.options.CLIMessage)
-			gologger.Printf(msg)
+			gologger.Print().Msgf(msg)
 			//nolint:errcheck // silent fail
 			r.notifier.SendNotification(msg)
 		}
@@ -71,7 +75,7 @@ func (r *Runner) Run() error {
 	// otherwise works as long term collaborator poll and notify via webhook
 	// If BIID passed via cli
 	if r.options.BIID != "" {
-		gologger.Printf("Using BIID: %s", r.options.BIID)
+		gologger.Print().Msgf("Using BIID: %s", r.options.BIID)
 		r.burpcollab.AddBIID(r.options.BIID)
 	}
 
@@ -96,7 +100,8 @@ func (r *Runner) Run() error {
 				var at int64
 				at, _ = strconv.ParseInt(resp.Time, 10, 64)
 				atTime := time.Unix(0, at*int64(time.Millisecond))
-				if resp.Protocol == "http" || resp.Protocol == "https" {
+				switch resp.Protocol {
+				case "http", "https":
 					rr := strings.NewReplacer(
 						"{{protocol}}", strings.ToUpper(resp.Protocol),
 						"{{from}}", resp.Client,
@@ -106,12 +111,11 @@ func (r *Runner) Run() error {
 					)
 
 					msg := rr.Replace(r.options.HTTPMessage)
-					gologger.Printf(msg)
+					gologger.Print().Msgf(msg)
 
 					//nolint:errcheck // silent fail
 					r.notifier.SendNotification(msg)
-				}
-				if resp.Protocol == "dns" {
+				case "dns":
 					rr := strings.NewReplacer(
 						"{{type}}", resp.Data.RequestType,
 						"{{domain}} ", resp.Data.SubDomain,
@@ -120,7 +124,21 @@ func (r *Runner) Run() error {
 						"{{request}}", resp.Data.RawRequestDecoded,
 					)
 					msg := rr.Replace(r.options.DNSMessage)
-					gologger.Printf(msg)
+					gologger.Print().Msgf(msg)
+
+					//nolint:errcheck // silent fail
+					r.notifier.SendNotification(msg)
+				case "smtp":
+					rr := strings.NewReplacer(
+						"{{from}}", resp.Client,
+						"{{time}}", atTime.String(),
+						"{{sender}}", resp.Data.SenderDecoded,
+						"{{recipients}}", strings.Join(resp.Data.RecipientsDecoded, ","),
+						"{{message}}", resp.Data.MessageDecoded,
+						"{{conversation}}", resp.Data.ConversationDecoded,
+					)
+					msg := rr.Replace(r.options.SMTPMessage)
+					gologger.Print().Msgf(msg)
 
 					//nolint:errcheck // silent fail
 					r.notifier.SendNotification(msg)

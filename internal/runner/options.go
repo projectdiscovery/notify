@@ -8,6 +8,9 @@ import (
 	"os"
 
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/gologger/formatter"
+	"github.com/projectdiscovery/gologger/levels"
+	"github.com/projectdiscovery/notify"
 )
 
 // Options of the internal runner
@@ -25,6 +28,9 @@ type Options struct {
 	TelegramAPIKey          string
 	TelegramChatID          string
 	Telegram                bool
+	SMTP                    bool
+	SMTPProviders           []notify.SMTPProvider
+	SMTPCC                  []string
 	Verbose                 bool
 	NoColor                 bool
 	Silent                  bool
@@ -33,6 +39,7 @@ type Options struct {
 	HTTPMessage             string
 	DNSMessage              string
 	CLIMessage              string
+	SMTPMessage             string
 }
 
 // ParseConfigFileOrOptions combining all settings
@@ -58,6 +65,7 @@ func ParseConfigFileOrOptions() *Options {
 	flag.IntVar(&options.Interval, "interval", 2, "Polling interval in seconds")
 	flag.StringVar(&options.HTTPMessage, "message-http", defaultHTTPMessage, "HTTP Message")
 	flag.StringVar(&options.DNSMessage, "message-dns", defaultDNSMessage, "DNS Message")
+	flag.StringVar(&options.SMTPMessage, "message-smtp", defaultSMTPMessage, "SMTP Message")
 	flag.StringVar(&options.CLIMessage, "message-cli", defaultCLIMessage, "CLI Message")
 
 	flag.Parse()
@@ -69,14 +77,14 @@ func ParseConfigFileOrOptions() *Options {
 	options.writeDefaultConfig()
 
 	if options.Version {
-		gologger.Infof("Current Version: %s\n", Version)
+		gologger.Info().Msgf("Current Version: %s\n", Version)
 		os.Exit(0)
 	}
 
 	// If a config file is provided, merge the options
 	defaultConfigPath, err := getDefaultConfigFile()
 	if err != nil {
-		gologger.Errorf("Program exiting: %s\n", err)
+		gologger.Error().Msgf("Program exiting: %s\n", err)
 	}
 	options.MergeFromConfig(defaultConfigPath, true)
 
@@ -88,30 +96,30 @@ func ParseConfigFileOrOptions() *Options {
 
 func (options *Options) configureOutput() {
 	if options.Verbose {
-		gologger.MaxLevel = gologger.Verbose
+		gologger.DefaultLogger.SetMaxLevel(levels.LevelVerbose)
 	}
 	if options.NoColor {
-		gologger.UseColors = false
+		gologger.DefaultLogger.SetFormatter(formatter.NewCLI(true))
 	}
 	if options.Silent {
-		gologger.MaxLevel = gologger.Silent
+		gologger.DefaultLogger.SetMaxLevel(levels.LevelSilent)
 	}
 }
 
 func (options *Options) writeDefaultConfig() {
 	configFile, err := getDefaultConfigFile()
 	if err != nil {
-		gologger.Printf("Could not get default configuration file: %s\n", err)
+		gologger.Print().Msgf("Could not get default configuration file: %s\n", err)
 	}
 
 	if fileExists(configFile) {
-		gologger.Printf("Found existing config file: %s\n", configFile)
+		gologger.Print().Msgf("Found existing config file: %s\n", configFile)
 		return
 	}
 
 	// Skip config file creation if run as root to avoid permission issues
 	if os.Getuid() == 0 {
-		gologger.Printf("Running as root, skipping config file write to avoid permissions issues: %s\n", configFile)
+		gologger.Print().Msgf("Running as root, skipping config file write to avoid permissions issues: %s\n", configFile)
 		return
 	}
 
@@ -132,6 +140,14 @@ func (options *Options) writeDefaultConfig() {
 	dummyConfig.TelegramAPIKey = "123456879"
 	dummyConfig.TelegramChatID = "123"
 	dummyConfig.Telegram = true
+	dummyConfig.SMTPProviders = append(dummyConfig.SMTPProviders, notify.SMTPProvider{
+		AuthenticationType: "basic",
+		Server:             "smtp.server.something:25",
+		Username:           "myusername@oremail.address",
+		Password:           "mysecretpassword",
+	})
+	dummyConfig.SMTPCC = append(dummyConfig.SMTPCC, "receiver@email.address")
+	dummyConfig.SMTP = true
 	dummyConfig.Interval = 2
 	dummyConfig.HTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n" +
 		"```\n" +
@@ -142,24 +158,30 @@ func (options *Options) writeDefaultConfig() {
 		"```\n" +
 		"{{request}}\n" +
 		"```"
+	dummyConfig.SMTPMessage = "The collaborator server received an SMTP connection from IP address {{from}} at {{time}}.\n" +
+		"The email details were:\n\n" +
+		"From:\n{{sender}}\n\n" +
+		"To:\n{{recipients}}\n\n" +
+		"Message:\n{{message}}\n\n" +
+		"SMTP Conversation:\n{{conversation}}"
 	dummyConfig.CLIMessage = "{{data}}"
 
 	err = dummyConfig.MarshalWrite(configFile)
 	if err != nil {
-		gologger.Printf("Could not write configuration file to %s: %s\n", configFile, err)
+		gologger.Print().Msgf("Could not write configuration file to %s: %s\n", configFile, err)
 		return
 	}
 
 	// turn all lines into comments
 	origFile, err := os.Open(configFile)
 	if err != nil {
-		gologger.Printf("Could not process temporary file: %s\n", err)
+		gologger.Print().Msgf("Could not process temporary file: %s\n", err)
 		return
 	}
 	tmpFile, err := ioutil.TempFile("", "")
 	if err != nil {
 		log.Println(err)
-		gologger.Printf("Could not process temporary file: %s\n", err)
+		gologger.Print().Msgf("Could not process temporary file: %s\n", err)
 		return
 	}
 	sc := bufio.NewScanner(origFile)
@@ -175,7 +197,7 @@ func (options *Options) writeDefaultConfig() {
 	//nolint:errcheck // silent fail
 	os.Rename(tmpFileName, configFile)
 
-	gologger.Printf("Configuration file saved to %s\n", configFile)
+	gologger.Print().Msgf("Configuration file saved to %s\n", configFile)
 }
 
 // MergeFromConfig with existing options
@@ -183,10 +205,10 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	configFile, err := UnmarshalRead(configFileName)
 	if err != nil {
 		if ignoreError {
-			gologger.Printf("Could not read configuration file %s - ignoring error: %s\n", configFileName, err)
+			gologger.Print().Msgf("Could not read configuration file %s - ignoring error: %s\n", configFileName, err)
 			return
 		}
-		gologger.Fatalf("Could not read configuration file %s: %s\n", configFileName, err)
+		gologger.Print().Msgf("Could not read configuration file %s: %s\n", configFileName, err)
 	}
 
 	if configFile.BIID != "" {
@@ -225,11 +247,23 @@ func (options *Options) MergeFromConfig(configFileName string, ignoreError bool)
 	if configFile.Telegram {
 		options.Telegram = configFile.Telegram
 	}
+	if len(configFile.SMTPProviders) > 0 {
+		options.SMTPProviders = configFile.SMTPProviders
+	}
+	if len(configFile.SMTPCC) > 0 {
+		options.SMTPCC = configFile.SMTPCC
+	}
+	if configFile.SMTP {
+		options.SMTP = configFile.SMTP
+	}
 	if configFile.HTTPMessage != "" {
 		options.HTTPMessage = configFile.HTTPMessage
 	}
 	if configFile.DNSMessage != "" {
 		options.DNSMessage = configFile.DNSMessage
+	}
+	if configFile.SMTPMessage != "" {
+		options.SMTPMessage = configFile.SMTPMessage
 	}
 	if configFile.CLIMessage != "" {
 		options.CLIMessage = configFile.CLIMessage

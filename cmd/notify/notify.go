@@ -15,12 +15,12 @@ func main() {
 
 	notifyRunner, err := runner.NewRunner(options)
 	if err != nil {
-		gologger.Fatalf("Could not create runner: %s\n", err)
+		gologger.Fatal().Msgf("Could not create runner: %s\n", err)
 	}
 
 	// Setup close handler
 	go func() {
-		c := make(chan os.Signal)
+		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 		go func() {
 			<-c
@@ -32,6 +32,6 @@ func main() {
 
 	err = notifyRunner.Run()
 	if err != nil {
-		gologger.Fatalf("Could not run notifier: %s\n", err)
+		gologger.Fatal().Msgf("Could not run notifier: %s\n", err)
 	}
 }
