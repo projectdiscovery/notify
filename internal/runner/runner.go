@@ -14,13 +14,6 @@ import (
 	"github.com/projectdiscovery/notify/pkg/types"
 )
 
-const (
-	defaultHTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n```\n{{request}}\n{{response}}```"
-	defaultDNSMessage  = "The collaborator server received a DNS lookup of type {{type}} for the domain name {{domain}} from {{from}} at {{time}}:\n```{{request}}```"
-	defaultSMTPMessage = "The collaborator server received an SMTP connection from IP address {{from}} at {{time}}\n\nThe email details were:\n\nFrom:\n{{sender}}\n\nTo:\n{{recipients}}\n\nMessage:\n{{message}}\n\nSMTP Conversation:\n{{conversation}}"
-	defaultCLIMessage  = "{{data}}"
-)
-
 // Runner contains the internal logic of the program
 type Runner struct {
 	options    *types.Options

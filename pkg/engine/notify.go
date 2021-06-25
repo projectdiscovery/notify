@@ -71,7 +71,7 @@ func (n *Notify) SendNotification(message string) error {
 	}
 
 	if n.options.Pushover {
-		url := fmt.Sprintf("pushover://shoutrrr:apiToken@userKey/?devices=device1[,device2, ...]", n.options.PushoverApiToken, n.options.UserKey, strings.Join(n.options.PushoverDevices, ","))
+		url := fmt.Sprintf("pushover://shoutrrr:%s@%s/?devices=%s", n.options.PushoverApiToken, n.options.UserKey, strings.Join(n.options.PushoverDevices, ","))
 		err := shoutrrr.Send(url, message)
 		if err != nil {
 			return err
