@@ -14,7 +14,7 @@ require (
 	github.com/miekg/dns v1.1.43 // indirect
 	github.com/onsi/ginkgo v1.16.4 // indirect
 	github.com/projectdiscovery/collaborator v0.0.2
-	github.com/projectdiscovery/goflags v0.0.4
+	github.com/projectdiscovery/goflags v0.0.5-0.20210625074658-a323e95c0c3b
 	github.com/projectdiscovery/gologger v1.1.4
 	github.com/projectdiscovery/proxify v0.0.4-0.20210217225554-5384e02d9d06
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
