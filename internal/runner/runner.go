@@ -10,43 +10,22 @@ import (
 
 	"github.com/projectdiscovery/collaborator"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/notify"
-)
-
-const (
-	defaultHTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n```\n{{request}}\n{{response}}```"
-	defaultDNSMessage  = "The collaborator server received a DNS lookup of type {{type}} for the domain name {{domain}} from {{from}} at {{time}}:\n```{{request}}```"
-	defaultSMTPMessage = "The collaborator server received an SMTP connection from IP address {{from}} at {{time}}\n\nThe email details were:\n\nFrom:\n{{sender}}\n\nTo:\n{{recipients}}\n\nMessage:\n{{message}}\n\nSMTP Conversation:\n{{conversation}}"
-	defaultCLIMessage  = "{{data}}"
+	"github.com/projectdiscovery/notify/pkg/engine"
+	"github.com/projectdiscovery/notify/pkg/types"
 )
 
 // Runner contains the internal logic of the program
 type Runner struct {
-	options    *Options
+	options    *types.Options
 	burpcollab *collaborator.BurpCollaborator
-	notifier   *notify.Notify
+	notifier   *engine.Notify
 }
 
 // NewRunner instance
-func NewRunner(options *Options) (*Runner, error) {
+func NewRunner(options *types.Options) (*Runner, error) {
 	burpcollab := collaborator.NewBurpCollaborator()
 
-	notifier, err := notify.NewWithOptions(&notify.Options{
-		SlackWebHookURL:         options.SlackWebHookURL,
-		SlackUsername:           options.SlackUsername,
-		SlackChannel:            options.SlackChannel,
-		Slack:                   options.Slack,
-		DiscordWebHookURL:       options.DiscordWebHookURL,
-		DiscordWebHookUsername:  options.DiscordWebHookUsername,
-		DiscordWebHookAvatarURL: options.DiscordWebHookAvatarURL,
-		Discord:                 options.Discord,
-		TelegramAPIKey:          options.TelegramAPIKey,
-		TelegramChatID:          options.TelegramChatID,
-		Telegram:                options.Telegram,
-		SMTP:                    options.SMTP,
-		SMTPProviders:           options.SMTPProviders,
-		SMTPCC:                  options.SMTPCC,
-	})
+	notifier, err := engine.NewWithOptions(options)
 	if err != nil {
 		return nil, err
 	}

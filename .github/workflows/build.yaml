@@ -14,9 +14,9 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
-          # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
           version: latest
           args: --timeout 5m
+          working-directory: .
 
   build:
     name: Build
