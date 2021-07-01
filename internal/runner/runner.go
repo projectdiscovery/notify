@@ -36,8 +36,22 @@ func NewRunner(options *types.Options) (*Runner, error) {
 // Run polling and notification
 func (r *Runner) Run() error {
 	// If stdin is present pass everything to webhooks and exit
-	if hasStdin() {
-		br := bufio.NewScanner(os.Stdin)
+	if hasStdin() || r.options.Data != "" {
+		var br *bufio.Scanner
+
+		switch {
+		case hasStdin():
+			br = bufio.NewScanner(os.Stdin)
+
+		case r.options.Data != "":
+			inFile, err := os.Open(r.options.Data)
+			if err != nil {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
+			br = bufio.NewScanner(inFile)
+
+		}
+
 		for br.Scan() {
 			msg := br.Text()
 			rr := strings.NewReplacer(
