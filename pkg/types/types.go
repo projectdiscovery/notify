@@ -44,7 +44,9 @@ type Options struct {
 	DNSMessage  string `yaml:"dns_message,omitempty"`
 	CLIMessage  string `yaml:"cli_message,omitempty"`
 	SMTPMessage string `yaml:"smtp_message,omitempty"`
-	Stdin       bool
+
+	Stdin bool
+	Data  string `yaml:"data,omitempty"`
 }
 
 type SMTPProvider struct {

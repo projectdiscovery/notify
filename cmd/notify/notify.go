@@ -71,6 +71,8 @@ func readConfig() {
 	set.StringVar(&options.DNSMessage, "message-dns", types.DefaultDNSMessage, "DNS Message")
 	set.StringVar(&options.SMTPMessage, "message-smtp", types.DefaultSMTPMessage, "SMTP Message")
 	set.StringVar(&options.CLIMessage, "message-cli", types.DefaultCLIMessage, "CLI Message")
+	set.StringVar(&options.Data, "data", "", "file path to read data from")
+
 	_ = set.Parse()
 
 	if cfgFile != "" {
