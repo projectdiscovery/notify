@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -34,7 +35,7 @@ func (dc *TelegramClient) sendHTTPRequest(message string) error {
 	r := strings.NewReplacer(
 		"{{apikey}}", dc.apiKEY,
 		"{{chatid}}", dc.chatID,
-		"{{message}}", message,
+		"{{message}}", url.QueryEscape(message),
 	)
 	URL := r.Replace(Endpoint)
 	req, err := retryablehttp.NewRequest(http.MethodGet, URL, nil)
