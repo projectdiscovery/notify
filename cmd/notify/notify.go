@@ -71,7 +71,8 @@ func readConfig() {
 	set.StringVar(&options.DNSMessage, "message-dns", types.DefaultDNSMessage, "DNS Message")
 	set.StringVar(&options.SMTPMessage, "message-smtp", types.DefaultSMTPMessage, "SMTP Message")
 	set.StringVar(&options.CLIMessage, "message-cli", types.DefaultCLIMessage, "CLI Message")
-	set.StringVar(&options.Data, "data", "", "file path to read data from")
+	set.StringVar(&options.Data, "data", "", "File path to read data from")
+	set.BoolVar(&options.StdinAll, "stdin-all", false, "Read all the input and send it as single message")
 
 	_ = set.Parse()
 

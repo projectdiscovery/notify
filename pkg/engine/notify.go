@@ -1,12 +1,12 @@
 package engine
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/acarl005/stripansi"
 	"github.com/containrrr/shoutrrr"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/types"
 )
 
@@ -34,29 +34,33 @@ func (n *Notify) SendNotification(message string) error {
 		url := fmt.Sprintf("slack://%s", slackTokens)
 		err := shoutrrr.Send(url, message)
 		if err != nil {
-			return err
+			gologger.Error().Msgf("Slack: error while sending message : %s\n", err)
+			// return err
 		}
 	}
 
 	if n.options.Discord {
 		discordTokens := strings.TrimPrefix(n.options.DiscordWebHookURL, "https://discord.com/api/webhooks/")
 		tokens := strings.Split(discordTokens, "/")
-		if len(tokens) != 2 {
-			return errors.New("Wrong discord configuration")
+		if len(tokens) == 2 {
+			webhookID, token := tokens[0], tokens[1]
+			url := fmt.Sprintf("discord://%s@%s?splitlines=No", token, webhookID)
+			err := shoutrrr.Send(url, message)
+			if err != nil {
+				gologger.Error().Msgf("Discord: error while sending message : %s\n", err)
+				// return err
+			}
 		}
-		webhookID, token := tokens[0], tokens[1]
-		url := fmt.Sprintf("discord://%s@%s", token, webhookID)
-		err := shoutrrr.Send(url, message)
-		if err != nil {
-			return err
-		}
+		// return errors.New("Wrong discord configuration")
+
 	}
 
 	if n.options.Telegram {
 		url := fmt.Sprintf("telegram://%s@telegram?channels=%s", n.options.TelegramAPIKey, n.options.TelegramChatID)
 		err := shoutrrr.Send(url, message)
 		if err != nil {
-			return err
+			gologger.Error().Msgf("Telegram: error while sending message : %s\n", err)
+			// return err
 		}
 	}
 
@@ -65,7 +69,8 @@ func (n *Notify) SendNotification(message string) error {
 			url := fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s", provider.Username, provider.Password, provider.Server, provider.FromAddress, strings.Join(n.options.SMTPCC, ","))
 			err := shoutrrr.Send(url, message)
 			if err != nil {
-				return err
+				gologger.Error().Msgf("SMTP: error while sending message : %s\n", err)
+				// return err
 			}
 		}
 	}
@@ -74,7 +79,8 @@ func (n *Notify) SendNotification(message string) error {
 		url := fmt.Sprintf("pushover://shoutrrr:%s@%s/?devices=%s", n.options.PushoverApiToken, n.options.UserKey, strings.Join(n.options.PushoverDevices, ","))
 		err := shoutrrr.Send(url, message)
 		if err != nil {
-			return err
+			gologger.Error().Msgf("Pushover: error while sending message : %s\n", err)
+			// return err
 		}
 	}
 
@@ -84,7 +90,8 @@ func (n *Notify) SendNotification(message string) error {
 		url := fmt.Sprintf("teams://%s", teamsTokens)
 		err := shoutrrr.Send(url, message)
 		if err != nil {
-			return err
+			gologger.Error().Msgf("Teams: error while sending message : %s\n", err)
+			// return err
 		}
 	}
 
