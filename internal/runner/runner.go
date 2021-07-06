@@ -88,6 +88,7 @@ func (r *Runner) Run() error {
 		br := bufio.NewScanner(inFile)
 		for br.Scan() {
 			msg := br.Text()
+			//nolint:errcheck
 			r.sendMessage(msg)
 		}
 		os.Exit(0)
