@@ -7,6 +7,7 @@ type Options struct {
 	SlackWebHookURL string `yaml:"slack_webhook_url,omitempty"`
 	SlackUsername   string `yaml:"slack_username,omitempty"`
 	SlackChannel    string `yaml:"slack_channel,omitempty"`
+	SlackThreadTS   string `yaml:"slack_thread_ts,omitempty"`
 	Slack           bool   `yaml:"slack,omitempty"`
 
 	// Discord

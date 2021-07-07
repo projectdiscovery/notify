@@ -3,6 +3,7 @@ package engine
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/acarl005/stripansi"
@@ -31,8 +32,13 @@ func (n *Notify) SendNotification(message string) error {
 	message = stripansi.Strip(message)
 	if n.options.Slack {
 		slackTokens := strings.TrimPrefix(n.options.SlackWebHookURL, "https://hooks.slack.com/services/")
-		url := fmt.Sprintf("slack://%s", slackTokens)
-		err := shoutrrr.Send(url, message)
+		url := &url.URL{
+			Scheme:   "slack",
+			Path:     slackTokens,
+			RawQuery: fmt.Sprintf("thread_ts=%s", n.options.SlackThreadTS),
+		}
+
+		err := shoutrrr.Send(url.String(), message)
 		if err != nil {
 			return err
 		}
