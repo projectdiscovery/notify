@@ -33,9 +33,12 @@ func (n *Notify) SendNotification(message string) error {
 	if n.options.Slack {
 		slackTokens := strings.TrimPrefix(n.options.SlackWebHookURL, "https://hooks.slack.com/services/")
 		url := &url.URL{
-			Scheme:   "slack",
-			Path:     slackTokens,
-			RawQuery: fmt.Sprintf("thread_ts=%s", n.options.SlackThreadTS),
+			Scheme: "slack",
+			Path:   slackTokens,
+		}
+
+		if n.options.SlackThreadTS != "" {
+			url.RawQuery = fmt.Sprintf("thread_ts=%s", n.options.SlackThreadTS)
 		}
 
 		err := shoutrrr.Send(url.String(), message)
