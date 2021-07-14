@@ -73,6 +73,7 @@ func readConfig() {
 	set.StringVar(&options.CLIMessage, "message-cli", types.DefaultCLIMessage, "CLI Message")
 	set.StringVar(&options.Data, "data", "", "File path to read data from")
 	set.BoolVar(&options.StdinAll, "stdin-all", false, "Read all the input and send it as single message")
+	set.IntVar(&options.CharLimit, "char-limit", 4000, "Character limit for message")
 
 	_ = set.Parse()
 

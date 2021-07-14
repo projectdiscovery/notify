@@ -45,9 +45,10 @@ type Options struct {
 	CLIMessage  string `yaml:"cli_message,omitempty"`
 	SMTPMessage string `yaml:"smtp_message,omitempty"`
 
-	Stdin    bool
-	StdinAll bool   `yaml:"stdin-all,omitempty"`
-	Data     string `yaml:"data,omitempty"`
+	Stdin     bool
+	StdinAll  bool   `yaml:"stdin_all,omitempty"`
+	CharLimit int    `yaml:"char_limit,omitempty"`
+	Data      string `yaml:"data,omitempty"`
 }
 
 type SMTPProvider struct {

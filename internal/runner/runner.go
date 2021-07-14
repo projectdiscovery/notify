@@ -3,7 +3,6 @@ package runner
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -59,25 +58,23 @@ func (r *Runner) Run() error {
 				gologger.Fatal().Msgf("%s\n", err)
 			}
 
-			// LimitReader can be used to read large file content in smaller chunks (size of which is supported by platforms)
-			// Although this might cause one issue:  messages won't necessarily get delivered in the same order that they are sent
-			reader := io.LimitReader(inFile, fi.Size())
 			msgB := make([]byte, fi.Size())
-			for {
-				n, err := reader.Read(msgB)
-				if err != nil {
-					if err == io.EOF {
-						break
-					}
-					gologger.Fatal().Msgf("%s\n", err)
-				}
+			n, err := inFile.Read(msgB)
+			if err != nil {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
 
-				if n == 0 {
-					break
-				}
+			if n == 0 {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
 
-				msg := string(msgB)
-				if err := r.sendMessage(msg); err != nil {
+			// char limit to search for a split
+			searchLimit := 250
+
+			items := SplitText(string(msgB), r.options.CharLimit, searchLimit)
+
+			for _, v := range items {
+				if err := r.sendMessage(v); err != nil {
 					gologger.Fatal().Msgf("%s\n", err)
 				}
 			}

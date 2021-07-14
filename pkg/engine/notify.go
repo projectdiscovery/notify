@@ -44,7 +44,7 @@ func (n *Notify) SendNotification(message string) error {
 		tokens := strings.Split(discordTokens, "/")
 		if len(tokens) == 2 {
 			webhookID, token := tokens[0], tokens[1]
-			url := fmt.Sprintf("discord://%s@%s?splitlines=No", token, webhookID)
+			url := fmt.Sprintf("discord://%s@%s?splitlines=no", token, webhookID)
 			err := shoutrrr.Send(url, message)
 			if err != nil {
 				gologger.Error().Msgf("Discord: error while sending message : %s\n", err)
