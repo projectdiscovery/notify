@@ -8,12 +8,12 @@ import (
 )
 
 type Provider struct {
-	Telegram []*Options `yaml:"options,omitempty"`
+	Telegram []*Options `yaml:"telegram,omitempty"`
 }
 
 type Options struct {
 	Profile        string `yaml:"profile,omitempty"`
-	TelegramAPIKey string `yaml:"telegram_apikey,omitempty"`
+	TelegramAPIKey string `yaml:"telegram_api_key,omitempty"`
 	TelegramChatID string `yaml:"telegram_chat_id,omitempty"`
 }
 

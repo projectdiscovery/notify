@@ -3,6 +3,7 @@ package providers
 import (
 	"github.com/acarl005/stripansi"
 	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers/discord"
 	"github.com/projectdiscovery/notify/pkg/providers/pushover"
 	"github.com/projectdiscovery/notify/pkg/providers/slack"
@@ -95,8 +96,9 @@ func (p *Client) Send(message string) error {
 	message = stripansi.Strip(message)
 
 	for _, v := range p.providers {
-		//nolint:errcheck
-		v.Send(message)
+		if err := v.Send(message); err != nil {
+			gologger.Error().Msgf("error while sending message: %s", err)
+		}
 	}
 
 	return nil
