@@ -59,12 +59,9 @@ func (r *Runner) Run() error {
 			}
 
 			msgB := make([]byte, fi.Size())
+			
 			n, err := inFile.Read(msgB)
-			if err != nil {
-				gologger.Fatal().Msgf("%s\n", err)
-			}
-
-			if n == 0 {
+			if err != nil || n == 0 {
 				gologger.Fatal().Msgf("%s\n", err)
 			}
 
