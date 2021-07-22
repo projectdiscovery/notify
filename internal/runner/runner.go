@@ -4,14 +4,18 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/projectdiscovery/collaborator"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/engine"
+	"github.com/projectdiscovery/notify/pkg/providers"
 	"github.com/projectdiscovery/notify/pkg/types"
+	"gopkg.in/yaml.v2"
 )
 
 // Runner contains the internal logic of the program
@@ -19,6 +23,7 @@ type Runner struct {
 	options    *types.Options
 	burpcollab *collaborator.BurpCollaborator
 	notifier   *engine.Notify
+	providers  *providers.Client
 }
 
 // NewRunner instance
@@ -29,8 +34,35 @@ func NewRunner(options *types.Options) (*Runner, error) {
 	if err != nil {
 		return nil, err
 	}
+	var providerOptions providers.Options
 
-	return &Runner{options: options, burpcollab: burpcollab, notifier: notifier}, nil
+	if options.ProviderConfig == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return nil, err
+		}
+		options.ProviderConfig = path.Join(home, "/.config/notify/provider-config.yaml")
+		gologger.Print().Msgf("Using default provider config: %s\n", options.ProviderConfig)
+	}
+
+	file, err := os.Open(options.ProviderConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not open provider config file")
+	}
+
+	if parseErr := yaml.NewDecoder(file).Decode(&providerOptions); parseErr != nil {
+		file.Close()
+		return nil, errors.Wrap(parseErr, "could not parse provider config file")
+	}
+
+	file.Close()
+
+	prClient, err := providers.New(&providerOptions, options.Providers, options.Profiles)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Runner{options: options, burpcollab: burpcollab, notifier: notifier, providers: prClient}, nil
 }
 
 // Run polling and notification
@@ -59,7 +91,7 @@ func (r *Runner) Run() error {
 			}
 
 			msgB := make([]byte, fi.Size())
-			
+
 			n, err := inFile.Read(msgB)
 			if err != nil || n == 0 {
 				gologger.Fatal().Msgf("%s\n", err)
@@ -84,6 +116,7 @@ func (r *Runner) Run() error {
 			msg := br.Text()
 			//nolint:errcheck
 			r.sendMessage(msg)
+
 		}
 		os.Exit(0)
 	}
@@ -173,7 +206,7 @@ func (r *Runner) sendMessage(msg string) error {
 	msg = rr.Replace(r.options.CLIMessage)
 	if len(msg) > 0 {
 		gologger.Print().Msgf(msg)
-		err := r.notifier.SendNotification(msg)
+		err := r.providers.Send(msg)
 		if err != nil {
 			return err
 		}
