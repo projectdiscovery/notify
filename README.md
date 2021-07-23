@@ -51,23 +51,31 @@ This will display help for the tool. Here are all the switches it supports.
 | Flag | Description | Example |
 |------|-------------|---------|
 | -biid	| burp private key	| notify -biid 123456789	|
-| -slack-webhook-url 	| Slack Webhook URL | notify -slack-webhook-url hxxp://a.b.c |
-| -slack-username	| Slack Username | notify -slack-username test |
-| -slack-channel	| Slack Channel | notify -slack-channel test |
-| -slack	| Enable Slack | notify -slack |
-| -discord-webhook-url 	| Discord Webhook URL | notify -discord-webhook-url hxxp://a.b.c |
-| -discord-username	| Discord Username | notify -discord-username test |
 | -discord-avatar	| Discord Avatar Url | notify -discord-avatar hxxp://a.b.c |
 | -discord	| Enable Discord | notify -discord |
-| -silent 	| Silent mode | notify -silent |
-| -version 	| Show version of notify | notify -version |
-| -interval 	| Polling interval in seconds | notify -interval 5 |
+| -discord-username	| Discord Username | notify -discord-username test |
+| -discord-webhook-url 	| Discord Webhook URL | notify -discord-webhook-url hxxp://a.b.c |
+| -dns-message 	| DNS Message | notify -dns-message test |
+| -http-message 	| HTTP Message | notify -http-message test |
 | -intercept-biid 	| Attempt to intercept biid (needs sudo) | notify -intercept-biid |
 | -intercept-biid-timeout 	| Timeout for biid interception in seconds | notify -intercept-biid-timeout 120 |
-| -http-message 	| HTTP Message | notify -http-message test |
-| -dns-message 	| DNS Message | notify -dns-message test |
+| -interval 	| Polling interval in seconds | notify -interval 5 |
+| -silent 	| Silent mode | notify -silent |
+| -slack-channel	| Slack Channel | notify -slack-channel test |
+| -slack	| Enable Slack | notify -slack |
+| -slack-username	| Slack Username | notify -slack-username test |
+| -slack-webhook-url 	| Slack Webhook URL | notify -slack-webhook-url hxxp://a.b.c |
+| -telegram-api-key | Telegram Api Key | notify -telegram-api-key 119489xxxx-:AAF4OV9  | 
+| -telegram-chat-id | Telegram Chat ID | notify -telegram-chat-id 1231434| 
+| -telegram | Enable Telegram  | notify -telegram  |
+| -version 	| Show version of notify | notify -version |
+
 
 # Installation Instructions
+
+## Dependencies (libpcap)
+
+``sudo apt-get install libpcap-dev``
 
 ### From Binary
 
@@ -113,9 +121,11 @@ Installing Intercept -
 
 # Intercept BIID
 
-- Run intercept as root `sudo intercept`
+- Run intercept `intercept`
 - Open Burp Suite => Project Options => Misc
-- Tick `Poll over unencrypted HTTP` (in v2020.12.1)
+- Tick `Pull Over HTTP`
+- Go to Options => Connections => Upstream Proxy Servers
+- Add `localhost:8888` (or the custom intercept listening port) as upstream proxy
 - Generate **new** collaborator, click on **Poll now**. 
 - Intercept will capture `biid` that can be used with `notify`
 
@@ -153,7 +163,7 @@ If you already configured the config file, you can simply run following command 
 
 ## Discord notification
 
-Similarly to slack, in order to use discord
+Similarly to slack, in order to use discord:
 
 ```sh
 ▶ notify -biid 132456789 -discord -discord-webhook-url https://a.b.c -discord-username notify-bot
@@ -161,7 +171,7 @@ Similarly to slack, in order to use discord
 
 ## Telegram notification
 
-Similarly to slack, in order to use discord
+Similarly to slack, in order to use Telegram:
 
 ```sh
 ▶ notify -biid 132456789 -telegram -telegram-api-key 119489xxxx-:AAF4OV9 -telegram-chat-id 1231434

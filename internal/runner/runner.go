@@ -4,66 +4,98 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/projectdiscovery/collaborator"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/notify"
-)
-
-const (
-	defaultHTTPMessage = "The collaborator server received an {{protocol}} request from {{from}} at {{time}}:\n```\n{{request}}\n{{response}}```"
-	defaultDNSMessage  = "The collaborator server received a DNS lookup of type {{type}} for the domain name {{domain}} from {{from}} at {{time}}:\n```{{request}}```"
-	defaultCLIMessage  = "{{data}}"
+	"github.com/projectdiscovery/notify/pkg/engine"
+	"github.com/projectdiscovery/notify/pkg/providers"
+	"github.com/projectdiscovery/notify/pkg/types"
+	"gopkg.in/yaml.v2"
 )
 
 // Runner contains the internal logic of the program
 type Runner struct {
-	options    *Options
+	options    *types.Options
 	burpcollab *collaborator.BurpCollaborator
-	notifier   *notify.Notify
+	notifier   *engine.Notify
+	providers  *providers.Client
 }
 
 // NewRunner instance
-func NewRunner(options *Options) (*Runner, error) {
+func NewRunner(options *types.Options) (*Runner, error) {
 	burpcollab := collaborator.NewBurpCollaborator()
 
-	notifier, err := notify.NewWithOptions(&notify.Options{
-		SlackWebHookURL:         options.SlackWebHookURL,
-		SlackUsername:           options.SlackUsername,
-		SlackChannel:            options.SlackChannel,
-		Slack:                   options.Slack,
-		DiscordWebHookURL:       options.DiscordWebHookURL,
-		DiscordWebHookUsername:  options.DiscordWebHookUsername,
-		DiscordWebHookAvatarURL: options.DiscordWebHookAvatarURL,
-		Discord:                 options.Discord,
-		TelegramAPIKey:          options.TelegramAPIKey,
-		TelegramChatID:          options.TelegramChatID,
-		Telegram:                options.Telegram,
-	})
+	notifier, err := engine.NewWithOptions(options)
+	if err != nil {
+		return nil, err
+	}
+	var providerOptions providers.Options
+
+	if options.ProviderConfig == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return nil, err
+		}
+		options.ProviderConfig = path.Join(home, "/.config/notify/provider-config.yaml")
+		gologger.Print().Msgf("Using default provider config: %s\n", options.ProviderConfig)
+	}
+
+	file, err := os.Open(options.ProviderConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not open provider config file")
+	}
+
+	if parseErr := yaml.NewDecoder(file).Decode(&providerOptions); parseErr != nil {
+		file.Close()
+		return nil, errors.Wrap(parseErr, "could not parse provider config file")
+	}
+
+	file.Close()
+
+	prClient, err := providers.New(&providerOptions, options.Providers, options.Profiles)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Runner{options: options, burpcollab: burpcollab, notifier: notifier}, nil
+	return &Runner{options: options, burpcollab: burpcollab, notifier: notifier, providers: prClient}, nil
 }
 
 // Run polling and notification
 func (r *Runner) Run() error {
 	// If stdin is present pass everything to webhooks and exit
-	if hasStdin() {
-		br := bufio.NewScanner(os.Stdin)
+	if hasStdin() || r.options.Data != "" {
+		var br *bufio.Scanner
+
+		switch {
+		case hasStdin():
+			br = bufio.NewScanner(os.Stdin)
+
+		case r.options.Data != "":
+			inFile, err := os.Open(r.options.Data)
+			if err != nil {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
+			br = bufio.NewScanner(inFile)
+
+		}
+
 		for br.Scan() {
 			msg := br.Text()
+			if msg == "" {
+				continue
+			}
 			rr := strings.NewReplacer(
 				"{{data}}", msg,
 			)
 			msg = rr.Replace(r.options.CLIMessage)
-			gologger.Printf(msg)
+			gologger.Print().Msgf(msg)
 			//nolint:errcheck // silent fail
-			r.notifier.SendNotification(msg)
+			r.providers.Send(msg)
 		}
 		os.Exit(0)
 	}
@@ -71,7 +103,7 @@ func (r *Runner) Run() error {
 	// otherwise works as long term collaborator poll and notify via webhook
 	// If BIID passed via cli
 	if r.options.BIID != "" {
-		gologger.Printf("Using BIID: %s", r.options.BIID)
+		gologger.Print().Msgf("Using BIID: %s", r.options.BIID)
 		r.burpcollab.AddBIID(r.options.BIID)
 	}
 
@@ -96,7 +128,8 @@ func (r *Runner) Run() error {
 				var at int64
 				at, _ = strconv.ParseInt(resp.Time, 10, 64)
 				atTime := time.Unix(0, at*int64(time.Millisecond))
-				if resp.Protocol == "http" || resp.Protocol == "https" {
+				switch resp.Protocol {
+				case "http", "https":
 					rr := strings.NewReplacer(
 						"{{protocol}}", strings.ToUpper(resp.Protocol),
 						"{{from}}", resp.Client,
@@ -106,12 +139,11 @@ func (r *Runner) Run() error {
 					)
 
 					msg := rr.Replace(r.options.HTTPMessage)
-					gologger.Printf(msg)
+					gologger.Print().Msgf(msg)
 
 					//nolint:errcheck // silent fail
 					r.notifier.SendNotification(msg)
-				}
-				if resp.Protocol == "dns" {
+				case "dns":
 					rr := strings.NewReplacer(
 						"{{type}}", resp.Data.RequestType,
 						"{{domain}} ", resp.Data.SubDomain,
@@ -120,7 +152,21 @@ func (r *Runner) Run() error {
 						"{{request}}", resp.Data.RawRequestDecoded,
 					)
 					msg := rr.Replace(r.options.DNSMessage)
-					gologger.Printf(msg)
+					gologger.Print().Msgf(msg)
+
+					//nolint:errcheck // silent fail
+					r.notifier.SendNotification(msg)
+				case "smtp":
+					rr := strings.NewReplacer(
+						"{{from}}", resp.Client,
+						"{{time}}", atTime.String(),
+						"{{sender}}", resp.Data.SenderDecoded,
+						"{{recipients}}", strings.Join(resp.Data.RecipientsDecoded, ","),
+						"{{message}}", resp.Data.MessageDecoded,
+						"{{conversation}}", resp.Data.ConversationDecoded,
+					)
+					msg := rr.Replace(r.options.SMTPMessage)
+					gologger.Print().Msgf(msg)
 
 					//nolint:errcheck // silent fail
 					r.notifier.SendNotification(msg)
