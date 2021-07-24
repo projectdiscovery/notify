@@ -19,6 +19,8 @@ type Options struct {
 	CLIMessage  string `yaml:"cli_message,omitempty"`
 	SMTPMessage string `yaml:"smtp_message,omitempty"`
 
-	Stdin bool
-	Data  string `yaml:"data,omitempty"`
+	Stdin     bool
+	Bulk      bool   `yaml:"bulk,omitempty"`
+	CharLimit int    `yaml:"char_limit,omitempty"`
+	Data      string `yaml:"data,omitempty"`
 }
