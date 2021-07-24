@@ -84,7 +84,7 @@ func (r *Runner) Run() error {
 			}
 		}
 
-		if r.options.StdinAll {
+		if r.options.Bulk {
 			fi, err := inFile.Stat()
 			if err != nil {
 				gologger.Fatal().Msgf("%s\n", err)
@@ -99,6 +99,9 @@ func (r *Runner) Run() error {
 
 			// char limit to search for a split
 			searchLimit := 250
+			if r.options.CharLimit < searchLimit {
+				searchLimit = r.options.CharLimit
+			}
 
 			items := SplitText(string(msgB), r.options.CharLimit, searchLimit)
 

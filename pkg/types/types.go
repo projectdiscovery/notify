@@ -20,7 +20,7 @@ type Options struct {
 	SMTPMessage string `yaml:"smtp_message,omitempty"`
 
 	Stdin     bool
-	StdinAll  bool   `yaml:"stdin_all,omitempty"`
+	Bulk      bool   `yaml:"bulk,omitempty"`
 	CharLimit int    `yaml:"char_limit,omitempty"`
 	Data      string `yaml:"data,omitempty"`
 }

@@ -8,10 +8,13 @@ import (
 func SplitText(in string, maxChunkSize, searchLimit int) (chunks []string) {
 	runes := []rune(in)
 	totalSize := len(runes)
-
+	minChunkSize := 1
 	chunkOffset := 0
 
-	maxPossibleChunks := int(math.Ceil(float64(totalSize) / float64(maxChunkSize-searchLimit+1)))
+	if maxChunkSize > searchLimit {
+		minChunkSize = maxChunkSize - searchLimit
+	}
+	maxPossibleChunks := int(math.Ceil(float64(totalSize) / float64(minChunkSize)))
 
 	for i := 0; i <= maxPossibleChunks; i++ {
 
@@ -29,6 +32,9 @@ func SplitText(in string, maxChunkSize, searchLimit int) (chunks []string) {
 
 				sp := chunkEnd - j
 
+				if sp < 0 {
+					break
+				}
 				// Check if sp is the suitable split point
 				if runes[sp] == '\n' {
 
