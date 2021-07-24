@@ -46,7 +46,7 @@ func main() {
 }
 
 func readConfig() {
-	set := goflags.New()
+	set := goflags.NewFlagSet()
 	set.Marshal = true
 	set.SetDescription(`Notify is a general notification tool`)
 	set.StringVar(&cfgFile, "config", "", "Notify configuration file")

@@ -16,7 +16,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/projectdiscovery/collaborator v0.0.2
 	github.com/projectdiscovery/fastdialer v0.0.8 // indirect
-	github.com/projectdiscovery/goflags v0.0.5-0.20210625074658-a323e95c0c3b
+	github.com/projectdiscovery/goflags v0.0.5
 	github.com/projectdiscovery/gologger v1.1.4
 	github.com/projectdiscovery/proxify v0.0.4-0.20210217225554-5384e02d9d06
 	github.com/projectdiscovery/retryabledns v1.0.10 // indirect
