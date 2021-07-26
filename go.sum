@@ -23,8 +23,8 @@ github.com/chromedp/chromedp v0.4.0/go.mod h1:DC3QUn4mJ24dwjcaGQLoZrhm4X/uPHZ6sp
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08 h1:ox2F0PSMlrAAiAdknSRMDrAr8mfxPCfSZolH+/qQnyQ=
 github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08/go.mod h1:pCxVEbcm3AMg7ejXyorUXi6HQCzOIBf7zEDVPtw0/U4=
-github.com/containrrr/shoutrrr v0.4.4 h1:vHZ4E/76pKVY+Jyn/qhBz3X540Bn8NI5ppPHK4PyILY=
-github.com/containrrr/shoutrrr v0.4.4/go.mod h1:zqL2BvfC1W4FujrT4b3/ZCLxvD+uoeEpBL7rg9Dqpbg=
+github.com/containrrr/shoutrrr v0.4.5-0.20210707101419-8018a476b557 h1:TvIiq3pBYX9D25mu1jZvCezS2FjoVvCS320pWytJkXI=
+github.com/containrrr/shoutrrr v0.4.5-0.20210707101419-8018a476b557/go.mod h1:zqL2BvfC1W4FujrT4b3/ZCLxvD+uoeEpBL7rg9Dqpbg=
 github.com/coreos/bbolt v1.3.2/go.mod h1:iRUV2dpdMOn7Bo10OQBFzIJO9kkE559Wcmn+qkEiiKk=
 github.com/coreos/etcd v3.3.10+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=
 github.com/coreos/etcd v3.3.13+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=

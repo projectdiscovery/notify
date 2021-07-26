@@ -4,6 +4,7 @@ import (
 	"github.com/acarl005/stripansi"
 	"github.com/pkg/errors"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/notify/pkg/providers/custom"
 	"github.com/projectdiscovery/notify/pkg/providers/discord"
 	"github.com/projectdiscovery/notify/pkg/providers/pushover"
 	"github.com/projectdiscovery/notify/pkg/providers/slack"
@@ -13,7 +14,7 @@ import (
 	"github.com/projectdiscovery/notify/pkg/utils"
 )
 
-// Options is a configuration file for nuclei reporting module
+// Options is a configuration file for notify providers
 type Options struct {
 	Slack    []*slack.Options    `yaml:"slack,omitempty"`
 	Discord  []*discord.Options  `yaml:"discord,omitempty"`
@@ -21,6 +22,7 @@ type Options struct {
 	SMTP     []*smtp.Options     `yaml:"smtp,omitempty"`
 	Teams    []*teams.Options    `yaml:"teams,omitempty"`
 	Telegram []*telegram.Options `yaml:"telegram,omitempty"`
+	Custom   []*custom.Options   `yaml:"custom,omitempty"`
 }
 
 // Provider is an interface implemented by providers
@@ -83,6 +85,15 @@ func New(options *Options, providers, profiles []string) (*Client, error) {
 		provider, err := telegram.New(options.Telegram, profiles)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create telegram provider client")
+		}
+		client.providers = append(client.providers, provider)
+	}
+
+	if options.Custom != nil && (len(providers) == 0 || utils.Contains(providers, "custom")) {
+
+		provider, err := custom.New(options.Custom, profiles)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not create custom provider client")
 		}
 		client.providers = append(client.providers, provider)
 	}
