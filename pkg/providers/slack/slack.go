@@ -13,17 +13,17 @@ type Provider struct {
 }
 
 type Options struct {
-	Profile         string `yaml:"profile,omitempty"`
+	ID              string `yaml:"id,omitempty"`
 	SlackWebHookURL string `yaml:"slack_webhook_url,omitempty"`
 	SlackUsername   string `yaml:"slack_username,omitempty"`
 	SlackChannel    string `yaml:"slack_channel,omitempty"`
 }
 
-func New(options []*Options, profiles []string) (*Provider, error) {
+func New(options []*Options, ids []string) (*Provider, error) {
 	provider := &Provider{}
 
 	for _, o := range options {
-		if len(profiles) == 0 || utils.Contains(profiles, o.Profile) {
+		if len(ids) == 0 || utils.Contains(ids, o.ID) {
 			provider.Slack = append(provider.Slack, o)
 		}
 	}
