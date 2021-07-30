@@ -64,8 +64,8 @@ func readConfig() {
 	set.BoolVar(&options.Bulk, "bulk", false, "Read the input and send it in bulk, character limit can be set using char-limit flag")
 	set.IntVar(&options.CharLimit, "char-limit", 4000, "Character limit for message")
 	set.StringVar(&options.ProviderConfig, "provider-config", "", "provider config path (default: $HOME/.config/notify/provider-config.yaml)")
-	set.StringSliceVar(&options.Providers, "provider", []string{}, "")
-	set.StringSliceVar(&options.IDs, "id", []string{}, "")
+	set.StringSliceVar(&options.Providers, "provider", []string{}, "provider to send the notification to (optional)")
+	set.StringSliceVar(&options.IDs, "id", []string{}, "id to send the notification to (optional)")
 
 	_ = set.Parse()
 
