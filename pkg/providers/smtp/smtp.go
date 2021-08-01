@@ -13,7 +13,7 @@ type Provider struct {
 }
 
 type Options struct {
-	Profile     string   `yaml:"profile,omitempty"`
+	ID          string   `yaml:"id,omitempty"`
 	Server      string   `yaml:"smtp_server,omitempty"`
 	Username    string   `yaml:"smtp_username,omitempty"`
 	Password    string   `yaml:"smtp_password,omitempty"`
@@ -21,11 +21,11 @@ type Options struct {
 	SMTPCC      []string `yaml:"smtp_cc,omitempty"`
 }
 
-func New(options []*Options, profiles []string) (*Provider, error) {
+func New(options []*Options, ids []string) (*Provider, error) {
 	provider := &Provider{}
 
 	for _, o := range options {
-		if len(profiles) == 0 || utils.Contains(profiles, o.Profile) {
+		if len(ids) == 0 || utils.Contains(ids, o.ID) {
 			provider.SMTP = append(provider.SMTP, o)
 		}
 	}

@@ -12,7 +12,7 @@ type Options struct {
 	Interval       int                 `yaml:"interval,omitempty"`
 	ProviderConfig string              `yaml:"provider_config,omitempty"`
 	Providers      goflags.StringSlice `yaml:"providers,omitempty"`
-	Profiles       goflags.StringSlice `yaml:"profiles,omitempty"`
+	IDs            goflags.StringSlice `yaml:"ids,omitempty"`
 
 	HTTPMessage string `yaml:"http_message,omitempty"`
 	DNSMessage  string `yaml:"dns_message,omitempty"`
