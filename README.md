@@ -44,7 +44,7 @@ This will display help for the tool. Here are all the switches it supports.
 | -char-limit int          | Character limit for message (default 4000)| notify -char-limit 2000 
 | -provider-config string  | provider config path (default: $HOME/.config/notify/provider-config.yaml)| notify -provider-config testproviderconfig.yaml
 | -provider string[]       | provider to send the notification to (optional)| notify -provider slack -provider telegram
-| -profile string[]        | profile to send the notification to (optional)| notify -profile recon
+| -id string[]             | id to send the notification to (optional)| notify -id recon
 
 
 # Installation Instructions
@@ -130,7 +130,7 @@ slack:
 discord:
   - id: "test"
     discord_channel: "test"
-    discord_username: "Sajad"
+    discord_username: "test"
     discord_webhook_url: "https://discord.com/api/webhooks/XXXXXXXX"
 telegram:
   - id: "recon"
