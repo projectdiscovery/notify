@@ -34,7 +34,7 @@ func NewRunner(options *types.Options) (*Runner, error) {
 	if err != nil {
 		return nil, err
 	}
-	var providerOptions providers.Options
+	var providerOptions providers.ProviderOptions
 
 	if options.ProviderConfig == "" {
 		home, err := os.UserHomeDir()
@@ -57,7 +57,7 @@ func NewRunner(options *types.Options) (*Runner, error) {
 
 	file.Close()
 
-	prClient, err := providers.New(&providerOptions, options.Providers, options.IDs)
+	prClient, err := providers.New(&providerOptions, options)
 	if err != nil {
 		return nil, err
 	}
@@ -203,10 +203,6 @@ func (r *Runner) Run() error {
 }
 
 func (r *Runner) sendMessage(msg string) error {
-	rr := strings.NewReplacer(
-		"{{data}}", msg,
-	)
-	msg = rr.Replace(r.options.CLIMessage)
 	if len(msg) > 0 {
 		gologger.Print().Msgf(msg)
 		err := r.providers.Send(msg)

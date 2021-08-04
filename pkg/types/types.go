@@ -14,10 +14,11 @@ type Options struct {
 	Providers      goflags.StringSlice `yaml:"providers,omitempty"`
 	IDs            goflags.StringSlice `yaml:"ids,omitempty"`
 
-	HTTPMessage string `yaml:"http_message,omitempty"`
-	DNSMessage  string `yaml:"dns_message,omitempty"`
-	CLIMessage  string `yaml:"cli_message,omitempty"`
-	SMTPMessage string `yaml:"smtp_message,omitempty"`
+	HTTPMessage   string `yaml:"http_message,omitempty"`
+	DNSMessage    string `yaml:"dns_message,omitempty"`
+	CLIMessage    string `yaml:"cli_message,omitempty"`
+	SMTPMessage   string `yaml:"smtp_message,omitempty"`
+	MessageFormat string `yaml:"message_format,omitempty"`
 
 	Stdin     bool
 	Bulk      bool   `yaml:"bulk,omitempty"`
