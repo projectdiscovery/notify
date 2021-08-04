@@ -59,7 +59,7 @@ func readConfig() {
 	set.IntVar(&options.CharLimit, "char-limit", 4000, "Character limit for message")
 	set.StringVar(&options.ProviderConfig, "provider-config", "", "provider config path (default: $HOME/.config/notify/provider-config.yaml)")
 	set.StringSliceVar(&options.Providers, "provider", []string{}, "provider to send the notification to (optional)")
-	set.StringSliceVar(&options.Profiles, "profile", []string{}, "profile to send the notification to (optional)")
+	set.StringSliceVar(&options.IDs, "id", []string{}, "id to send the notification to (optional)")
 
 	_ = set.Parse()
 

@@ -44,7 +44,7 @@ func NewRunner(options *types.Options) (*Runner, error) {
 
 	file.Close()
 
-	prClient, err := providers.New(&providerOptions, options.Providers, options.Profiles)
+	prClient, err := providers.New(&providerOptions, options.Providers, options.IDs)
 	if err != nil {
 		return nil, err
 	}

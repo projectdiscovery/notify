@@ -9,7 +9,7 @@ type Options struct {
 	Version        bool                `yaml:"version,omitempty"`
 	ProviderConfig string              `yaml:"provider_config,omitempty"`
 	Providers      goflags.StringSlice `yaml:"providers,omitempty"`
-	Profiles       goflags.StringSlice `yaml:"profiles,omitempty"`
+	IDs            goflags.StringSlice `yaml:"ids,omitempty"`
 
 	Stdin     bool
 	Bulk      bool   `yaml:"bulk,omitempty"`
