@@ -55,62 +55,60 @@ func NewRunner(options *types.Options) (*Runner, error) {
 // Run polling and notification
 func (r *Runner) Run() error {
 
-	// If stdin/file input is present pass everything to webhooks and exit
-	if hasStdin() || r.options.Data != "" {
-		var inFile *os.File
-		var err error
+	var inFile *os.File
+	var err error
 
-		switch {
-		case hasStdin():
-			inFile = os.Stdin
+	switch {
+	case hasStdin():
+		inFile = os.Stdin
 
-		case r.options.Data != "":
-			inFile, err = os.Open(r.options.Data)
-			if err != nil {
+	case r.options.Data != "":
+		inFile, err = os.Open(r.options.Data)
+		if err != nil {
+			gologger.Fatal().Msgf("%s\n", err)
+		}
+	default:
+		return errors.New("notify works with stdin or file using -data flag")
+	}
+
+	if r.options.Bulk {
+		fi, err := inFile.Stat()
+		if err != nil {
+			gologger.Fatal().Msgf("%s\n", err)
+		}
+
+		msgB := make([]byte, fi.Size())
+
+		n, err := inFile.Read(msgB)
+		if err != nil || n == 0 {
+			gologger.Fatal().Msgf("%s\n", err)
+		}
+
+		// char limit to search for a split
+		searchLimit := 250
+		if r.options.CharLimit < searchLimit {
+			searchLimit = r.options.CharLimit
+		}
+
+		items := SplitText(string(msgB), r.options.CharLimit, searchLimit)
+
+		for _, v := range items {
+			if err := r.sendMessage(v); err != nil {
 				gologger.Fatal().Msgf("%s\n", err)
 			}
 		}
 
-		if r.options.Bulk {
-			fi, err := inFile.Stat()
-			if err != nil {
-				gologger.Fatal().Msgf("%s\n", err)
-			}
-
-			msgB := make([]byte, fi.Size())
-
-			n, err := inFile.Read(msgB)
-			if err != nil || n == 0 {
-				gologger.Fatal().Msgf("%s\n", err)
-			}
-
-			// char limit to search for a split
-			searchLimit := 250
-			if r.options.CharLimit < searchLimit {
-				searchLimit = r.options.CharLimit
-			}
-
-			items := SplitText(string(msgB), r.options.CharLimit, searchLimit)
-
-			for _, v := range items {
-				if err := r.sendMessage(v); err != nil {
-					gologger.Fatal().Msgf("%s\n", err)
-				}
-			}
-
-			os.Exit(0)
-		}
-
-		br := bufio.NewScanner(inFile)
-		for br.Scan() {
-			msg := br.Text()
-			//nolint:errcheck
-			r.sendMessage(msg)
-
-		}
 		os.Exit(0)
 	}
-	return errors.New("notify works with stdin or file using -data flag")
+
+	br := bufio.NewScanner(inFile)
+	for br.Scan() {
+		msg := br.Text()
+		//nolint:errcheck
+		r.sendMessage(msg)
+
+	}
+	return nil
 }
 
 func (r *Runner) sendMessage(msg string) error {
