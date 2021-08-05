@@ -13,6 +13,7 @@ type Options struct {
 	ProviderConfig string              `yaml:"provider_config,omitempty"`
 	Providers      goflags.StringSlice `yaml:"providers,omitempty"`
 	IDs            goflags.StringSlice `yaml:"ids,omitempty"`
+	Proxy          string              `yaml:"proxy,omitempty"`
 
 	HTTPMessage string `yaml:"http_message,omitempty"`
 	DNSMessage  string `yaml:"dns_message,omitempty"`
