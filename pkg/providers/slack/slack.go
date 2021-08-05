@@ -2,7 +2,6 @@ package slack
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"strings"
 
@@ -53,10 +52,6 @@ func (p *Provider) Send(message string) error {
 			url := &url.URL{
 				Scheme: "slack",
 				Path:   slackTokens,
-			}
-
-			if pr.SlackThreadTS != "" && pr.SlackThreads {
-				url.RawQuery = fmt.Sprintf("thread_ts=%s", pr.SlackThreadTS)
 			}
 
 			err := shoutrrr.Send(url.String(), message)
