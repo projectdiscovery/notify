@@ -12,16 +12,16 @@ type Provider struct {
 }
 
 type Options struct {
-	Profile        string `yaml:"profile,omitempty"`
+	ID             string `yaml:"id,omitempty"`
 	TelegramAPIKey string `yaml:"telegram_api_key,omitempty"`
 	TelegramChatID string `yaml:"telegram_chat_id,omitempty"`
 }
 
-func New(options []*Options, profiles []string) (*Provider, error) {
+func New(options []*Options, ids []string) (*Provider, error) {
 	provider := &Provider{}
 
 	for _, o := range options {
-		if len(profiles) == 0 || utils.Contains(profiles, o.Profile) {
+		if len(ids) == 0 || utils.Contains(ids, o.ID) {
 			provider.Telegram = append(provider.Telegram, o)
 		}
 	}

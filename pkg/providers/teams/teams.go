@@ -13,15 +13,15 @@ type Provider struct {
 }
 
 type Options struct {
-	Profile         string `yaml:"profile,omitempty"`
+	ID              string `yaml:"id,omitempty"`
 	TeamsWebHookURL string `yaml:"teams_webhook_url,omitempty"`
 }
 
-func New(options []*Options, profiles []string) (*Provider, error) {
+func New(options []*Options, ids []string) (*Provider, error) {
 	provider := &Provider{}
 
 	for _, o := range options {
-		if len(profiles) == 0 || utils.Contains(profiles, o.Profile) {
+		if len(ids) == 0 || utils.Contains(ids, o.ID) {
 			provider.Teams = append(provider.Teams, o)
 		}
 	}

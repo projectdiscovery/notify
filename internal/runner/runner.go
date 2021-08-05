@@ -57,7 +57,7 @@ func NewRunner(options *types.Options) (*Runner, error) {
 
 	file.Close()
 
-	prClient, err := providers.New(&providerOptions, options.Providers, options.Profiles)
+	prClient, err := providers.New(&providerOptions, options.Providers, options.IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -67,35 +67,59 @@ func NewRunner(options *types.Options) (*Runner, error) {
 
 // Run polling and notification
 func (r *Runner) Run() error {
-	// If stdin is present pass everything to webhooks and exit
+
+	// If stdin/file input is present pass everything to webhooks and exit
 	if hasStdin() || r.options.Data != "" {
-		var br *bufio.Scanner
+		var inFile *os.File
+		var err error
 
 		switch {
 		case hasStdin():
-			br = bufio.NewScanner(os.Stdin)
+			inFile = os.Stdin
 
 		case r.options.Data != "":
-			inFile, err := os.Open(r.options.Data)
+			inFile, err = os.Open(r.options.Data)
 			if err != nil {
 				gologger.Fatal().Msgf("%s\n", err)
 			}
-			br = bufio.NewScanner(inFile)
-
 		}
 
+		if r.options.Bulk {
+			fi, err := inFile.Stat()
+			if err != nil {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
+
+			msgB := make([]byte, fi.Size())
+
+			n, err := inFile.Read(msgB)
+			if err != nil || n == 0 {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
+
+			// char limit to search for a split
+			searchLimit := 250
+			if r.options.CharLimit < searchLimit {
+				searchLimit = r.options.CharLimit
+			}
+
+			items := SplitText(string(msgB), r.options.CharLimit, searchLimit)
+
+			for _, v := range items {
+				if err := r.sendMessage(v); err != nil {
+					gologger.Fatal().Msgf("%s\n", err)
+				}
+			}
+
+			os.Exit(0)
+		}
+
+		br := bufio.NewScanner(inFile)
 		for br.Scan() {
 			msg := br.Text()
-			if msg == "" {
-				continue
-			}
-			rr := strings.NewReplacer(
-				"{{data}}", msg,
-			)
-			msg = rr.Replace(r.options.CLIMessage)
-			gologger.Print().Msgf(msg)
-			//nolint:errcheck // silent fail
-			r.providers.Send(msg)
+			//nolint:errcheck
+			r.sendMessage(msg)
+
 		}
 		os.Exit(0)
 	}
@@ -176,6 +200,21 @@ func (r *Runner) Run() error {
 
 		r.burpcollab.Empty()
 	}
+}
+
+func (r *Runner) sendMessage(msg string) error {
+	rr := strings.NewReplacer(
+		"{{data}}", msg,
+	)
+	msg = rr.Replace(r.options.CLIMessage)
+	if len(msg) > 0 {
+		gologger.Print().Msgf(msg)
+		err := r.providers.Send(msg)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Close the runner instance
