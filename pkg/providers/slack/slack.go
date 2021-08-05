@@ -1,6 +1,7 @@
 package slack
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -19,6 +20,8 @@ type Options struct {
 	SlackUsername   string `yaml:"slack_username,omitempty"`
 	SlackChannel    string `yaml:"slack_channel,omitempty"`
 	SlackThreadTS   string `yaml:"slack_thread_ts,omitempty"`
+	SlackThreads    bool   `yaml:"slack_threads,omitempty"`
+	SlackToken      string `yaml:"slack_token,omitempty"`
 }
 
 func New(options []*Options, profiles []string) (*Provider, error) {
@@ -37,19 +40,29 @@ func (p *Provider) Send(message string) error {
 
 	for _, pr := range p.Slack {
 
-		slackTokens := strings.TrimPrefix(pr.SlackWebHookURL, "https://hooks.slack.com/services/")
-		url := &url.URL{
-			Scheme: "slack",
-			Path:   slackTokens,
-		}
+		if pr.SlackThreads {
+			if pr.SlackToken == "" {
+				return errors.New("can't start a slack thread without slack_token value in provider config")
+			}
+			if pr.SlackChannel == "" {
+				return errors.New("can't start a slack thread without slack_channel value in provider config")
+			}
+			return pr.SendThreaded(message)
+		} else {
+			slackTokens := strings.TrimPrefix(pr.SlackWebHookURL, "https://hooks.slack.com/services/")
+			url := &url.URL{
+				Scheme: "slack",
+				Path:   slackTokens,
+			}
 
-		if pr.SlackThreadTS != "" {
-			url.RawQuery = fmt.Sprintf("thread_ts=%s", pr.SlackThreadTS)
-		}
+			if pr.SlackThreadTS != "" && pr.SlackThreads {
+				url.RawQuery = fmt.Sprintf("thread_ts=%s", pr.SlackThreadTS)
+			}
 
-		err := shoutrrr.Send(url.String(), message)
-		if err != nil {
-			return err
+			err := shoutrrr.Send(url.String(), message)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
