@@ -43,7 +43,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 			return errors.New("Wrong discord configuration")
 		}
 		webhookID, token := tokens[0], tokens[1]
-		url := fmt.Sprintf("discord://%s@%s", token, webhookID)
+		url := fmt.Sprintf("discord://%s@%s?splitlines=no", token, webhookID)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			return err
