@@ -46,24 +46,20 @@ func main() {
 }
 
 func readConfig() {
-	set := goflags.New()
+	set := goflags.NewFlagSet()
 	set.Marshal = true
 	set.SetDescription(`Notify is a general notification tool`)
 	set.StringVar(&cfgFile, "config", "", "Notify configuration file")
-	set.StringVar(&options.BIID, "biid", "", "burp collaborator unique id")
 	set.BoolVar(&options.Silent, "silent", false, "Don't print the banner")
 	set.BoolVar(&options.Version, "version", false, "Show version of notify")
 	set.BoolVar(&options.Verbose, "v", false, "Show Verbose output")
 	set.BoolVar(&options.NoColor, "no-color", false, "Don't Use colors in output")
-	set.IntVar(&options.Interval, "interval", 2, "Polling interval in seconds")
-	set.StringVar(&options.HTTPMessage, "message-http", types.DefaultHTTPMessage, "HTTP Message")
-	set.StringVar(&options.DNSMessage, "message-dns", types.DefaultDNSMessage, "DNS Message")
-	set.StringVar(&options.SMTPMessage, "message-smtp", types.DefaultSMTPMessage, "SMTP Message")
-	set.StringVar(&options.CLIMessage, "message-cli", types.DefaultCLIMessage, "CLI Message")
-	set.StringVar(&options.Data, "data", "", "file path to read data from")
+	set.StringVar(&options.Data, "data", "", "File path to read data from")
+	set.BoolVar(&options.Bulk, "bulk", false, "Read the input and send it in bulk, character limit can be set using char-limit flag")
+	set.IntVar(&options.CharLimit, "char-limit", 4000, "Character limit for message")
 	set.StringVar(&options.ProviderConfig, "provider-config", "", "provider config path (default: $HOME/.config/notify/provider-config.yaml)")
-	set.StringSliceVar(&options.Providers, "provider", []string{}, "")
-	set.StringSliceVar(&options.Profiles, "profile", []string{}, "")
+	set.StringSliceVar(&options.Providers, "provider", []string{}, "provider to send the notification to (optional)")
+	set.StringSliceVar(&options.IDs, "id", []string{}, "id to send the notification to (optional)")
 
 	_ = set.Parse()
 

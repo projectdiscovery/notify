@@ -35,13 +35,13 @@ type Client struct {
 	options   *Options
 }
 
-func New(options *Options, providers, profiles []string) (*Client, error) {
+func New(options *Options, providers, ids []string) (*Client, error) {
 
 	client := &Client{options: options}
 
 	if options.Slack != nil && (len(providers) == 0 || utils.Contains(providers, "slack")) {
 
-		provider, err := slack.New(options.Slack, profiles)
+		provider, err := slack.New(options.Slack, ids)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create slack provider client")
 		}
@@ -50,7 +50,7 @@ func New(options *Options, providers, profiles []string) (*Client, error) {
 	}
 	if options.Discord != nil && (len(providers) == 0 || utils.Contains(providers, "discord")) {
 
-		provider, err := discord.New(options.Discord, profiles)
+		provider, err := discord.New(options.Discord, ids)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create discord provider client")
 		}
@@ -58,7 +58,7 @@ func New(options *Options, providers, profiles []string) (*Client, error) {
 	}
 	if options.Pushover != nil && (len(providers) == 0 || utils.Contains(providers, "pushover")) {
 
-		provider, err := pushover.New(options.Pushover, profiles)
+		provider, err := pushover.New(options.Pushover, ids)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create pushover provider client")
 		}
@@ -66,7 +66,7 @@ func New(options *Options, providers, profiles []string) (*Client, error) {
 	}
 	if options.SMTP != nil && (len(providers) == 0 || utils.Contains(providers, "smtp")) {
 
-		provider, err := smtp.New(options.SMTP, profiles)
+		provider, err := smtp.New(options.SMTP, ids)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create smtp provider client")
 		}
@@ -74,7 +74,7 @@ func New(options *Options, providers, profiles []string) (*Client, error) {
 	}
 	if options.Teams != nil && (len(providers) == 0 || utils.Contains(providers, "teams")) {
 
-		provider, err := teams.New(options.Teams, profiles)
+		provider, err := teams.New(options.Teams, ids)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create teams provider client")
 		}
@@ -82,7 +82,7 @@ func New(options *Options, providers, profiles []string) (*Client, error) {
 	}
 	if options.Telegram != nil && (len(providers) == 0 || utils.Contains(providers, "telegram")) {
 
-		provider, err := telegram.New(options.Telegram, profiles)
+		provider, err := telegram.New(options.Telegram, ids)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create telegram provider client")
 		}
@@ -91,7 +91,7 @@ func New(options *Options, providers, profiles []string) (*Client, error) {
 
 	if options.Custom != nil && (len(providers) == 0 || utils.Contains(providers, "custom")) {
 
-		provider, err := custom.New(options.Custom, profiles)
+		provider, err := custom.New(options.Custom, ids)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create custom provider client")
 		}

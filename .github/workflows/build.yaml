@@ -37,11 +37,3 @@ jobs:
       - name: Build notify
         run: go build .
         working-directory: cmd/notify/
-
-      - name: Test intercept
-        run: go test .
-        working-directory: cmd/intercept/
-
-      - name: Build intercept
-        run: go build .
-        working-directory: cmd/intercept/
