@@ -23,8 +23,7 @@ type Runner struct {
 
 // NewRunner instance
 func NewRunner(options *types.Options) (*Runner, error) {
-
-	var providerOptions providers.Options
+	var providerOptions providers.ProviderOptions
 
 	if options.ProviderConfig == "" {
 		home, err := os.UserHomeDir()
@@ -47,7 +46,7 @@ func NewRunner(options *types.Options) (*Runner, error) {
 
 	file.Close()
 
-	prClient, err := providers.New(&providerOptions, options.Providers, options.IDs)
+	prClient, err := providers.New(&providerOptions, options)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +129,6 @@ func (r *Runner) Run() error {
 }
 
 func (r *Runner) sendMessage(msg string) error {
-
 	if len(msg) > 0 {
 		gologger.Print().Msgf(msg)
 		err := r.providers.Send(msg)

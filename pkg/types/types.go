@@ -12,6 +12,8 @@ type Options struct {
 	IDs            goflags.StringSlice `yaml:"ids,omitempty"`
 	Proxy          string              `yaml:"proxy,omitempty"`
 
+	MessageFormat string `yaml:"message_format,omitempty"`
+
 	Stdin     bool
 	Bulk      bool   `yaml:"bulk,omitempty"`
 	CharLimit int    `yaml:"char_limit,omitempty"`
