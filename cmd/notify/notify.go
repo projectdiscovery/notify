@@ -60,6 +60,7 @@ func readConfig() {
 	set.StringVar(&options.ProviderConfig, "provider-config", "", "provider config path (default: $HOME/.config/notify/provider-config.yaml)")
 	set.StringSliceVar(&options.Providers, "provider", []string{}, "provider to send the notification to (optional)")
 	set.StringSliceVar(&options.IDs, "id", []string{}, "id to send the notification to (optional)")
+	set.StringVar(&options.Proxy, "proxy", "", "Set http proxy to be used by notify")
 
 	_ = set.Parse()
 
