@@ -61,6 +61,7 @@ func readConfig() {
 	set.StringSliceVar(&options.Providers, "provider", []string{}, "provider to send the notification to (optional)")
 	set.StringSliceVar(&options.IDs, "id", []string{}, "id to send the notification to (optional)")
 	set.StringVar(&options.MessageFormat, "msg-format", "{{data}}", "apply custom formatting to the text")
+	set.StringVar(&options.Proxy, "proxy", "", "Set http proxy to be used by notify")
 
 	_ = set.Parse()
 

@@ -2,6 +2,9 @@ package runner
 
 import (
 	"bufio"
+	"crypto/tls"
+	"net/http"
+	"net/url"
 	"os"
 	"path"
 
@@ -53,6 +56,21 @@ func NewRunner(options *types.Options) (*Runner, error) {
 
 // Run polling and notification
 func (r *Runner) Run() error {
+
+	if r.options.Proxy != "" {
+		proxyurl, err := url.Parse(r.options.Proxy)
+		if err != nil || proxyurl == nil {
+			gologger.Warning().Msgf("supplied proxy '%s' is not valid", r.options.Proxy)
+		} else {
+			http.DefaultClient.Transport = &http.Transport{
+				Proxy:             http.ProxyURL(proxyurl),
+				ForceAttemptHTTP2: true,
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
+			}
+		}
+	}
 
 	var inFile *os.File
 	var err error
