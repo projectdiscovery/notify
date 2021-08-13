@@ -91,9 +91,9 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 		client.providers = append(client.providers, provider)
 	}
 
-	if options.Custom != nil && (len(providers) == 0 || utils.Contains(providers, "custom")) {
+	if providerOptions.Custom != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "custom")) {
 
-		provider, err := custom.New(options.Custom, ids)
+		provider, err := custom.New(providerOptions.Custom, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create custom provider client")
 		}

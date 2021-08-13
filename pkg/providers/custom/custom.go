@@ -2,7 +2,6 @@ package custom
 
 import (
 	"bytes"
-	"strings"
 
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"github.com/projectdiscovery/retryablehttp-go"
@@ -13,11 +12,11 @@ type Provider struct {
 }
 
 type Options struct {
-	ID                      string `yaml:"id,omitempty"`
+	ID               string            `yaml:"id,omitempty"`
 	CustomWebhookURL string            `yaml:"custom_webook_url,omitempty"`
 	CustomMethod     string            `yaml:"custom_method,omitempty"`
 	CustomHeaders    map[string]string `yaml:"custom_headers,omitempty"`
-	CustomBody       string            `yaml:"custom_body,omitempty"`
+	CustomFormat     string            `yaml:"custom_format,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -32,16 +31,14 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	return provider, nil
 }
 
-func (p *Provider) Send(message string) error {
+func (p *Provider) Send(message, CliFormat string) error {
 
 	for _, pr := range p.Custom {
 
-		rr := strings.NewReplacer(
-			"{{data}}", message,
-		)
-		final := rr.Replace(pr.CustomBody)
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.CustomFormat))
+		body := bytes.NewBufferString(msg)
 
-		r, err := retryablehttp.NewRequest(pr.CustomMethod, pr.CustomWebhookURL, bytes.NewReader([]byte(final)))
+		r, err := retryablehttp.NewRequest(pr.CustomMethod, pr.CustomWebhookURL, body)
 		if err != nil {
 			return err
 		}
