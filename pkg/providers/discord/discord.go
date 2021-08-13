@@ -18,6 +18,7 @@ type Options struct {
 	DiscordWebHookURL       string `yaml:"discord_webhook_url,omitempty"`
 	DiscordWebHookUsername  string `yaml:"discord_username,omitempty"`
 	DiscordWebHookAvatarURL string `yaml:"discord_avatar,omitempty"`
+	DiscordFormat           string `yaml:"discord_format,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -31,17 +32,19 @@ func New(options []*Options, ids []string) (*Provider, error) {
 
 	return provider, nil
 }
-func (p *Provider) Send(message string) error {
+func (p *Provider) Send(message, CliFormat string) error {
 
 	for _, pr := range p.Discord {
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.DiscordFormat))
+
 		discordTokens := strings.TrimPrefix(pr.DiscordWebHookURL, "https://discord.com/api/webhooks/")
 		tokens := strings.Split(discordTokens, "/")
 		if len(tokens) != 2 {
 			return errors.New("Wrong discord configuration")
 		}
 		webhookID, token := tokens[0], tokens[1]
-		url := fmt.Sprintf("discord://%s@%s", token, webhookID)
-		err := shoutrrr.Send(url, message)
+		url := fmt.Sprintf("discord://%s@%s?splitlines=no", token, webhookID)
+		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			return err
 		}

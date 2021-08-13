@@ -15,6 +15,7 @@ type Provider struct {
 type Options struct {
 	ID              string `yaml:"id,omitempty"`
 	TeamsWebHookURL string `yaml:"teams_webhook_url,omitempty"`
+	TeamsFormat     string `yaml:"teams_format,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -29,13 +30,15 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	return provider, nil
 }
 
-func (p *Provider) Send(message string) error {
+func (p *Provider) Send(message, CliFormat string) error {
 
 	for _, pr := range p.Teams {
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.TeamsFormat))
+
 		teamsTokens := strings.TrimPrefix(pr.TeamsWebHookURL, "https://outlook.office.com/webhook/")
 		teamsTokens = strings.ReplaceAll(teamsTokens, "IncomingWebhook/", "")
 		url := fmt.Sprintf("teams://%s", teamsTokens)
-		err := shoutrrr.Send(url, message)
+		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			return err
 		}

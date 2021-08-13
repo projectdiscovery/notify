@@ -11,11 +11,12 @@ import (
 	"github.com/projectdiscovery/notify/pkg/providers/smtp"
 	"github.com/projectdiscovery/notify/pkg/providers/teams"
 	"github.com/projectdiscovery/notify/pkg/providers/telegram"
+	"github.com/projectdiscovery/notify/pkg/types"
 	"github.com/projectdiscovery/notify/pkg/utils"
 )
 
-// Options is a configuration file for notify providers
-type Options struct {
+// ProviderOptions is configuration for notify providers
+type ProviderOptions struct {
 	Slack    []*slack.Options    `yaml:"slack,omitempty"`
 	Discord  []*discord.Options  `yaml:"discord,omitempty"`
 	Pushover []*pushover.Options `yaml:"pushover,omitempty"`
@@ -27,62 +28,63 @@ type Options struct {
 
 // Provider is an interface implemented by providers
 type Provider interface {
-	Send(string) error
+	Send(message, CliFormat string) error
 }
 
 type Client struct {
-	providers []Provider
-	options   *Options
+	providers       []Provider
+	providerOptions *ProviderOptions
+	options         *types.Options
 }
 
-func New(options *Options, providers, ids []string) (*Client, error) {
+func New(providerOptions *ProviderOptions, options *types.Options) (*Client, error) {
 
-	client := &Client{options: options}
+	client := &Client{providerOptions: providerOptions, options: options}
 
-	if options.Slack != nil && (len(providers) == 0 || utils.Contains(providers, "slack")) {
+	if providerOptions.Slack != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "slack")) {
 
-		provider, err := slack.New(options.Slack, ids)
+		provider, err := slack.New(providerOptions.Slack, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create slack provider client")
 		}
 
 		client.providers = append(client.providers, provider)
 	}
-	if options.Discord != nil && (len(providers) == 0 || utils.Contains(providers, "discord")) {
+	if providerOptions.Discord != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "discord")) {
 
-		provider, err := discord.New(options.Discord, ids)
+		provider, err := discord.New(providerOptions.Discord, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create discord provider client")
 		}
 		client.providers = append(client.providers, provider)
 	}
-	if options.Pushover != nil && (len(providers) == 0 || utils.Contains(providers, "pushover")) {
+	if providerOptions.Pushover != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "pushover")) {
 
-		provider, err := pushover.New(options.Pushover, ids)
+		provider, err := pushover.New(providerOptions.Pushover, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create pushover provider client")
 		}
 		client.providers = append(client.providers, provider)
 	}
-	if options.SMTP != nil && (len(providers) == 0 || utils.Contains(providers, "smtp")) {
+	if providerOptions.SMTP != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "smtp")) {
 
-		provider, err := smtp.New(options.SMTP, ids)
+		provider, err := smtp.New(providerOptions.SMTP, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create smtp provider client")
 		}
 		client.providers = append(client.providers, provider)
 	}
-	if options.Teams != nil && (len(providers) == 0 || utils.Contains(providers, "teams")) {
+	if providerOptions.Teams != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "teams")) {
 
-		provider, err := teams.New(options.Teams, ids)
+		provider, err := teams.New(providerOptions.Teams, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create teams provider client")
 		}
 		client.providers = append(client.providers, provider)
 	}
-	if options.Telegram != nil && (len(providers) == 0 || utils.Contains(providers, "telegram")) {
+	if providerOptions.Telegram != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "telegram")) {
 
-		provider, err := telegram.New(options.Telegram, ids)
+		provider, err := telegram.New(providerOptions.Telegram, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create telegram provider client")
 		}
@@ -107,7 +109,7 @@ func (p *Client) Send(message string) error {
 	message = stripansi.Strip(message)
 
 	for _, v := range p.providers {
-		if err := v.Send(message); err != nil {
+		if err := v.Send(message, p.options.MessageFormat); err != nil {
 			gologger.Error().Msgf("error while sending message: %s", err)
 		}
 	}

@@ -2,6 +2,9 @@ package runner
 
 import (
 	"bufio"
+	"crypto/tls"
+	"net/http"
+	"net/url"
 	"os"
 	"path"
 
@@ -20,8 +23,7 @@ type Runner struct {
 
 // NewRunner instance
 func NewRunner(options *types.Options) (*Runner, error) {
-
-	var providerOptions providers.Options
+	var providerOptions providers.ProviderOptions
 
 	if options.ProviderConfig == "" {
 		home, err := os.UserHomeDir()
@@ -44,7 +46,7 @@ func NewRunner(options *types.Options) (*Runner, error) {
 
 	file.Close()
 
-	prClient, err := providers.New(&providerOptions, options.Providers, options.IDs)
+	prClient, err := providers.New(&providerOptions, options)
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +56,21 @@ func NewRunner(options *types.Options) (*Runner, error) {
 
 // Run polling and notification
 func (r *Runner) Run() error {
+
+	if r.options.Proxy != "" {
+		proxyurl, err := url.Parse(r.options.Proxy)
+		if err != nil || proxyurl == nil {
+			gologger.Warning().Msgf("supplied proxy '%s' is not valid", r.options.Proxy)
+		} else {
+			http.DefaultClient.Transport = &http.Transport{
+				Proxy:             http.ProxyURL(proxyurl),
+				ForceAttemptHTTP2: true,
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
+			}
+		}
+	}
 
 	var inFile *os.File
 	var err error
@@ -112,7 +129,6 @@ func (r *Runner) Run() error {
 }
 
 func (r *Runner) sendMessage(msg string) error {
-
 	if len(msg) > 0 {
 		gologger.Print().Msgf(msg)
 		err := r.providers.Send(msg)
