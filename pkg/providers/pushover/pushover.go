@@ -17,6 +17,7 @@ type Options struct {
 	PushoverApiToken string   `yaml:"pushover_api_token,omitempty"`
 	UserKey          string   `yaml:"pushover_user_key,omitempty"`
 	PushoverDevices  []string `yaml:"pushover_devices,omitempty"`
+	PushoverFormat   string   `yaml:"pushover_format,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -31,11 +32,13 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	return provider, nil
 }
 
-func (p *Provider) Send(message string) error {
+func (p *Provider) Send(message, CliFormat string) error {
 
 	for _, pr := range p.Pushover {
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.PushoverFormat))
+
 		url := fmt.Sprintf("pushover://shoutrrr:%s@%s/?devices=%s", pr.PushoverApiToken, pr.UserKey, strings.Join(pr.PushoverDevices, ","))
-		err := shoutrrr.Send(url, message)
+		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			return err
 		}

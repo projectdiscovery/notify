@@ -10,6 +10,9 @@ type Options struct {
 	ProviderConfig string              `yaml:"provider_config,omitempty"`
 	Providers      goflags.StringSlice `yaml:"providers,omitempty"`
 	IDs            goflags.StringSlice `yaml:"ids,omitempty"`
+	Proxy          string              `yaml:"proxy,omitempty"`
+
+	MessageFormat string `yaml:"message_format,omitempty"`
 
 	Stdin     bool
 	Bulk      bool   `yaml:"bulk,omitempty"`

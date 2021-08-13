@@ -18,9 +18,10 @@ type Options struct {
 	SlackWebHookURL string `yaml:"slack_webhook_url,omitempty"`
 	SlackUsername   string `yaml:"slack_username,omitempty"`
 	SlackChannel    string `yaml:"slack_channel,omitempty"`
-	SlackThreadTS   string `yaml:"slack_thread_ts,omitempty"`
 	SlackThreads    bool   `yaml:"slack_threads,omitempty"`
+	SlackThreadTS   string `yaml:"slack_thread_ts,omitempty"`
 	SlackToken      string `yaml:"slack_token,omitempty"`
+	SlackFormat     string `yaml:"slack_format,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -35,9 +36,9 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	return provider, nil
 }
 
-func (p *Provider) Send(message string) error {
-
+func (p *Provider) Send(message, CliFormat string) error {
 	for _, pr := range p.Slack {
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SlackFormat))
 
 		if pr.SlackThreads {
 			if pr.SlackToken == "" {
@@ -46,7 +47,7 @@ func (p *Provider) Send(message string) error {
 			if pr.SlackChannel == "" {
 				return errors.New("can't start a slack thread without slack_channel value in provider config")
 			}
-			return pr.SendThreaded(message)
+			return pr.SendThreaded(msg)
 		} else {
 			slackTokens := strings.TrimPrefix(pr.SlackWebHookURL, "https://hooks.slack.com/services/")
 			url := &url.URL{
@@ -54,7 +55,7 @@ func (p *Provider) Send(message string) error {
 				Path:   slackTokens,
 			}
 
-			err := shoutrrr.Send(url.String(), message)
+			err := shoutrrr.Send(url.String(), msg)
 			if err != nil {
 				return err
 			}

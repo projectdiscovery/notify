@@ -15,6 +15,7 @@ type Options struct {
 	ID             string `yaml:"id,omitempty"`
 	TelegramAPIKey string `yaml:"telegram_api_key,omitempty"`
 	TelegramChatID string `yaml:"telegram_chat_id,omitempty"`
+	TelegramFormat string `yaml:"telegram_format,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -29,11 +30,13 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	return provider, nil
 }
 
-func (p *Provider) Send(message string) error {
+func (p *Provider) Send(message, CliFormat string) error {
 
 	for _, pr := range p.Telegram {
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.TelegramFormat))
+
 		url := fmt.Sprintf("telegram://%s@telegram?channels=%s", pr.TelegramAPIKey, pr.TelegramChatID)
-		err := shoutrrr.Send(url, message)
+		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			return err
 		}
