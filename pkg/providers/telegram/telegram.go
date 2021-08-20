@@ -43,6 +43,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send telegram notification for id: %s ", pr.ID))
 			TelegramErr = multierr.Append(TelegramErr, err)
+			continue
 		}
 		gologger.Verbose().Msgf("telegram notification sent for id: %s", pr.ID)
 	}

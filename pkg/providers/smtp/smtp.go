@@ -47,6 +47,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send smtp notification for id: %s ", pr.ID))
 			SmtpErr = multierr.Append(SmtpErr, err)
+			continue
 		}
 		gologger.Verbose().Msgf("smtp notification sent for id: %s", pr.ID)
 	}

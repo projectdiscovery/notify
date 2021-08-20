@@ -45,6 +45,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send pushover notification for id: %s ", pr.ID))
 			PushoverErr = multierr.Append(PushoverErr, err)
+			continue
 		}
 		gologger.Verbose().Msgf("pushover notification sent for id: %s", pr.ID)
 	}

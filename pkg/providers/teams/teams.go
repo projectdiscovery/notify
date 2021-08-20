@@ -45,6 +45,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send teams notification for id: %s ", pr.ID))
 			TeamsErr = multierr.Append(TeamsErr, err)
+			continue
 		}
 		gologger.Verbose().Msgf("teams notification sent for id: %s", pr.ID)
 	}

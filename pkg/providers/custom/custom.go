@@ -59,6 +59,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s ", pr.ID))
 			CustomErr = multierr.Append(CustomErr, err)
+			continue
 		}
 		gologger.Verbose().Msgf("custom notification sent for id: %s", pr.ID)
 	}

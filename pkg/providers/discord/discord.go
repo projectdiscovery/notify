@@ -53,6 +53,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send discord notification for id: %s ", pr.ID))
 			DiscordErr = multierr.Append(DiscordErr, err)
+			continue
 		}
 		gologger.Verbose().Msgf("discord notification sent for id: %s", pr.ID)
 	}

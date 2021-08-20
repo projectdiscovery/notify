@@ -30,8 +30,8 @@ func (c *Client) Get(url string, response interface{}) error {
 	return nil
 }
 
-func (c *Client) Post(url string, request interface{}, headers http.Header, response interface{}) error {
-	body, err := json.Marshal(request)
+func (c *Client) Post(url string, requestBody interface{}, headers http.Header, response interface{}) error {
+	body, err := json.Marshal(requestBody)
 	if err != nil {
 		return fmt.Errorf("error creating payload: %v", err)
 	}
