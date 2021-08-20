@@ -51,20 +51,19 @@ notify -h
 
 This will display help for the tool. Here are all the switches it supports.
 
-| Flag                    | Description                                     | Example                                   |
-| ----------------------- | ----------------------------------------------- | ----------------------------------------- |
-| -config string          | Notify configuration file                       | notify -config config.yaml                |
-| -silent                 | Don't print the banner                          | notify -silent                            |
-| -version                | Show version of notify                          | notify -version                           |
-| -v                      | Show Verbose output                             | notify -v                                 |
-| -no-color               | Don't Use colors in output                      | notify -no-color                          |
-| -data string            | File path to read data from                     | notify -data test.txt                     |
-| -bulk                   | Read and send data in bulk from file.           | notify -bulk                              |
-| -char-limit int         | Character limit for message (default 4000)      | notify -char-limit 2000                   |
-| -provider-config string | provider config path                            | notify -provider providers.yaml           |
-| -provider string[]      | provider to send the notification to (optional) | notify -provider slack -provider telegram |
-| -id string[]            | id to send the notification to (optional)       | notify -id recon,scans                    |
-
+| Flag             | Description                                     | Example                           |
+| ---------------- | ----------------------------------------------- | --------------------------------- |
+| -config          | Notify configuration file                       | notify -config config.yaml        |
+| -silent          | Don't print the banner                          | notify -silent                    |
+| -version         | Show version of notify                          | notify -version                   |
+| -v               | Show Verbose output                             | notify -v                         |
+| -no-color        | Don't Use colors in output                      | notify -no-color                  |
+| -data            | File path to read data from                     | notify -data test.txt             |
+| -bulk            | Read and send data in bulk from file.           | notify -bulk                      |
+| -char-limit      | Character limit for message (default 4000)      | notify -char-limit 2000           |
+| -provider-config | provider config path                            | notify -provider-config conf.yaml |
+| -provider        | provider to send the notification to (optional) | notify -provider slack,telegram   |
+| -id              | id to send the notification to (optional)       | notify -id recon,scans            |
 
 
 # Notify Installation
