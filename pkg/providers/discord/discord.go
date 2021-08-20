@@ -1,12 +1,13 @@
 package discord
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/pkg/errors"
 	"github.com/projectdiscovery/notify/pkg/utils"
+	"go.uber.org/multierr"
 )
 
 type Provider struct {
@@ -33,21 +34,23 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	return provider, nil
 }
 func (p *Provider) Send(message, CliFormat string) error {
+	var DiscordErr error
 
 	for _, pr := range p.Discord {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.DiscordFormat))
 
 		discordTokens := strings.TrimPrefix(pr.DiscordWebHookURL, "https://discord.com/api/webhooks/")
 		tokens := strings.Split(discordTokens, "/")
-		if len(tokens) != 2 {
-			return errors.New("Wrong discord configuration")
+		if len(tokens) < 2 {
+			DiscordErr = multierr.Append(DiscordErr, errors.Wrap(errors.New("wrong discord configuration"), "error sending discord"))
+			continue
 		}
 		webhookID, token := tokens[0], tokens[1]
 		url := fmt.Sprintf("discord://%s@%s?splitlines=no", token, webhookID)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			return err
+			DiscordErr = multierr.Append(DiscordErr, errors.Wrap(err, "error sending discord"))
 		}
 	}
-	return nil
+	return DiscordErr
 }

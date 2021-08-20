@@ -6,6 +6,9 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/projectdiscovery/notify/pkg/utils"
+	"go.uber.org/multierr"
+	"github.com/pkg/errors"
+
 )
 
 type Provider struct {
@@ -35,15 +38,15 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
-
+	var SmtpErr error
 	for _, pr := range p.SMTP {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SMTPFormat))
 
 		url := fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s", pr.Username, pr.Password, pr.Server, pr.FromAddress, strings.Join(pr.SMTPCC, ","))
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			return err
+			SmtpErr = multierr.Append(SmtpErr,  errors.Wrap(err, "error sending smtp"))
 		}
 	}
-	return nil
+	return SmtpErr
 }

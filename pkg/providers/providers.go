@@ -110,7 +110,7 @@ func (p *Client) Send(message string) error {
 
 	for _, v := range p.providers {
 		if err := v.Send(message, p.options.MessageFormat); err != nil {
-			gologger.Error().Msgf("error while sending message: %s", err)
+			gologger.Error().Msgf("%s", err)
 		}
 	}
 

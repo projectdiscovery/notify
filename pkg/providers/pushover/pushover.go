@@ -6,6 +6,8 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/projectdiscovery/notify/pkg/utils"
+	"go.uber.org/multierr"
+	"github.com/pkg/errors"
 )
 
 type Provider struct {
@@ -33,15 +35,15 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
-
+	var PushoverErr error
 	for _, pr := range p.Pushover {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.PushoverFormat))
 
 		url := fmt.Sprintf("pushover://shoutrrr:%s@%s/?devices=%s", pr.PushoverApiToken, pr.UserKey, strings.Join(pr.PushoverDevices, ","))
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			return err
+			PushoverErr = multierr.Append(PushoverErr,  errors.Wrap(err, "error sending pushover"))
 		}
 	}
-	return nil
+	return PushoverErr
 }

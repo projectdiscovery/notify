@@ -55,3 +55,7 @@ func (c *Client) Post(url string, request interface{}, headers http.Header, resp
 	}
 	return nil
 }
+
+func (c *Client) Do(req *http.Request) (*http.Response, error) {
+	return c.httpClient.Do(req)
+}

@@ -2,9 +2,12 @@ package custom
 
 import (
 	"bytes"
+	"net/http"
 
+	"github.com/pkg/errors"
 	"github.com/projectdiscovery/notify/pkg/utils"
-	"github.com/projectdiscovery/retryablehttp-go"
+	"github.com/projectdiscovery/notify/pkg/utils/httpreq"
+	"go.uber.org/multierr"
 )
 
 type Provider struct {
@@ -32,26 +35,27 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
+	var CustomErr error
 
 	for _, pr := range p.Custom {
 
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.CustomFormat))
 		body := bytes.NewBufferString(msg)
 
-		r, err := retryablehttp.NewRequest(pr.CustomMethod, pr.CustomWebhookURL, body)
+		r, err := http.NewRequest(pr.CustomMethod, pr.CustomWebhookURL, body)
 		if err != nil {
-			return err
+			CustomErr = multierr.Append(CustomErr, errors.Wrap(err, "error sending custom"))
+			continue
 		}
 
 		for k, v := range pr.CustomHeaders {
 			r.Header.Set(k, v)
 		}
 
-		client := retryablehttp.NewClient(retryablehttp.DefaultOptionsSingle)
-		_, err = client.Do(r)
+		_, err = httpreq.NewClient().Do(r)
 		if err != nil {
-			return err
+			CustomErr = multierr.Append(CustomErr, errors.Wrap(err, "error sending custom"))
 		}
 	}
-	return nil
+	return CustomErr
 }
