@@ -6,6 +6,7 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"go.uber.org/multierr"
 )
@@ -46,6 +47,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send slack notification for id: %s ", pr.ID))
 			SlackErr = multierr.Append(SlackErr, err)
 		}
+		gologger.Verbose().Msgf("slack notification sent for id: %s", pr.ID)
 	}
 	return SlackErr
 }

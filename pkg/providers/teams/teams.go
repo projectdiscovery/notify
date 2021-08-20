@@ -6,6 +6,7 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"go.uber.org/multierr"
 )
@@ -45,6 +46,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send teams notification for id: %s ", pr.ID))
 			TeamsErr = multierr.Append(TeamsErr, err)
 		}
+		gologger.Verbose().Msgf("teams notification sent for id: %s", pr.ID)
 	}
 	return TeamsErr
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"go.uber.org/multierr"
 )
@@ -43,6 +44,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send telegram notification for id: %s ", pr.ID))
 			TelegramErr = multierr.Append(TelegramErr, err)
 		}
+		gologger.Verbose().Msgf("telegram notification sent for id: %s", pr.ID)
 	}
 	return TelegramErr
 }

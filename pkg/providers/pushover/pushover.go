@@ -6,6 +6,7 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"go.uber.org/multierr"
 )
@@ -45,6 +46,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send pushover notification for id: %s ", pr.ID))
 			PushoverErr = multierr.Append(PushoverErr, err)
 		}
+		gologger.Verbose().Msgf("pushover notification sent for id: %s", pr.ID)
 	}
 	return PushoverErr
 }

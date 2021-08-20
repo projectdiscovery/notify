@@ -6,6 +6,7 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"go.uber.org/multierr"
 )
@@ -53,6 +54,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send discord notification for id: %s ", pr.ID))
 			DiscordErr = multierr.Append(DiscordErr, err)
 		}
+		gologger.Verbose().Msgf("discord notification sent for id: %s", pr.ID)
 	}
 	return DiscordErr
 }
