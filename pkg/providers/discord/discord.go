@@ -42,14 +42,16 @@ func (p *Provider) Send(message, CliFormat string) error {
 		discordTokens := strings.TrimPrefix(pr.DiscordWebHookURL, "https://discord.com/api/webhooks/")
 		tokens := strings.Split(discordTokens, "/")
 		if len(tokens) < 2 {
-			DiscordErr = multierr.Append(DiscordErr, errors.Wrap(errors.New("wrong discord configuration"), "error sending discord"))
+			err := fmt.Errorf("incorrect discord configuration for id: %s ", pr.ID)
+			DiscordErr = multierr.Append(DiscordErr, err)
 			continue
 		}
 		webhookID, token := tokens[0], tokens[1]
 		url := fmt.Sprintf("discord://%s@%s?splitlines=no", token, webhookID)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			DiscordErr = multierr.Append(DiscordErr, errors.Wrap(err, "error sending discord"))
+			err = errors.Wrap(err, fmt.Sprintf("failed to send discord notification for id: %s ", pr.ID))
+			DiscordErr = multierr.Append(DiscordErr, err)
 		}
 	}
 	return DiscordErr

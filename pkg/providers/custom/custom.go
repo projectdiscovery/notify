@@ -2,6 +2,7 @@ package custom
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -44,7 +45,8 @@ func (p *Provider) Send(message, CliFormat string) error {
 
 		r, err := http.NewRequest(pr.CustomMethod, pr.CustomWebhookURL, body)
 		if err != nil {
-			CustomErr = multierr.Append(CustomErr, errors.Wrap(err, "error sending custom"))
+			err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s ", pr.ID))
+			CustomErr = multierr.Append(CustomErr, err)
 			continue
 		}
 
@@ -54,7 +56,8 @@ func (p *Provider) Send(message, CliFormat string) error {
 
 		_, err = httpreq.NewClient().Do(r)
 		if err != nil {
-			CustomErr = multierr.Append(CustomErr, errors.Wrap(err, "error sending custom"))
+			err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s ", pr.ID))
+			CustomErr = multierr.Append(CustomErr, err)
 		}
 	}
 	return CustomErr

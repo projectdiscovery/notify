@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/pkg/errors"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"go.uber.org/multierr"
-	"github.com/pkg/errors"
 )
 
 type Provider struct {
@@ -42,7 +42,8 @@ func (p *Provider) Send(message, CliFormat string) error {
 		url := fmt.Sprintf("pushover://shoutrrr:%s@%s/?devices=%s", pr.PushoverApiToken, pr.UserKey, strings.Join(pr.PushoverDevices, ","))
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			PushoverErr = multierr.Append(PushoverErr,  errors.Wrap(err, "error sending pushover"))
+			err = errors.Wrap(err, fmt.Sprintf("failed to send pushover notification for id: %s ", pr.ID))
+			PushoverErr = multierr.Append(PushoverErr, err)
 		}
 	}
 	return PushoverErr

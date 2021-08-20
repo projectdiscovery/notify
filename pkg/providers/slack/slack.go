@@ -43,7 +43,8 @@ func (p *Provider) Send(message, CliFormat string) error {
 		url := fmt.Sprintf("slack://%s", slackTokens)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			SlackErr = multierr.Append(SlackErr, errors.Wrap(err, "error sending slack"))
+			err = errors.Wrap(err, fmt.Sprintf("failed to send slack notification for id: %s ", pr.ID))
+			SlackErr = multierr.Append(SlackErr, err)
 		}
 	}
 	return SlackErr

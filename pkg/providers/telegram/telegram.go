@@ -40,7 +40,8 @@ func (p *Provider) Send(message, CliFormat string) error {
 		url := fmt.Sprintf("telegram://%s@telegram?channels=%s", pr.TelegramAPIKey, pr.TelegramChatID)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			TelegramErr = multierr.Append(TelegramErr, errors.Wrap(err, "error sending telegram"))
+			err = errors.Wrap(err, fmt.Sprintf("failed to send telegram notification for id: %s ", pr.ID))
+			TelegramErr = multierr.Append(TelegramErr, err)
 		}
 	}
 	return TelegramErr

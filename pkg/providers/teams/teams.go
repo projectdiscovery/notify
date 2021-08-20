@@ -5,10 +5,9 @@ import (
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/pkg/errors"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"go.uber.org/multierr"
-	"github.com/pkg/errors"
-
 )
 
 type Provider struct {
@@ -43,7 +42,8 @@ func (p *Provider) Send(message, CliFormat string) error {
 		url := fmt.Sprintf("teams://%s", teamsTokens)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			TeamsErr = multierr.Append(TeamsErr,  errors.Wrap(err, "error sending teams"))
+			err = errors.Wrap(err, fmt.Sprintf("failed to send teams notification for id: %s ", pr.ID))
+			TeamsErr = multierr.Append(TeamsErr, err)
 		}
 	}
 	return TeamsErr
