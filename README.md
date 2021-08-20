@@ -108,6 +108,15 @@ telegram:
     telegram_api_key: "XXXXXXXXXXXX"
     telegram_chat_id: "XXXXXXXX"
     telegram_format: "{{data}}"
+
+custom:
+  - id: webhook
+    custom_webook_url: http://host/api/webhook
+    custom_method: GET
+    custom_format: '{{data}}'
+    custom_headers:
+      Content-Type: application/json
+      X-Api-Key: XXXXX
 ``` 
 
 # Running Notify
