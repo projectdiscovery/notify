@@ -40,7 +40,7 @@ func (options *Options) SendThreaded(message string) error {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("error while sending slack message: %s ", fmt.Errorf("request failed with status code %d ", res.StatusCode))
+		return fmt.Errorf("slack request failed with status code %d ", res.StatusCode)
 	}
 
 	var response APIResponse

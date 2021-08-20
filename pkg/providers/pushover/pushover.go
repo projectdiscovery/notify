@@ -5,7 +5,10 @@ import (
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
+	"go.uber.org/multierr"
 )
 
 type Provider struct {
@@ -33,15 +36,18 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
-
+	var PushoverErr error
 	for _, pr := range p.Pushover {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.PushoverFormat))
 
 		url := fmt.Sprintf("pushover://shoutrrr:%s@%s/?devices=%s", pr.PushoverApiToken, pr.UserKey, strings.Join(pr.PushoverDevices, ","))
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			return err
+			err = errors.Wrap(err, fmt.Sprintf("failed to send pushover notification for id: %s ", pr.ID))
+			PushoverErr = multierr.Append(PushoverErr, err)
+			continue
 		}
+		gologger.Verbose().Msgf("pushover notification sent for id: %s", pr.ID)
 	}
-	return nil
+	return PushoverErr
 }

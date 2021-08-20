@@ -5,7 +5,10 @@ import (
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
+	"go.uber.org/multierr"
 )
 
 type Provider struct {
@@ -35,15 +38,18 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
-
+	var SmtpErr error
 	for _, pr := range p.SMTP {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SMTPFormat))
 
 		url := fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s", pr.Username, pr.Password, pr.Server, pr.FromAddress, strings.Join(pr.SMTPCC, ","))
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			return err
+			err = errors.Wrap(err, fmt.Sprintf("failed to send smtp notification for id: %s ", pr.ID))
+			SmtpErr = multierr.Append(SmtpErr, err)
+			continue
 		}
+		gologger.Verbose().Msgf("smtp notification sent for id: %s", pr.ID)
 	}
-	return nil
+	return SmtpErr
 }

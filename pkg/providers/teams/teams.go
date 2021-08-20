@@ -5,7 +5,10 @@ import (
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
+	"go.uber.org/multierr"
 )
 
 type Provider struct {
@@ -31,7 +34,7 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
-
+	var TeamsErr error
 	for _, pr := range p.Teams {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.TeamsFormat))
 
@@ -40,8 +43,11 @@ func (p *Provider) Send(message, CliFormat string) error {
 		url := fmt.Sprintf("teams://%s", teamsTokens)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			return err
+			err = errors.Wrap(err, fmt.Sprintf("failed to send teams notification for id: %s ", pr.ID))
+			TeamsErr = multierr.Append(TeamsErr, err)
+			continue
 		}
+		gologger.Verbose().Msgf("teams notification sent for id: %s", pr.ID)
 	}
-	return nil
+	return TeamsErr
 }

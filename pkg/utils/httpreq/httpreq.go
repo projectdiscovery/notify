@@ -47,11 +47,15 @@ func (c *Client) Post(url string, request interface{}, headers http.Header, resp
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("error sending payload: %v", err)
+		return fmt.Errorf("failed to send payload: %v", err)
 	}
 
 	if err = jsoniter.NewDecoder(res.Body).Decode(&response); err != nil {
 		return fmt.Errorf("error trying to unmarshal the response: %v", err)
 	}
 	return nil
+}
+
+func (c *Client) Do(req *http.Request) (*http.Response, error) {
+	return c.httpClient.Do(req)
 }

@@ -1,12 +1,15 @@
 package slack
 
 import (
-	"errors"
+	"fmt"
 	"net/url"
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
+	"go.uber.org/multierr"
 )
 
 type Provider struct {
@@ -37,17 +40,29 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
+	var SlackErr error
 	for _, pr := range p.Slack {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SlackFormat))
 
 		if pr.SlackThreads {
 			if pr.SlackToken == "" {
-				return errors.New("can't start a slack thread without slack_token value in provider config")
+				err := errors.Wrap(fmt.Errorf("slack_token value is required to start a thread"),
+					fmt.Sprintf("failed to send slack notification for id: %s ", pr.ID))
+				SlackErr = multierr.Append(SlackErr, err)
+				continue
 			}
 			if pr.SlackChannel == "" {
-				return errors.New("can't start a slack thread without slack_channel value in provider config")
+				err := errors.Wrap(fmt.Errorf("slack_channel value is required to start a thread"),
+					fmt.Sprintf("failed to send slack notification for id: %s ", pr.ID))
+				SlackErr = multierr.Append(SlackErr, err)
+				continue
 			}
-			return pr.SendThreaded(msg)
+			if err := pr.SendThreaded(msg); err != nil {
+				err = errors.Wrap(err,
+					fmt.Sprintf("failed to send slack notification for id: %s ", pr.ID))
+				SlackErr = multierr.Append(SlackErr, err)
+				continue
+			}
 		} else {
 			slackTokens := strings.TrimPrefix(pr.SlackWebHookURL, "https://hooks.slack.com/services/")
 			url := &url.URL{
@@ -57,9 +72,14 @@ func (p *Provider) Send(message, CliFormat string) error {
 
 			err := shoutrrr.Send(url.String(), msg)
 			if err != nil {
-				return err
+				err = errors.Wrap(err,
+					fmt.Sprintf("failed to send slack notification for id: %s ", pr.ID))
+				SlackErr = multierr.Append(SlackErr, err)
+				continue
 			}
 		}
+		gologger.Verbose().Msgf("Slack notification sent successfully for id: %s", pr.ID)
+
 	}
-	return nil
+	return SlackErr
 }
