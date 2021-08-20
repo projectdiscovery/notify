@@ -8,8 +8,8 @@ type Options struct {
 	Silent         bool                `yaml:"silent,omitempty"`
 	Version        bool                `yaml:"version,omitempty"`
 	ProviderConfig string              `yaml:"provider_config,omitempty"`
-	Providers      goflags.StringSlice `yaml:"providers,omitempty"`
-	IDs            goflags.StringSlice `yaml:"ids,omitempty"`
+	Providers      goflags.NormalizedStringSlice `yaml:"providers,omitempty"`
+	IDs            goflags.NormalizedStringSlice `yaml:"ids,omitempty"`
 	Proxy          string              `yaml:"proxy,omitempty"`
 
 	MessageFormat string `yaml:"message_format,omitempty"`

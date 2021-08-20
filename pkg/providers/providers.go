@@ -13,6 +13,7 @@ import (
 	"github.com/projectdiscovery/notify/pkg/providers/telegram"
 	"github.com/projectdiscovery/notify/pkg/types"
 	"github.com/projectdiscovery/notify/pkg/utils"
+	"go.uber.org/multierr"
 )
 
 // ProviderOptions is configuration for notify providers
@@ -110,7 +111,9 @@ func (p *Client) Send(message string) error {
 
 	for _, v := range p.providers {
 		if err := v.Send(message, p.options.MessageFormat); err != nil {
-			gologger.Error().Msgf("error while sending message: %s", err)
+			for _, v := range multierr.Errors(err) {
+				gologger.Error().Msgf("%s", v)
+			}
 		}
 	}
 

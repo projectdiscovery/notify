@@ -5,7 +5,10 @@ import (
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/pkg/errors"
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
+	"go.uber.org/multierr"
 )
 
 type Provider struct {
@@ -33,6 +36,7 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
+	var SlackErr error
 	for _, pr := range p.Slack {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SlackFormat))
 
@@ -40,8 +44,10 @@ func (p *Provider) Send(message, CliFormat string) error {
 		url := fmt.Sprintf("slack://%s", slackTokens)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
-			return err
+			err = errors.Wrap(err, fmt.Sprintf("failed to send slack notification for id: %s ", pr.ID))
+			SlackErr = multierr.Append(SlackErr, err)
 		}
+		gologger.Verbose().Msgf("slack notification sent for id: %s", pr.ID)
 	}
-	return nil
+	return SlackErr
 }

@@ -77,6 +77,10 @@ func (r *Runner) Run() error {
 
 	switch {
 	case hasStdin():
+		if r.options.Bulk {
+			gologger.Error().Msgf("bulk flag is not supported with stdin")
+			os.Exit(1)
+		}
 		inFile = os.Stdin
 
 	case r.options.Data != "":
