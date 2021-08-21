@@ -1,4 +1,4 @@
-FROM golang:1.16.0-alpine as build-env
+FROM golang:1.17.0-alpine as build-env
 RUN GO111MODULE=on go get -v github.com/projectdiscovery/notify/cmd/notify
 
 FROM alpine:latest
