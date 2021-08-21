@@ -117,6 +117,16 @@ pushover:
     pushover_devices:
       - "iphone"
 
+smtp:
+  - id: email
+    smtp_server: mail.example.com
+    smtp_username: test@example.com
+    smtp_password: password
+    from_address: from@email.com
+    smtp_cc:
+      - to@email.com
+    smtp_format: "{{data}}"
+
 custom:
   - id: webhook
     custom_webook_url: http://host/api/webhook
