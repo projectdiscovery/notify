@@ -3,11 +3,14 @@ package runner
 import (
 	"bufio"
 	"crypto/tls"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
 
+	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers"
@@ -38,13 +41,13 @@ func NewRunner(options *types.Options) (*Runner, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "could not open provider config file")
 	}
-
 	if parseErr := yaml.NewDecoder(file).Decode(&providerOptions); parseErr != nil {
 		file.Close()
 		return nil, errors.Wrap(parseErr, "could not parse provider config file")
 	}
 
-	file.Close()
+	// Discard all internal logs
+	shoutrrr.SetLogger(log.New(ioutil.Discard, "", 0))
 
 	prClient, err := providers.New(&providerOptions, options)
 	if err != nil {
