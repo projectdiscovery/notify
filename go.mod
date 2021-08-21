@@ -1,15 +1,27 @@
 module github.com/projectdiscovery/notify
 
-go 1.14
+go 1.15
 
 require (
-	github.com/Shopify/yaml v2.1.0+incompatible
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
-	github.com/projectdiscovery/collaborator v0.0.1
-	github.com/projectdiscovery/gologger v1.0.1
+	github.com/containrrr/shoutrrr v0.4.5-0.20210707101419-8018a476b557
+	github.com/fatih/color v1.12.0 // indirect
+	github.com/golang/protobuf v1.4.3 // indirect
+	github.com/google/go-cmp v0.5.4 // indirect
+	github.com/google/uuid v1.2.0 // indirect
+	github.com/json-iterator/go v1.1.11
+	github.com/klauspost/compress v1.13.1 // indirect
+	github.com/mattn/go-isatty v0.0.13 // indirect
+	github.com/onsi/ginkgo v1.16.4 // indirect
+	github.com/onsi/gomega v1.10.5 // indirect
+	github.com/pkg/errors v0.9.1
+	github.com/projectdiscovery/goflags v0.0.7
+	github.com/projectdiscovery/gologger v1.1.4
 	github.com/projectdiscovery/retryablehttp-go v1.0.1
-	golang.org/x/crypto v0.0.0-20201116153603-4be66e5b6582 // indirect
-	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect
-	golang.org/x/sys v0.0.0-20201116194326-cc9327a14d48 // indirect
+	go.uber.org/multierr v1.1.0
+	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
+	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
+	google.golang.org/protobuf v1.25.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0
+	nhooyr.io/websocket v1.8.7 // indirect
 )

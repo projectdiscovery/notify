@@ -1,23 +1,59 @@
 package runner
 
-import "os"
+import (
+	"math"
+)
 
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
+// SplitText tries to split a string by line while keeping the chunk size as close to maxChunkSize as possible (equal or less than maxChunkSize)
+func SplitText(in string, maxChunkSize, searchLimit int) (chunks []string) {
+	runes := []rune(in)
+	totalSize := len(runes)
+	minChunkSize := 1
+	chunkOffset := 0
+
+	if maxChunkSize > searchLimit {
+		minChunkSize = maxChunkSize - searchLimit
 	}
-	return !info.IsDir()
-}
+	maxPossibleChunks := int(math.Ceil(float64(totalSize) / float64(minChunkSize)))
 
-func hasStdin() bool {
-	stat, err := os.Stdin.Stat()
-	if err != nil {
-		return false
+	for i := 0; i <= maxPossibleChunks; i++ {
+
+		chunkEnd := chunkOffset + maxChunkSize
+		nextChunkStart := chunkEnd
+
+		// Check if it is the last chunk (chunkEnd is greater or equal to total size)
+		if chunkEnd >= totalSize {
+			chunkEnd = totalSize
+			nextChunkStart = totalSize
+		} else {
+
+			//Check for a line break
+			for j := 0; j < searchLimit; j++ {
+
+				sp := chunkEnd - j
+
+				if sp < 0 {
+					break
+				}
+				// Check if sp is the suitable split point
+				if runes[sp] == '\n' {
+
+					chunkEnd = sp
+					nextChunkStart = chunkEnd + 1
+
+					break
+				}
+			}
+
+		}
+
+		chunks = append(chunks, string(runes[chunkOffset:chunkEnd]))
+
+		chunkOffset = nextChunkStart
+		if chunkOffset >= totalSize {
+			break
+		}
 	}
 
-	isPipedFromChrDev := (stat.Mode() & os.ModeCharDevice) == 0
-	isPipedFromFIFO := (stat.Mode() & os.ModeNamedPipe) != 0
-
-	return isPipedFromChrDev || isPipedFromFIFO
+	return chunks
 }
