@@ -78,7 +78,7 @@ The default provider config file can be created at `$HOME/.config/notify/provide
 
 ```yaml
 slack:
-  - id: "recon"
+  - id: "slack"
     slack_channel: "recon"
     slack_username: "test"
     slack_format: "{{data}}"
@@ -104,10 +104,18 @@ discord:
     discord_webhook_url: "https://discord.com/api/webhooks/XXXXXXXX"
 
 telegram:
-  - id: "quick"
+  - id: "tel"
     telegram_api_key: "XXXXXXXXXXXX"
     telegram_chat_id: "XXXXXXXX"
     telegram_format: "{{data}}"
+
+pushover:
+  - id: "push"
+    pushover_user_key: "XXXX"
+    pushover_api_token: "YYYY"
+    pushover_format: "{{data}}"
+    pushover_devices:
+      - "iphone"
 
 custom:
   - id: webhook
@@ -196,5 +204,6 @@ Notify flags can be configured at default config (`$HOME/.config/notify/config.y
 - [Creating Slack webhook](https://slack.com/intl/en-it/help/articles/115005265063-Incoming-webhooks-for-Slack)
 - [Creating Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
 - [Creating Telegram bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
+- [Creating Pushover Token](https://github.com/containrrr/shoutrrr/blob/main/docs/services/pushover.md)
 
 Notify is made with 🖤 by the [projectdiscovery](https://projectdiscovery.io) team.
