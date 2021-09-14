@@ -79,18 +79,17 @@ func (r *Runner) Run() error {
 	var err error
 
 	switch {
+	case r.options.Data != "":
+		inFile, err = os.Open(r.options.Data)
+		if err != nil {
+			gologger.Fatal().Msgf("%s\n", err)
+		}
 	case hasStdin():
 		if r.options.Bulk {
 			gologger.Error().Msgf("bulk flag is not supported with stdin")
 			os.Exit(1)
 		}
 		inFile = os.Stdin
-
-	case r.options.Data != "":
-		inFile, err = os.Open(r.options.Data)
-		if err != nil {
-			gologger.Fatal().Msgf("%s\n", err)
-		}
 	default:
 		return errors.New("notify works with stdin or file using -data flag")
 	}
