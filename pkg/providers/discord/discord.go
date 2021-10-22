@@ -51,10 +51,10 @@ func (p *Provider) Send(message, CliFormat string) error {
 		
 		webhookID, webhookToken := matchedGroups["webhook_identifier"], matchedGroups["webhook_token"]
 		url := fmt.Sprintf("discord://%s@%s?splitlines=no", webhookToken, webhookID)
-		err := shoutrrr.Send(url, msg)
-		if err != nil {
-			err = errors.Wrap(err, fmt.Sprintf("failed to send discord notification for id: %s ", pr.ID))
-			DiscordErr = multierr.Append(DiscordErr, err)
+		sendErr := shoutrrr.Send(url, msg)
+		if sendErr != nil {
+			sendErr = errors.Wrap(sendErr, fmt.Sprintf("failed to send discord notification for id: %s ", pr.ID))
+			DiscordErr = multierr.Append(DiscordErr, sendErr)
 			continue
 		}
 		gologger.Verbose().Msgf("discord notification sent for id: %s", pr.ID)
