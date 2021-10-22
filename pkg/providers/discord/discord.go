@@ -2,6 +2,7 @@ package discord
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
@@ -39,8 +40,9 @@ func (p *Provider) Send(message, CliFormat string) error {
 
 	for _, pr := range p.Discord {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.DiscordFormat))
+		discordRegex := regexp.MustCompile(`https://(discord.com|discordapp.com)/api/webhooks/`)
 
-		discordTokens := strings.TrimPrefix(pr.DiscordWebHookURL, "https://discord.com/api/webhooks/")
+		discordTokens := strings.TrimPrefix(pr.DiscordWebHookURL, discordRegex.FindString(pr.DiscordWebHookURL))
 		tokens := strings.Split(discordTokens, "/")
 		if len(tokens) < 2 {
 			err := fmt.Errorf("incorrect discord configuration for id: %s ", pr.ID)
