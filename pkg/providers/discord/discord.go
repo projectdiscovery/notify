@@ -2,8 +2,6 @@ package discord
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
