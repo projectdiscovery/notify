@@ -62,6 +62,7 @@ func readConfig() {
 	set.NormalizedStringSliceVar(&options.IDs, "id", []string{}, "id to send the notification to (optional)")
 	set.StringVar(&options.MessageFormat, "msg-format", "{{data}}", "apply custom formatting to the text")
 	set.StringVar(&options.Proxy, "proxy", "", "Set http proxy to be used by notify")
+	set.IntVar(&options.RateLimit, "rate-limit", 0, "Maximum number of HTTP requests to send per second")
 
 	_ = set.Parse()
 
