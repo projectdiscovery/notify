@@ -9,12 +9,14 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"time"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers"
 	"github.com/projectdiscovery/notify/pkg/types"
+	"github.com/projectdiscovery/notify/pkg/utils"
 	"gopkg.in/yaml.v2"
 )
 
@@ -59,13 +61,13 @@ func NewRunner(options *types.Options) (*Runner, error) {
 
 // Run polling and notification
 func (r *Runner) Run() error {
-
+	defaultTransport := http.DefaultTransport.(*http.Transport)
 	if r.options.Proxy != "" {
 		proxyurl, err := url.Parse(r.options.Proxy)
 		if err != nil || proxyurl == nil {
 			gologger.Warning().Msgf("supplied proxy '%s' is not valid", r.options.Proxy)
 		} else {
-			http.DefaultClient.Transport = &http.Transport{
+			defaultTransport = &http.Transport{
 				Proxy:             http.ProxyURL(proxyurl),
 				ForceAttemptHTTP2: true,
 				TLSClientConfig: &tls.Config{
@@ -73,6 +75,10 @@ func (r *Runner) Run() error {
 				},
 			}
 		}
+	}
+
+	if r.options.RateLimit > 0 {
+		http.DefaultClient.Transport = utils.NewThrottledTransport(time.Second, r.options.RateLimit, defaultTransport)
 	}
 
 	var inFile *os.File
