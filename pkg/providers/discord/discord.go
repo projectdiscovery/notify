@@ -2,13 +2,13 @@ package discord
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"go.uber.org/multierr"
+	"github.com/oriser/regroup"
 )
 
 type Provider struct {
@@ -39,20 +39,22 @@ func (p *Provider) Send(message, CliFormat string) error {
 
 	for _, pr := range p.Discord {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.DiscordFormat))
-
-		discordTokens := strings.TrimPrefix(pr.DiscordWebHookURL, "https://discord.com/api/webhooks/")
-		tokens := strings.Split(discordTokens, "/")
-		if len(tokens) < 2 {
+		
+		discordWebhookRegex := regroup.MustCompile(`(?P<scheme>https?):\/\/(?P<domain>(?:ptb\.|canary\.)?discord(?:app)?\.com)\/api(?:\/)?(?P<api_version>v\d{1,2})?\/webhooks\/(?P<webhook_identifier>\d{17,19})\/(?P<webhook_token>[\w\-]{68})`)
+		matchedGroups, err := discordWebhookRegex.Groups(pr.DiscordWebHookURL)
+		
+		if err != nil {
 			err := fmt.Errorf("incorrect discord configuration for id: %s ", pr.ID)
 			DiscordErr = multierr.Append(DiscordErr, err)
 			continue
 		}
-		webhookID, token := tokens[0], tokens[1]
-		url := fmt.Sprintf("discord://%s@%s?splitlines=no", token, webhookID)
-		err := shoutrrr.Send(url, msg)
-		if err != nil {
-			err = errors.Wrap(err, fmt.Sprintf("failed to send discord notification for id: %s ", pr.ID))
-			DiscordErr = multierr.Append(DiscordErr, err)
+		
+		webhookID, webhookToken := matchedGroups["webhook_identifier"], matchedGroups["webhook_token"]
+		url := fmt.Sprintf("discord://%s@%s?splitlines=no", webhookToken, webhookID)
+		sendErr := shoutrrr.Send(url, msg)
+		if sendErr != nil {
+			sendErr = errors.Wrap(sendErr, fmt.Sprintf("failed to send discord notification for id: %s ", pr.ID))
+			DiscordErr = multierr.Append(DiscordErr, sendErr)
 			continue
 		}
 		gologger.Verbose().Msgf("discord notification sent for id: %s", pr.ID)
