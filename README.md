@@ -82,39 +82,39 @@ slack:
   - id: "slack"
     slack_channel: "recon"
     slack_username: "test"
-    slack_format: "{{data}}"
+    slack_format: "{{.Data}}"
     slack_webhook_url: "https://hooks.slack.com/services/XXXXXX"
 
   - id: "vulns"
     slack_channel: "vulns"
     slack_username: "test"
-    slack_format: "{{data}}"
+    slack_format: "{{.Data}}"
     slack_webhook_url: "https://hooks.slack.com/services/XXXXXX"
 
 discord:
   - id: "crawl"
     discord_channel: "crawl"
     discord_username: "test"
-    discord_format: "{{data}}"
+    discord_format: "{{.Data}}"
     discord_webhook_url: "https://discord.com/api/webhooks/XXXXXXXX"
 
   - id: "subs"
     discord_channel: "subs"
     discord_username: "test"
-    discord_format: "{{data}}"
+    discord_format: "{{.Data}}"
     discord_webhook_url: "https://discord.com/api/webhooks/XXXXXXXX"
 
 telegram:
   - id: "tel"
     telegram_api_key: "XXXXXXXXXXXX"
     telegram_chat_id: "XXXXXXXX"
-    telegram_format: "{{data}}"
+    telegram_format: "{{.Data}}"
 
 pushover:
   - id: "push"
     pushover_user_key: "XXXX"
     pushover_api_token: "YYYY"
-    pushover_format: "{{data}}"
+    pushover_format: "{{.Data}}"
     pushover_devices:
       - "iphone"
 
@@ -126,13 +126,13 @@ smtp:
     from_address: from@email.com
     smtp_cc:
       - to@email.com
-    smtp_format: "{{data}}"
+    smtp_format: "{{.Data}}"
 
 custom:
   - id: webhook
     custom_webook_url: http://host/api/webhook
     custom_method: GET
-    custom_format: '{{data}}'
+    custom_format: '{{.Data}}'
     custom_headers:
       Content-Type: application/json
       X-Api-Key: XXXXX

@@ -57,7 +57,7 @@ func readConfig() {
 	set.IntVarP(&options.RateLimit, "rate-limit", "rl", 0, "maximum number of HTTP requests to send per second")
 	set.BoolVar(&options.Bulk, "bulk", false, "enable bulk processing (supported with file input")
 	set.IntVarP(&options.CharLimit, "char-limit", "cl", 4000, "max character limit per message")
-	set.StringVarP(&options.MessageFormat, "msg-format", "mf", "{{data}}", "add custom formatting to message")
+	set.StringVarP(&options.MessageFormat, "msg-format", "mf", "{{.Data}}", "add custom formatting to message")
 	set.BoolVar(&options.Silent, "silent", false, "enable silent mode")
 	set.BoolVarP(&options.Verbose, "verbose", "v", false, "enable verbose mode")
 	set.BoolVar(&options.Version, "version", false, "display version")

@@ -1,10 +1,14 @@
 package utils
 
 import (
-	"strings"
+	"bytes"
+	"text/template"
+
+	"github.com/Masterminds/sprig/v3"
+	"github.com/projectdiscovery/gologger"
 )
 
-const defaultFormat = "{{data}}"
+const defaultFormat = "{{.Data}}"
 
 func Contains(slice []string, item string) bool {
 	set := make(map[string]struct{}, len(slice))
@@ -18,7 +22,19 @@ func Contains(slice []string, item string) bool {
 }
 
 func FormatMessage(msg, format string) string {
-	return strings.Replace(format, defaultFormat, msg, -1)
+	buf := new(bytes.Buffer)
+	tpl, err := template.New("msg").Funcs(sprig.TxtFuncMap()).Parse(format)
+	if err != nil {
+		gologger.Error().Msgf("failed to parse message template %s:%v", format, err)
+		return msg
+	}
+
+	err = tpl.Execute(buf, struct{ Data string }{Data: msg})
+	if err != nil {
+		gologger.Error().Msgf("failed to execute message template: %v", err)
+		return msg
+	}
+	return buf.String()
 }
 
 func SelectFormat(cliFormat, configFormat string) string {
