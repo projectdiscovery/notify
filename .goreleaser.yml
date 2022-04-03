@@ -31,3 +31,30 @@ archives:
 
 checksum:
   algorithm: sha256
+
+snapcrafts:
+  - id: notify
+    replacements:
+      darwin: macOS
+    name: notify
+    publish: false
+    summary: Notify is a Go-based assistance package that enables you to stream the output of several tools.
+    description: |
+      Notify is a Go-based assistance package that enables you to stream the output of several tools (or read from a file) and publish it to a variety of supported platforms.
+    grade: stable
+    confinement: strict
+    license: MIT
+    base: core18
+    apps:
+      notify:
+        command: notify
+        plugs:
+          - home
+          - network
+          - removable-media
+          - dot-notify
+    plugs:
+      dot-notify:
+        interface: personal-files
+        write:
+          - $HOME/.config/notify
