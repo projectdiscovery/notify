@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="static/notify-logo.png" alt="notify" width="200px"></a>
+  <img src="static/notify-logo.png" alt="notify" width="200px">
   <br>
 </h1>
 
@@ -28,7 +28,7 @@
 Notify is a Go-based assistance package that enables you to stream the output of several tools (or read from a file) and publish it to a variety of supported platforms.
 
 <h1 align="left">
-  <img src="static/notify-httpx.png" alt="notify-httpx" width="700px"></a>
+  <img src="static/notify-httpx.png" alt="notify-httpx" width="700px">
   <br>
 </h1>
 
@@ -51,20 +51,20 @@ notify -h
 
 This will display help for the tool. Here are all the switches it supports.
 
-| Flag             | Description                                        | Example                    |
-|------------------|----------------------------------------------------|----------------------------|
-| -config          | Notify configuration file                          | notify -config config.yaml |
-| -silent          | Don't print the banner                             | notify -silent             |
-| -version         | Show version of notify                             | notify -version            |
-| -v               | Show Verbose output                                | notify -v                  |
-| -no-color        | Don't Use colors in output                         | notify -nc                 |
-| -data            | File path to read data from                        | notify -i test.txt         |
-| -bulk            | Read and send data in bulk from file.              | notify -bulk               |
-| -char-limit      | Character limit for message (default 4000)         | notify -cl 2000            |
-| -provider-config | provider config path                               | notify -pc provider.yaml   |
-| -provider        | provider to send the notification to (optional)    | notify -p slack,telegram   |
-| -id              | id to send the notification to (optional)          | notify -id recon,scans     |
-| -rate-limit      | maximum number of HTTP requests to send per second | notify -rl 1               |
+| Flag               | Description                                        | Example                      |
+|--------------------|----------------------------------------------------|------------------------------|
+| `-config`          | Notify configuration file                          | `notify -config config.yaml` |
+| `-silent`          | Don't print the banner                             | `notify -silent`             |
+| `-version`         | Show version of notify                             | `notify -version`            |
+| `-v`               | Show Verbose output                                | `notify -v`                  |
+| `-no-color`        | Don't Use colors in output                         | `notify -nc`                 |
+| `-data`            | File path to read data from                        | `notify -i test.txt`         |
+| `-bulk`            | Read and send data in bulk from file.              | `notify -bulk`               |
+| `-char-limit`      | Character limit for message (default 4000)         | `notify -cl 2000`            |
+| `-provider-config` | provider config path                               | `notify -pc provider.yaml`   |
+| `-provider`        | provider to send the notification to (optional)    | `notify -p slack,telegram`   |
+| `-id`              | id to send the notification to (optional)          | `notify -id recon,scans`     |
+| `-rate-limit`      | maximum number of HTTP requests to send per second | `notify -rl 1`               |
 
 
 # Notify Installation
@@ -150,7 +150,7 @@ subfinder -d hackerone.com | notify
 
 <h1 align="left">
 <img width="365" alt="notify-subfinder" src="https://user-images.githubusercontent.com/8293321/130240854-e3031bc6-ecc8-47f8-9654-4c58e09cc622.png">
-
+</h1>
 
 ### Send notification using output file
 
@@ -195,7 +195,7 @@ subfinder -d intigriti.com | httpx | nuclei -tags exposure -o output.txt; notify
 
 The tool tries to use the default provider config (`$HOME/.config/notify/provider-config.yaml`), it can also be specified via CLI by using **provider-config** flag.
 
-To run the tool with custom providers config, just use the following command.
+To run the tool with custom provider config, just use the following command.
 
 ```sh
 notify -provider-config providers.yaml
