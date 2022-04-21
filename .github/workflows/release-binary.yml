@@ -11,14 +11,14 @@ jobs:
     steps: 
       - 
         name: "Check out code"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with: 
           fetch-depth: 0
       - 
         name: "Set up Go"
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with: 
-          go-version: 1.17
+          go-version: 1.18
       - 
         env: 
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
