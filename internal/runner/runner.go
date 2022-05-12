@@ -3,6 +3,7 @@ package runner
 import (
 	"bufio"
 	"crypto/tls"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -91,25 +92,14 @@ func (r *Runner) Run() error {
 			gologger.Fatal().Msgf("%s\n", err)
 		}
 	case hasStdin():
-		if r.options.Bulk {
-			gologger.Error().Msgf("bulk flag is not supported with stdin")
-			os.Exit(1)
-		}
 		inFile = os.Stdin
 	default:
 		return errors.New("notify works with stdin or file using -data flag")
 	}
 
 	if r.options.Bulk {
-		fi, err := inFile.Stat()
+		msgB, err := io.ReadAll(inFile)
 		if err != nil {
-			gologger.Fatal().Msgf("%s\n", err)
-		}
-
-		msgB := make([]byte, fi.Size())
-
-		n, err := inFile.Read(msgB)
-		if err != nil || n == 0 {
 			gologger.Fatal().Msgf("%s\n", err)
 		}
 
