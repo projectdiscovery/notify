@@ -14,6 +14,7 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
+	"github.com/projectdiscovery/fileutil"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers"
 	"github.com/projectdiscovery/notify/pkg/types"
@@ -91,7 +92,7 @@ func (r *Runner) Run() error {
 		if err != nil {
 			gologger.Fatal().Msgf("%s\n", err)
 		}
-	case hasStdin():
+	case fileutil.HasStdin():
 		inFile = os.Stdin
 	default:
 		return errors.New("notify works with stdin or file using -data flag")
