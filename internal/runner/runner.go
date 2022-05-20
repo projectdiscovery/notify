@@ -3,7 +3,7 @@ package runner
 import (
 	"bufio"
 	"crypto/tls"
-	"io"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -98,42 +98,74 @@ func (r *Runner) Run() error {
 		return errors.New("notify works with stdin or file using -data flag")
 	}
 
-	if r.options.Bulk {
-		msgB, err := io.ReadAll(inFile)
-		if err != nil {
-			gologger.Fatal().Msgf("%s\n", err)
-		}
-
-		// char limit to search for a split
-		searchLimit := 250
-		if r.options.CharLimit < searchLimit {
-			searchLimit = r.options.CharLimit
-		}
-
-		items := SplitText(string(msgB), r.options.CharLimit, searchLimit)
-
-		for _, v := range items {
-			if err := r.sendMessage(v); err != nil {
-				gologger.Fatal().Msgf("%s\n", err)
-			}
-		}
-
-		os.Exit(0)
-	}
-
 	br := bufio.NewScanner(inFile)
+	if r.options.Bulk {
+		br.Split(bulkSplitter(r.options.CharLimit))
+	}
 	for br.Scan() {
 		msg := br.Text()
 		//nolint:errcheck
 		r.sendMessage(msg)
-
 	}
 	return nil
 }
 
+// Return a SplitFunc that tries to split on newlines while giving as many bytes that are <= charLimit each time
+func bulkSplitter(charLimit int) bufio.SplitFunc {
+	return func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+		// We need to be prepared to collect tokens because ScanLines trims trailing CR's for us
+		tokens := make([]byte, 0, charLimit)
+
+		advance, token, err = bufio.ScanLines(data, atEOF)
+
+		if err != nil || token == nil {
+			// Didn't get a line
+			return
+		}
+
+		if len(token) >= charLimit {
+			// Got too much. Give charLimit bytes and finish the rest of the line next time.
+			advance = charLimit
+			token = token[:charLimit]
+			return
+		}
+
+		tokens = append(tokens, token...)
+
+		// Keep getting lines until we exceed charLimit
+		for {
+			newAdvance, token, err := bufio.ScanLines(data[advance:], atEOF)
+
+			if err != nil || token == nil {
+				// Failed to get a line
+				break
+			}
+
+			if len(tokens)+len(token) > charLimit {
+				// Too much. Give what we had.
+				return advance, tokens, err
+			}
+
+			advance += newAdvance
+			tokens = append(tokens, '\n')
+			tokens = append(tokens, token...)
+		}
+
+		// Stopped getting lines but still hungry for bytes
+
+		// Are we done?
+		if atEOF {
+			return advance, tokens, nil
+		}
+
+		// Need more data
+		return 0, nil, nil
+	}
+}
+
 func (r *Runner) sendMessage(msg string) error {
 	if len(msg) > 0 {
-		gologger.Print().Msgf(msg)
+		fmt.Println(msg)
 		err := r.providers.Send(msg)
 		if err != nil {
 			return err
