@@ -4,55 +4,48 @@ import (
 	"bufio"
 )
 
+var ellipsis = []byte("...")
+
 // Return a bufio.SplitFunc that tries to split on newlines while giving as many bytes that are <= charLimit each time
 func bulkSplitter(charLimit int) bufio.SplitFunc {
 	return func(data []byte, atEOF bool) (advance int, token []byte, err error) {
-		// We need to be prepared to collect tokens because ScanLines trims trailing CR's for us
-		tokens := make([]byte, 0, charLimit)
-
-		advance, token, err = bufio.ScanLines(data, atEOF)
-
-		if err != nil || token == nil {
-			// Didn't get a line
-			return
-		}
-
-		if len(token) >= charLimit {
-			// Got too much. Give charLimit bytes and finish the rest of the line next time.
-			advance = charLimit
-			token = token[:charLimit]
-			return
-		}
-
-		tokens = append(tokens, token...)
+		var lineAdvance int
+		var line []byte
 
 		// Keep getting lines until we exceed charLimit
 		for {
-			newAdvance, token, err := bufio.ScanLines(data[advance:], atEOF)
+			lineAdvance, line, err = bufio.ScanLines(data[advance:], atEOF)
 
-			if err != nil || token == nil {
+			if err != nil || line == nil {
 				// Failed to get a line
-				break
+				if atEOF {
+					// We're done
+					if len(token) > 0 {
+						// Remove the trailing newline
+						token = token[:len(token)-1]
+					}
+					return
+				}
+
+				// We need more data
+				return 0, nil, nil
 			}
 
-			if len(tokens)+len(token) > charLimit {
-				// Too much. Give what we had.
-				return advance, tokens, err
+			if len(token)+len(line) > charLimit {
+				// What we had and what we got is too much
+				if len(token) == 0 {
+					// Even just the first line is too much
+					// Truncate and give it
+					token = append(token, line[:charLimit-len(ellipsis)]...)
+					token = append(token, ellipsis...)
+					advance = charLimit - len(ellipsis)
+				}
+				return
 			}
 
-			advance += newAdvance
-			tokens = append(tokens, '\n')
-			tokens = append(tokens, token...)
+			advance += lineAdvance
+			token = append(token, line...)
+			token = append(token, '\n')
 		}
-
-		// Stopped getting lines but still hungry for bytes
-
-		// Are we done?
-		if atEOF {
-			return advance, tokens, nil
-		}
-
-		// Need more data
-		return 0, nil, nil
 	}
 }
