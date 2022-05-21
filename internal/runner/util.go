@@ -20,11 +20,7 @@ func bulkSplitter(charLimit int) bufio.SplitFunc {
 				// Failed to get a line
 				if atEOF {
 					// We're done
-					if len(token) > 0 {
-						// Remove the trailing newline
-						token = token[:len(token)-1]
-					}
-					return
+					break
 				}
 
 				// We need more data
@@ -39,13 +35,23 @@ func bulkSplitter(charLimit int) bufio.SplitFunc {
 					token = append(token, line[:charLimit-len(ellipsis)]...)
 					token = append(token, ellipsis...)
 					advance = charLimit - len(ellipsis)
+					return
+				} else {
+					// Give what we had
+					break
 				}
-				return
 			}
 
 			advance += lineAdvance
 			token = append(token, line...)
 			token = append(token, '\n')
 		}
+
+		if len(token) > 0 {
+			// We have something. It'll have a trailing newline
+			// Remove it
+			token = token[:len(token)-1]
+		}
+		return
 	}
 }
