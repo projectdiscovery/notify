@@ -127,6 +127,7 @@ smtp:
     smtp_cc:
       - to@email.com
     smtp_format: "{{data}}"
+    subject: "Email subject"
 
 custom:
   - id: webhook
