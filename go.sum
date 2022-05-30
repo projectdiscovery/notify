@@ -17,8 +17,6 @@ github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08 h1:ox2F0PSMlrAAiAdk
 github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08/go.mod h1:pCxVEbcm3AMg7ejXyorUXi6HQCzOIBf7zEDVPtw0/U4=
 github.com/containrrr/shoutrrr v0.4.5-0.20220522113502-c91dc3cf1279 h1:yfK5DlNtPcbQzVYFq0PgY1Nt/YQQmDMXJJMRI4jX6kg=
 github.com/containrrr/shoutrrr v0.4.5-0.20220522113502-c91dc3cf1279/go.mod h1:PZKYVjVIabjVkRTbvK5N3t01xaZkD2d0hiRgzlHV6eA=
-github.com/containrrr/shoutrrr v0.5.3 h1:ndDN/cKl3cfmuHHjcTDiLTxxjl/1VTWTolOUTLUgiqc=
-github.com/containrrr/shoutrrr v0.5.3/go.mod h1:ye9jGX5YzMnJ76waaNVWlJ4luhMEyt1EWU5unYTQSb0=
 github.com/coreos/bbolt v1.3.2/go.mod h1:iRUV2dpdMOn7Bo10OQBFzIJO9kkE559Wcmn+qkEiiKk=
 github.com/coreos/etcd v3.3.13+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=
 github.com/coreos/go-semver v0.2.0/go.mod h1:nnelYz7RCh+5ahJtPPxZlU+153eP4D4r3EedlOD2RNk=
