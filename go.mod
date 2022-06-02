@@ -6,6 +6,7 @@ require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/containrrr/shoutrrr v0.4.5-0.20220522113502-c91dc3cf1279
 	github.com/json-iterator/go v1.1.12
+	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/pkg/errors v0.9.1
 	github.com/projectdiscovery/fileutil v0.0.0-20220510111557-fba17e05663f
@@ -20,7 +21,6 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08 // indirect
 	github.com/fatih/color v1.10.0 // indirect
-	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
