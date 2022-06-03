@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -9,11 +10,12 @@ import (
 )
 
 var (
-	debug     = os.Getenv("DEBUG") == "true"
-	errored   = false
-	success   = aurora.Green("[✓]").String()
-	failed    = aurora.Red("[✘]").String()
-	testCases = map[string]testutils.TestCase{
+	providerConfig = flag.String("provider-config", "", "provider config to use for testing")
+	debug          = os.Getenv("DEBUG") == "true"
+	errored        = false
+	success        = aurora.Green("[✓]").String()
+	failed         = aurora.Red("[✘]").String()
+	testCases      = map[string]testutils.TestCase{
 		"smtp":     &smtp{},
 		"discord":  &discord{},
 		"telegram": &telegram{},
@@ -25,6 +27,8 @@ var (
 )
 
 func main() {
+	flag.Parse()
+
 	for name, test := range testCases {
 		fmt.Printf("Running test cases for \"%s\"\n", aurora.Blue(name))
 		err := test.Execute()

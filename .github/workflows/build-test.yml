@@ -1,6 +1,5 @@
 name: 🔨 Build Test
 on:
-  push:
   pull_request:
   workflow_dispatch:
 
@@ -25,3 +24,9 @@ jobs:
       - name: Build
         run: go build .
         working-directory: cmd/notify/
+
+      - name: Integration Tests
+        run: |
+          chmod +x action-run.sh
+          bash action-run.sh
+        working-directory: cmd/integration-test/

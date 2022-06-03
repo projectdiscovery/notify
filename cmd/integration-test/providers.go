@@ -8,7 +8,11 @@ import (
 )
 
 func run(provider string) error {
-	results, err := testutils.RunNotifyAndGetResults(debug, "--provider", provider)
+	args := []string{"--provider", provider}
+	if *providerConfig != "" {
+		args = append(args, "--provider-config", *providerConfig)
+	}
+	results, err := testutils.RunNotifyAndGetResults(debug, args...)
 	if err != nil {
 		return err
 	}
