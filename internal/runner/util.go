@@ -57,8 +57,8 @@ func bulkSplitter(charLimit int) bufio.SplitFunc {
 	}
 }
 
-// SlitInChunks splits a string into chunks of size charLimit
-func SlitInChunks(data string, charLimit int) []string {
+// SplitInChunks splits a string into chunks of size charLimit
+func SplitInChunks(data string, charLimit int) []string {
 	length := len(data)
 	noOfChunks := int(math.Ceil(float64(length) / float64(charLimit)))
 	chunks := make([]string, noOfChunks)

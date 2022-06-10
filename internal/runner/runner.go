@@ -113,7 +113,7 @@ func (r *Runner) Run() error {
 		msg := br.Text()
 		if len(msg) > r.options.CharLimit {
 			// send the msg in chunks of length charLimit
-			for _, chunk := range SlitInChunks(msg, r.options.CharLimit) {
+			for _, chunk := range SplitInChunks(msg, r.options.CharLimit) {
 				//nolint:errcheck
 				r.sendMessage(chunk)
 			}
