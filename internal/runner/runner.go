@@ -97,14 +97,31 @@ func (r *Runner) Run() error {
 		return errors.New("notify works with stdin or file using -data flag")
 	}
 
+	info, err := inFile.Stat()
+	if err != nil {
+		return errors.Wrap(err, "could not get file info")
+	}
 	br := bufio.NewScanner(inFile)
+	maxSize := int(info.Size())
+	buffer := make([]byte, 0, maxSize)
+	br.Buffer(buffer, maxSize)
+
 	if r.options.Bulk {
 		br.Split(bulkSplitter(r.options.CharLimit))
 	}
 	for br.Scan() {
 		msg := br.Text()
-		//nolint:errcheck
-		r.sendMessage(msg)
+		if len(msg) > r.options.CharLimit {
+			// send the msg in chunks of length charLimit
+			for _, chunk := range SplitInChunks(msg, r.options.CharLimit) {
+				//nolint:errcheck
+				r.sendMessage(chunk)
+			}
+		} else {
+			//nolint:errcheck
+			r.sendMessage(msg)
+		}
+
 	}
 	return nil
 }
