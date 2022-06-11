@@ -12,11 +12,12 @@ require (
 	github.com/projectdiscovery/goflags v0.0.7
 	github.com/projectdiscovery/gologger v1.1.4
 	go.uber.org/multierr v1.8.0
-	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
+	go.uber.org/ratelimit v0.2.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
+	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08 // indirect
 	github.com/fatih/color v1.10.0 // indirect
@@ -27,6 +28,8 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/projectdiscovery/stringsutil v0.0.0-20220422150559-b54fb5dc6833 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/sys v0.0.0-20210113181707-4bcb84eeeb78 // indirect
+	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
+	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
+	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
