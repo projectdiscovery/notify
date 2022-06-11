@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/projectdiscovery/fileutil"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
@@ -13,7 +14,7 @@ import (
 // ParseOptions parses the command line flags provided by a user
 func ParseOptions(options *types.Options) {
 	// Check if stdin pipe was given
-	options.Stdin = hasStdin()
+	options.Stdin = fileutil.HasStdin()
 
 	// Read the inputs and configure the logging
 	configureOutput(options)
@@ -54,17 +55,4 @@ func validateOptions(options *types.Options) error {
 	}
 
 	return nil
-}
-
-// hasStdin returns true if we have stdin input
-func hasStdin() bool {
-	stat, err := os.Stdin.Stat()
-	if err != nil {
-		return false
-	}
-
-	isPipedFromChrDev := (stat.Mode() & os.ModeCharDevice) == 0
-	isPipedFromFIFO := (stat.Mode() & os.ModeNamedPipe) != 0
-
-	return isPipedFromChrDev || isPipedFromFIFO
 }
