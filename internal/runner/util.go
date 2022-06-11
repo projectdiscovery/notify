@@ -2,7 +2,6 @@ package runner
 
 import (
 	"bufio"
-	"math"
 )
 
 var ellipsis = []byte("...")
@@ -55,22 +54,4 @@ func bulkSplitter(charLimit int) bufio.SplitFunc {
 		}
 		return
 	}
-}
-
-// SplitInChunks splits a string into chunks of size charLimit
-func SplitInChunks(data string, charLimit int) []string {
-	length := len(data)
-	noOfChunks := int(math.Ceil(float64(length) / float64(charLimit)))
-	chunks := make([]string, noOfChunks)
-	var start, stop int
-
-	for i := 0; i < noOfChunks; i += 1 {
-		start = i * charLimit
-		stop = start + charLimit
-		if stop > length {
-			stop = length
-		}
-		chunks[i] = data[start:stop]
-	}
-	return chunks
 }
