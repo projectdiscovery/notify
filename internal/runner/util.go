@@ -25,7 +25,7 @@ func bulkSplitter(charLimit int) bufio.SplitFunc {
 				}
 
 				// We need more data
-				return 0, nil, nil
+				return
 			}
 
 			if len(token)+len(line) > charLimit {
