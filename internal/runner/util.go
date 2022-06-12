@@ -8,7 +8,8 @@ import (
 var ellipsis = []byte("...")
 
 // Return a bufio.SplitFunc that splits on as few newlines as possible
-// while giving as many bytes that are <= charLimit each time
+// while giving as many bytes that are <= charLimit each time.
+// Note: charLimit must be <= the buffer underlying the bufio.Scanner
 func bulkSplitter(charLimit int) (bufio.SplitFunc, error) {
 	if charLimit <= len(ellipsis) {
 		return nil, fmt.Errorf("charLimit must be > %d", len(ellipsis))
@@ -28,8 +29,24 @@ func bulkSplitter(charLimit int) (bufio.SplitFunc, error) {
 					break
 				}
 
-				// We need more data
-				return 0, nil, nil
+				if len(data) < charLimit {
+					// We need more data
+					return 0, nil, nil
+				} else {
+					// We have enough data, but bufio.ScanLines couldn't see a newline in what's left
+					// If we handle this then we can assure the bufio.Scanner will never give bufio.ErrTooLong
+					if len(token) == 0 {
+						// Even just the first line is too much
+						// Truncate and give it
+						token = append(token, data[:charLimit-len(ellipsis)]...)
+						token = append(token, ellipsis...)
+						advance = charLimit - len(ellipsis)
+						return advance, token, nil
+					} else {
+						// Give what we had
+						break
+					}
+				}
 			}
 
 			if len(token)+len(line) > charLimit {
@@ -62,7 +79,8 @@ func bulkSplitter(charLimit int) (bufio.SplitFunc, error) {
 }
 
 // Return a bufio.SplitFunc that splits on all newlines
-// while giving as many bytes that are <= charLimit each time
+// while giving as many bytes that are <= charLimit each time.
+// Note: charLimit must be <= the buffer underlying the bufio.Scanner
 func lineLengthSplitter(charLimit int) (bufio.SplitFunc, error) {
 	if charLimit <= len(ellipsis) {
 		return nil, fmt.Errorf("charLimit must be > %d", len(ellipsis))
@@ -74,8 +92,17 @@ func lineLengthSplitter(charLimit int) (bufio.SplitFunc, error) {
 		advance, line, err = bufio.ScanLines(data[advance:], atEOF)
 
 		if !atEOF && (err != nil || line == nil) {
-			// We need more data
-			return 0, nil, nil
+			if len(data) < charLimit {
+				// We need more data
+				return 0, nil, nil
+			} else {
+				// We have enough data, but bufio.ScanLines couldn't see a newline in it
+				// If we handle this then we can assure the bufio.Scanner will never give bufio.ErrTooLong
+				token = append(token, data[:charLimit-len(ellipsis)]...)
+				token = append(token, ellipsis...)
+				advance = charLimit - len(ellipsis)
+				return advance, token, nil
+			}
 		}
 
 		if len(line) > charLimit {

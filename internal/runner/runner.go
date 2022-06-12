@@ -101,6 +101,12 @@ func (r *Runner) Run() error {
 
 	br := bufio.NewScanner(inFile)
 
+	if r.options.CharLimit > bufio.MaxScanTokenSize {
+		// Satisfy the condition of our splitters, which is that charLimit is <= the size of the bufio.Scanner buffer
+		buffer := make([]byte, 0, r.options.CharLimit)
+		br.Buffer(buffer, r.options.CharLimit)
+	}
+
 	if r.options.Bulk {
 		splitter, err = bulkSplitter(r.options.CharLimit)
 	} else {
