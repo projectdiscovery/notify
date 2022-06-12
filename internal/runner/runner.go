@@ -85,6 +85,7 @@ func (r *Runner) Run() error {
 
 	var inFile *os.File
 	var err error
+	var splitter bufio.SplitFunc
 
 	switch {
 	case r.options.Data != "":
@@ -99,11 +100,19 @@ func (r *Runner) Run() error {
 	}
 
 	br := bufio.NewScanner(inFile)
+
 	if r.options.Bulk {
-		br.Split(bulkSplitter(r.options.CharLimit))
+		splitter, err = bulkSplitter(r.options.CharLimit)
 	} else {
-		br.Split(lineLengthSplitter(r.options.CharLimit))
+		splitter, err = lineLengthSplitter(r.options.CharLimit)
 	}
+
+	if err != nil {
+		return err
+	}
+
+	br.Split(splitter)
+
 	for br.Scan() {
 		msg := br.Text()
 		//nolint:errcheck

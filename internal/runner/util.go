@@ -2,13 +2,17 @@ package runner
 
 import (
 	"bufio"
+	"fmt"
 )
 
 var ellipsis = []byte("...")
 
 // Return a bufio.SplitFunc that splits on as few newlines as possible
 // while giving as many bytes that are <= charLimit each time
-func bulkSplitter(charLimit int) bufio.SplitFunc {
+func bulkSplitter(charLimit int) (bufio.SplitFunc, error) {
+	if charLimit <= len(ellipsis) {
+		return nil, fmt.Errorf("charLimit must be > %d", len(ellipsis))
+	}
 	return func(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		var lineAdvance int
 		var line []byte
@@ -54,12 +58,15 @@ func bulkSplitter(charLimit int) bufio.SplitFunc {
 			token = token[:len(token)-1]
 		}
 		return
-	}
+	}, nil
 }
 
 // Return a bufio.SplitFunc that splits on all newlines
 // while giving as many bytes that are <= charLimit each time
-func lineLengthSplitter(charLimit int) bufio.SplitFunc {
+func lineLengthSplitter(charLimit int) (bufio.SplitFunc, error) {
+	if charLimit <= len(ellipsis) {
+		return nil, fmt.Errorf("charLimit must be > %d", len(ellipsis))
+	}
 	return func(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		var line []byte
 
@@ -80,5 +87,5 @@ func lineLengthSplitter(charLimit int) bufio.SplitFunc {
 		}
 
 		return advance, line, err
-	}
+	}, nil
 }
