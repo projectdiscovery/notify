@@ -101,6 +101,8 @@ func (r *Runner) Run() error {
 	br := bufio.NewScanner(inFile)
 	if r.options.Bulk {
 		br.Split(bulkSplitter(r.options.CharLimit))
+	} else {
+		br.Split(lineLengthSplitter(r.options.CharLimit))
 	}
 	for br.Scan() {
 		msg := br.Text()

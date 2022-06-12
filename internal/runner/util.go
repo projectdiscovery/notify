@@ -6,7 +6,8 @@ import (
 
 var ellipsis = []byte("...")
 
-// Return a bufio.SplitFunc that tries to split on newlines while giving as many bytes that are <= charLimit each time
+// Return a bufio.SplitFunc that splits on as few newlines as possible
+// while giving as many bytes that are <= charLimit each time
 func bulkSplitter(charLimit int) bufio.SplitFunc {
 	return func(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		var lineAdvance int
@@ -53,5 +54,31 @@ func bulkSplitter(charLimit int) bufio.SplitFunc {
 			token = token[:len(token)-1]
 		}
 		return
+	}
+}
+
+// Return a bufio.SplitFunc that splits on all newlines
+// while giving as many bytes that are <= charLimit each time
+func lineLengthSplitter(charLimit int) bufio.SplitFunc {
+	return func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+		var line []byte
+
+		// Get a line
+		advance, line, err = bufio.ScanLines(data[advance:], atEOF)
+
+		if !atEOF && (err != nil || line == nil) {
+			// We need more data
+			return 0, nil, nil
+		}
+
+		if len(line) > charLimit {
+			// Got too much
+			token = append(token, line[:charLimit-len(ellipsis)]...)
+			token = append(token, ellipsis...)
+			advance = charLimit - len(ellipsis)
+			return
+		}
+
+		return advance, line, err
 	}
 }
