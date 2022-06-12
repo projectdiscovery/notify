@@ -109,7 +109,7 @@ func (r *Runner) Run() error {
 		//nolint:errcheck
 		r.sendMessage(msg)
 	}
-	return nil
+	return br.Err()
 }
 
 func (r *Runner) sendMessage(msg string) error {
