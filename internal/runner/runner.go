@@ -84,6 +84,7 @@ func (r *Runner) Run() error {
 
 	var inFile *os.File
 	var err error
+	var splitter bufio.SplitFunc
 
 	switch {
 	case r.options.Data != "":
@@ -97,38 +98,37 @@ func (r *Runner) Run() error {
 		return errors.New("notify works with stdin or file using -data flag")
 	}
 
-	info, err := inFile.Stat()
-	if err != nil {
-		return errors.Wrap(err, "could not get file info")
-	}
 	br := bufio.NewScanner(inFile)
-	maxSize := int(info.Size())
-	buffer := make([]byte, 0, maxSize)
-	br.Buffer(buffer, maxSize)
+
+	if r.options.CharLimit > bufio.MaxScanTokenSize {
+		// Satisfy the condition of our splitters, which is that charLimit is <= the size of the bufio.Scanner buffer
+		buffer := make([]byte, 0, r.options.CharLimit)
+		br.Buffer(buffer, r.options.CharLimit)
+	}
 
 	if r.options.Bulk {
-		br.Split(bulkSplitter(r.options.CharLimit))
+		splitter, err = bulkSplitter(r.options.CharLimit)
+	} else {
+		splitter, err = lineLengthSplitter(r.options.CharLimit)
 	}
+
+	if err != nil {
+		return err
+	}
+
+	br.Split(splitter)
+
 	for br.Scan() {
 		msg := br.Text()
-		if len(msg) > r.options.CharLimit {
-			// send the msg in chunks of length charLimit
-			for _, chunk := range SplitInChunks(msg, r.options.CharLimit) {
-				//nolint:errcheck
-				r.sendMessage(chunk)
-			}
-		} else {
-			//nolint:errcheck
-			r.sendMessage(msg)
-		}
-
+		//nolint:errcheck
+		r.sendMessage(msg)
 	}
-	return nil
+	return br.Err()
 }
 
 func (r *Runner) sendMessage(msg string) error {
 	if len(msg) > 0 {
-		gologger.Print().Msgf("%s\n", msg)
+		gologger.Silent().Msgf("%s\n", msg)
 		err := r.providers.Send(msg)
 		if err != nil {
 			return err
