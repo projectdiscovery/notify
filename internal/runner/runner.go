@@ -3,7 +3,6 @@ package runner
 import (
 	"bufio"
 	"crypto/tls"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -129,7 +128,7 @@ func (r *Runner) Run() error {
 
 func (r *Runner) sendMessage(msg string) error {
 	if len(msg) > 0 {
-		fmt.Println(msg)
+		gologger.Silent().Msgf("%s\n", msg)
 		err := r.providers.Send(msg)
 		if err != nil {
 			return err
