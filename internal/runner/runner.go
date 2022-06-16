@@ -13,6 +13,7 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
+	"github.com/projectdiscovery/fileutil"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers"
 	"github.com/projectdiscovery/notify/pkg/types"
@@ -83,6 +84,7 @@ func (r *Runner) Run() error {
 
 	var inFile *os.File
 	var err error
+	var splitter bufio.SplitFunc
 
 	switch {
 	case r.options.Data != "":
@@ -90,59 +92,43 @@ func (r *Runner) Run() error {
 		if err != nil {
 			gologger.Fatal().Msgf("%s\n", err)
 		}
-	case hasStdin():
-		if r.options.Bulk {
-			gologger.Error().Msgf("bulk flag is not supported with stdin")
-			os.Exit(1)
-		}
+	case fileutil.HasStdin():
 		inFile = os.Stdin
 	default:
 		return errors.New("notify works with stdin or file using -data flag")
 	}
 
-	if r.options.Bulk {
-		fi, err := inFile.Stat()
-		if err != nil {
-			gologger.Fatal().Msgf("%s\n", err)
-		}
+	br := bufio.NewScanner(inFile)
 
-		msgB := make([]byte, fi.Size())
-
-		n, err := inFile.Read(msgB)
-		if err != nil || n == 0 {
-			gologger.Fatal().Msgf("%s\n", err)
-		}
-
-		// char limit to search for a split
-		searchLimit := 250
-		if r.options.CharLimit < searchLimit {
-			searchLimit = r.options.CharLimit
-		}
-
-		items := SplitText(string(msgB), r.options.CharLimit, searchLimit)
-
-		for _, v := range items {
-			if err := r.sendMessage(v); err != nil {
-				gologger.Fatal().Msgf("%s\n", err)
-			}
-		}
-
-		os.Exit(0)
+	if r.options.CharLimit > bufio.MaxScanTokenSize {
+		// Satisfy the condition of our splitters, which is that charLimit is <= the size of the bufio.Scanner buffer
+		buffer := make([]byte, 0, r.options.CharLimit)
+		br.Buffer(buffer, r.options.CharLimit)
 	}
 
-	br := bufio.NewScanner(inFile)
+	if r.options.Bulk {
+		splitter, err = bulkSplitter(r.options.CharLimit)
+	} else {
+		splitter, err = lineLengthSplitter(r.options.CharLimit)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	br.Split(splitter)
+
 	for br.Scan() {
 		msg := br.Text()
 		//nolint:errcheck
 		r.sendMessage(msg)
-
 	}
-	return nil
+	return br.Err()
 }
 
 func (r *Runner) sendMessage(msg string) error {
 	if len(msg) > 0 {
-		gologger.Print().Msgf(msg)
+		gologger.Silent().Msgf("%s\n", msg)
 		err := r.providers.Send(msg)
 		if err != nil {
 			return err

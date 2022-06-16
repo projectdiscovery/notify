@@ -59,7 +59,7 @@ This will display help for the tool. Here are all the switches it supports.
 | `-v`               | Show Verbose output                                | `notify -v`                  |
 | `-no-color`        | Don't Use colors in output                         | `notify -nc`                 |
 | `-data`            | File path to read data from                        | `notify -i test.txt`         |
-| `-bulk`            | Read and send data in bulk from file.              | `notify -bulk`               |
+| `-bulk`            | Read and send data in bulk                         | `notify -bulk`               |
 | `-char-limit`      | Character limit for message (default 4000)         | `notify -cl 2000`            |
 | `-provider-config` | provider config path                               | `notify -pc provider.yaml`   |
 | `-provider`        | provider to send the notification to (optional)    | `notify -p slack,telegram`   |
@@ -127,6 +127,7 @@ smtp:
     smtp_cc:
       - to@email.com
     smtp_format: "{{data}}"
+    subject: "Email subject"
 
 custom:
   - id: webhook
@@ -207,8 +208,7 @@ Notify flags can be configured at default config (`$HOME/.config/notify/config.y
 
 ## Notes
 - As default notify sends notification line by line
-- **bulk** flag is supported with data flag.
-- stdin/pipe input doesn't support **bulk** posting.
+- Use `-bulk` to send notification as entire message/s (messages might be chunked)
 
 ## References
 
