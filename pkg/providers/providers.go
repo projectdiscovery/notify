@@ -6,6 +6,7 @@ import (
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers/custom"
 	"github.com/projectdiscovery/notify/pkg/providers/discord"
+	"github.com/projectdiscovery/notify/pkg/providers/googlechat"
 	"github.com/projectdiscovery/notify/pkg/providers/pushover"
 	"github.com/projectdiscovery/notify/pkg/providers/slack"
 	"github.com/projectdiscovery/notify/pkg/providers/smtp"
@@ -18,13 +19,14 @@ import (
 
 // ProviderOptions is configuration for notify providers
 type ProviderOptions struct {
-	Slack    []*slack.Options    `yaml:"slack,omitempty"`
-	Discord  []*discord.Options  `yaml:"discord,omitempty"`
-	Pushover []*pushover.Options `yaml:"pushover,omitempty"`
-	SMTP     []*smtp.Options     `yaml:"smtp,omitempty"`
-	Teams    []*teams.Options    `yaml:"teams,omitempty"`
-	Telegram []*telegram.Options `yaml:"telegram,omitempty"`
-	Custom   []*custom.Options   `yaml:"custom,omitempty"`
+	Slack      []*slack.Options      `yaml:"slack,omitempty"`
+	Discord    []*discord.Options    `yaml:"discord,omitempty"`
+	Pushover   []*pushover.Options   `yaml:"pushover,omitempty"`
+	SMTP       []*smtp.Options       `yaml:"smtp,omitempty"`
+	Teams      []*teams.Options      `yaml:"teams,omitempty"`
+	Telegram   []*telegram.Options   `yaml:"telegram,omitempty"`
+	GoogleChat []*googlechat.Options `yaml:"googlechat,omitempty"`
+	Custom     []*custom.Options     `yaml:"custom,omitempty"`
 }
 
 // Provider is an interface implemented by providers
@@ -64,6 +66,14 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 		provider, err := pushover.New(providerOptions.Pushover, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create pushover provider client")
+		}
+		client.providers = append(client.providers, provider)
+	}
+	if providerOptions.GoogleChat != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "googlechat")) {
+
+		provider, err := googlechat.New(providerOptions.GoogleChat, options.IDs)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not create googlechat provider client")
 		}
 		client.providers = append(client.providers, provider)
 	}
