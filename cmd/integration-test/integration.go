@@ -16,13 +16,13 @@ var (
 	success        = aurora.Green("[✓]").String()
 	failed         = aurora.Red("[✘]").String()
 	testCases      = map[string]testutils.TestCase{
-		"smtp":     &smtp{},
 		"discord":  &discord{},
 		"telegram": &telegram{},
-		"teams":    &teams{},
 		"slack":    &slack{},
-		"pushover": &pushover{},
 		"custom":   &custom{},
+		//		"teams":    &teams{},
+		//		"smtp":     &smtp{},
+		//		"pushover": &pushover{},
 	}
 )
 

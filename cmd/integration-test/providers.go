@@ -39,35 +39,35 @@ func (h *custom) Execute() error {
 	return run("custom")
 }
 
-type pushover struct{}
-
-func (h *pushover) Execute() error {
-	return run("pushover")
-}
-
 type slack struct{}
 
 func (h *slack) Execute() error {
 	return run("slack")
 }
 
-type smtp struct{}
-
-func (h *smtp) Execute() error {
-	return run("smtp")
-}
-
-type teams struct{}
-
-func (h *teams) Execute() error {
-	return run("teams")
-}
-
-type telegram struct{}
-
-func (h *telegram) Execute() error {
-	return run("telegram")
-}
+// type pushover struct{}
+//
+// func (h *pushover) Execute() error {
+// 	return run("pushover")
+// }
+//
+// type smtp struct{}
+//
+// func (h *smtp) Execute() error {
+// 	return run("smtp")
+// }
+//
+// type teams struct{}
+//
+// func (h *teams) Execute() error {
+// 	return run("teams")
+// }
+//
+// type telegram struct{}
+//
+// func (h *telegram) Execute() error {
+// 	return run("telegram")
+// }
 
 func errIncorrectResultsCount(results []string) error {
 	return fmt.Errorf("incorrect number of results %s", strings.Join(results, "\n\t"))
