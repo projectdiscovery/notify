@@ -1,12 +1,12 @@
 discord:
   - id: "disocord-integration-test"
-    discord_webhook_url: "${discord_webhook_url}"
+    discord_webhook_url: "${DISCORD_WEBHOOK_URL}"
     discord_format: "{{data}}" 
 slack:
   - id: "slack-integration-test"
     slack_channel: "random"
     slack_username: "test"
-    slack_webhook_url: "${slack_webhook_url}"
+    slack_webhook_url: "${SLACK_WEBHOOK_URL}"
     slack_format: "{{data}}" 
 telegram:
   - id: "telegram-integration-test"
@@ -15,7 +15,7 @@ telegram:
     telegram_format: "{{data}}"
 custom:
   - id: "custom-integration-test"
-    custom_webook_url: "${custom_webook_url}"
+    custom_webook_url: "${CUSTOM_WEBOOK_URL}"
     custom_method: POST
     custom_format: '{{data}}'
     custom_headers: 
