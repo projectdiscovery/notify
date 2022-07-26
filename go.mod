@@ -9,7 +9,7 @@ require (
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/pkg/errors v0.9.1
 	github.com/projectdiscovery/fileutil v0.0.0-20220510111557-fba17e05663f
-	github.com/projectdiscovery/goflags v0.0.8
+	github.com/projectdiscovery/goflags v0.0.9
 	github.com/projectdiscovery/gologger v1.1.4
 	go.uber.org/multierr v1.8.0
 	go.uber.org/ratelimit v0.2.0
