@@ -22,9 +22,9 @@ func FormatMessage(msg, format string) string {
 }
 
 func SelectFormat(cliFormat, configFormat string) string {
-	if cliFormat != "" && cliFormat != defaultFormat {
+	if cliFormat != "" {
 		return cliFormat
-	} else if configFormat != "" && configFormat != defaultFormat {
+	} else if configFormat != "" {
 		return configFormat
 	}
 	return defaultFormat
