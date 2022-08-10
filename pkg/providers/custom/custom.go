@@ -11,6 +11,7 @@ import (
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"github.com/projectdiscovery/notify/pkg/utils/httpreq"
+	"github.com/projectdiscovery/sliceutil"
 )
 
 type Provider struct {
@@ -29,7 +30,7 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	provider := &Provider{}
 
 	for _, o := range options {
-		if len(ids) == 0 || utils.Contains(ids, o.ID) {
+		if len(ids) == 0 || sliceutil.Contains(ids, o.ID) {
 			provider.Custom = append(provider.Custom, o)
 		}
 	}
