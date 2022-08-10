@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -17,8 +16,6 @@ func FormatMessage(msg, format string) string {
 // 2. configFormat
 // 3. defaulFormat
 func SelectFormat(cliFormat, configFormat string) string {
-	fmt.Println("cliFormat: ", cliFormat)
-	fmt.Println("configFormat: ", configFormat)
 	if cliFormat != "" {
 		return cliFormat
 	} else if configFormat != "" {
