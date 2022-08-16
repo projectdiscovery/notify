@@ -12,6 +12,7 @@ type Options struct {
 	IDs            goflags.StringSlice `yaml:"ids,omitempty"`
 	Proxy          string              `yaml:"proxy,omitempty"`
 	RateLimit      int                 `yaml:"rate_limit,omitempty"`
+	Delay          int                 `yaml:"delay,omitempty"`
 
 	MessageFormat string `yaml:"message_format,omitempty"`
 
