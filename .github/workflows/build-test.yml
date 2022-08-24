@@ -24,8 +24,12 @@ jobs:
       - name: Build
         run: go build .
         working-directory: cmd/notify/
-
+  
       - name: Integration Tests
+        env: 
+          DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL }}"
+          SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}"
+          CUSTOM_WEBOOK_URL: "${{ secrets.CUSTOM_WEBOOK_URL }}"
         run: |
           chmod +x action-run.sh
           bash action-run.sh
