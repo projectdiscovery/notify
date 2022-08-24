@@ -79,7 +79,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 				continue
 			}
 		}
-		gologger.Verbose().Msgf("Slack notification sent successfully for id: %s", pr.ID)
+		gologger.Verbose().Msgf("Slack notification sent for id: %s", pr.ID)
 
 	}
 	return SlackErr
