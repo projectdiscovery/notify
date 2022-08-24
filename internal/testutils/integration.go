@@ -1,6 +1,7 @@
 package testutils
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
 )
@@ -8,7 +9,7 @@ import (
 // RunNotifyAndGetResults returns a list of results for a template
 func RunNotifyAndGetResults(debug bool, args ...string) ([]string, error) {
 	cmd := exec.Command("bash", "-c")
-	cmdLine := `echo "integration test"` + ` | ./notify `
+	cmdLine := `echo "hello from notify integration test :)"` + ` | ./notify `
 	cmdLine += strings.Join(args, " ")
 
 	cmdLine += " --v"
@@ -22,6 +23,9 @@ func RunNotifyAndGetResults(debug bool, args ...string) ([]string, error) {
 	items := strings.Split(string(data), "\n")
 	for _, i := range items {
 		if i != "" {
+			if debug {
+				fmt.Printf("%s\n", i)
+			}
 			if strings.Contains(i, "notification sent for id:") {
 				parts = append(parts, i)
 			}

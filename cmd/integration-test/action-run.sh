@@ -11,7 +11,7 @@ rm integration-test notify 2>/dev/null
 go build ../notify
 go build
 
-./integration-test --provider-config final-config.yaml
+DEBUG=true ./integration-test --provider-config final-config.yaml
 if [ $? -eq 0 ]
 then
   exit 0
