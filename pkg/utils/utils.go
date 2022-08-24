@@ -6,25 +6,19 @@ import (
 
 const defaultFormat = "{{data}}"
 
-func Contains(slice []string, item string) bool {
-	set := make(map[string]struct{}, len(slice))
-	for _, s := range slice {
-		set[s] = struct{}{}
-	}
-
-	_, ok := set[item]
-	return ok
-
-}
-
+// FormatMessage formats the message according to the format string
 func FormatMessage(msg, format string) string {
 	return strings.Replace(format, defaultFormat, msg, -1)
 }
 
+// SelectFormat returns the format string in the following order of precedence:
+// 1. cliFormat
+// 2. configFormat
+// 3. defaulFormat
 func SelectFormat(cliFormat, configFormat string) string {
-	if cliFormat != "" && cliFormat != defaultFormat {
+	if cliFormat != "" {
 		return cliFormat
-	} else if configFormat != "" && configFormat != defaultFormat {
+	} else if configFormat != "" {
 		return configFormat
 	}
 	return defaultFormat

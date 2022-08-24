@@ -6,25 +6,27 @@ import (
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers/custom"
 	"github.com/projectdiscovery/notify/pkg/providers/discord"
+	"github.com/projectdiscovery/notify/pkg/providers/googlechat"
 	"github.com/projectdiscovery/notify/pkg/providers/pushover"
 	"github.com/projectdiscovery/notify/pkg/providers/slack"
 	"github.com/projectdiscovery/notify/pkg/providers/smtp"
 	"github.com/projectdiscovery/notify/pkg/providers/teams"
 	"github.com/projectdiscovery/notify/pkg/providers/telegram"
 	"github.com/projectdiscovery/notify/pkg/types"
-	"github.com/projectdiscovery/notify/pkg/utils"
+	"github.com/projectdiscovery/sliceutil"
 	"go.uber.org/multierr"
 )
 
 // ProviderOptions is configuration for notify providers
 type ProviderOptions struct {
-	Slack    []*slack.Options    `yaml:"slack,omitempty"`
-	Discord  []*discord.Options  `yaml:"discord,omitempty"`
-	Pushover []*pushover.Options `yaml:"pushover,omitempty"`
-	SMTP     []*smtp.Options     `yaml:"smtp,omitempty"`
-	Teams    []*teams.Options    `yaml:"teams,omitempty"`
-	Telegram []*telegram.Options `yaml:"telegram,omitempty"`
-	Custom   []*custom.Options   `yaml:"custom,omitempty"`
+	Slack      []*slack.Options      `yaml:"slack,omitempty"`
+	Discord    []*discord.Options    `yaml:"discord,omitempty"`
+	Pushover   []*pushover.Options   `yaml:"pushover,omitempty"`
+	SMTP       []*smtp.Options       `yaml:"smtp,omitempty"`
+	Teams      []*teams.Options      `yaml:"teams,omitempty"`
+	Telegram   []*telegram.Options   `yaml:"telegram,omitempty"`
+	GoogleChat []*googlechat.Options `yaml:"googlechat,omitempty"`
+	Custom     []*custom.Options     `yaml:"custom,omitempty"`
 }
 
 // Provider is an interface implemented by providers
@@ -42,7 +44,7 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 
 	client := &Client{providerOptions: providerOptions, options: options}
 
-	if providerOptions.Slack != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "slack")) {
+	if providerOptions.Slack != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "slack")) {
 
 		provider, err := slack.New(providerOptions.Slack, options.IDs)
 		if err != nil {
@@ -51,7 +53,7 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 
 		client.providers = append(client.providers, provider)
 	}
-	if providerOptions.Discord != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "discord")) {
+	if providerOptions.Discord != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "discord")) {
 
 		provider, err := discord.New(providerOptions.Discord, options.IDs)
 		if err != nil {
@@ -59,7 +61,7 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 		}
 		client.providers = append(client.providers, provider)
 	}
-	if providerOptions.Pushover != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "pushover")) {
+	if providerOptions.Pushover != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "pushover")) {
 
 		provider, err := pushover.New(providerOptions.Pushover, options.IDs)
 		if err != nil {
@@ -67,7 +69,15 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 		}
 		client.providers = append(client.providers, provider)
 	}
-	if providerOptions.SMTP != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "smtp")) {
+	if providerOptions.GoogleChat != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "googlechat")) {
+
+		provider, err := googlechat.New(providerOptions.GoogleChat, options.IDs)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not create googlechat provider client")
+		}
+		client.providers = append(client.providers, provider)
+	}
+	if providerOptions.SMTP != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "smtp")) {
 
 		provider, err := smtp.New(providerOptions.SMTP, options.IDs)
 		if err != nil {
@@ -75,7 +85,7 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 		}
 		client.providers = append(client.providers, provider)
 	}
-	if providerOptions.Teams != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "teams")) {
+	if providerOptions.Teams != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "teams")) {
 
 		provider, err := teams.New(providerOptions.Teams, options.IDs)
 		if err != nil {
@@ -83,7 +93,7 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 		}
 		client.providers = append(client.providers, provider)
 	}
-	if providerOptions.Telegram != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "telegram")) {
+	if providerOptions.Telegram != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "telegram")) {
 
 		provider, err := telegram.New(providerOptions.Telegram, options.IDs)
 		if err != nil {
@@ -92,7 +102,7 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 		client.providers = append(client.providers, provider)
 	}
 
-	if providerOptions.Custom != nil && (len(options.Providers) == 0 || utils.Contains(options.Providers, "custom")) {
+	if providerOptions.Custom != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "custom")) {
 
 		provider, err := custom.New(providerOptions.Custom, options.IDs)
 		if err != nil {

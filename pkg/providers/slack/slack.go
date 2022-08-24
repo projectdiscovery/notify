@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
+	"github.com/projectdiscovery/sliceutil"
 	"go.uber.org/multierr"
 )
 
@@ -31,7 +32,7 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	provider := &Provider{}
 
 	for _, o := range options {
-		if len(ids) == 0 || utils.Contains(ids, o.ID) {
+		if len(ids) == 0 || sliceutil.Contains(ids, o.ID) {
 			provider.Slack = append(provider.Slack, o)
 		}
 	}
@@ -78,7 +79,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 				continue
 			}
 		}
-		gologger.Verbose().Msgf("Slack notification sent successfully for id: %s", pr.ID)
+		gologger.Verbose().Msgf("Slack notification sent for id: %s", pr.ID)
 
 	}
 	return SlackErr
