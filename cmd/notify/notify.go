@@ -55,6 +55,7 @@ func readConfig() {
 	set.StringSliceVarP(&options.Providers, "provider", "p", []string{}, "provider to send the notification to (optional)", goflags.NormalizedStringSliceOptions)
 	set.StringSliceVar(&options.IDs, "id", []string{}, "id to send the notification to (optional)", goflags.NormalizedStringSliceOptions)
 	set.IntVarP(&options.RateLimit, "rate-limit", "rl", 1, "maximum number of HTTP requests to send per second")
+	set.IntVarP(&options.Delay, "delay", "d", 0, "delay in seconds between each notification")
 	set.BoolVar(&options.Bulk, "bulk", false, "enable bulk processing")
 	set.IntVarP(&options.CharLimit, "char-limit", "cl", 4000, "max character limit per message")
 	set.StringVarP(&options.MessageFormat, "msg-format", "mf", "", "add custom formatting to message")
