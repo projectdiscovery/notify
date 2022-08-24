@@ -109,6 +109,8 @@ telegram:
     telegram_api_key: "XXXXXXXXXXXX"
     telegram_chat_id: "XXXXXXXX"
     telegram_format: "{{data}}"
+    # https://core.telegram.org/bots/api#formatting-options
+    telegram_parsemode: "Markdown" # None/Markdown/MarkdownV2/HTML
 
 pushover:
   - id: "push"

@@ -16,10 +16,11 @@ type Provider struct {
 }
 
 type Options struct {
-	ID             string `yaml:"id,omitempty"`
-	TelegramAPIKey string `yaml:"telegram_api_key,omitempty"`
-	TelegramChatID string `yaml:"telegram_chat_id,omitempty"`
-	TelegramFormat string `yaml:"telegram_format,omitempty"`
+	ID                string `yaml:"id,omitempty"`
+	TelegramAPIKey    string `yaml:"telegram_api_key,omitempty"`
+	TelegramChatID    string `yaml:"telegram_chat_id,omitempty"`
+	TelegramFormat    string `yaml:"telegram_format,omitempty"`
+	TelegramParseMode string `yaml:"telegram_parsemode,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -38,8 +39,10 @@ func (p *Provider) Send(message, CliFormat string) error {
 	var TelegramErr error
 	for _, pr := range p.Telegram {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.TelegramFormat))
-
-		url := fmt.Sprintf("telegram://%s@telegram?channels=%s", pr.TelegramAPIKey, pr.TelegramChatID)
+		if pr.TelegramParseMode == "" {
+			pr.TelegramParseMode = "None"
+		}
+		url := fmt.Sprintf("telegram://%s@telegram?channels=%s&parsemode=%s", pr.TelegramAPIKey, pr.TelegramChatID, pr.TelegramParseMode)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send telegram notification for id: %s ", pr.ID))
