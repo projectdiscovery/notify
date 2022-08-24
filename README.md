@@ -35,8 +35,9 @@ Notify is a Go-based assistance package that enables you to stream the output of
 # Features
 
 - Supports for Slack / Discord / Telegram
-- Supports for Pushover / Email / Teams
-- Supports for File / Pipe output
+- Supports for Pushover / Email
+- Supports for Microsoft Teams / Google Chat
+- Supports for File / Pipe input
 - Supports Line by Line / Bulk Post
 - Supports using Single / Multiple providers
 - Supports Custom Web-hooks
@@ -51,20 +52,23 @@ notify -h
 
 This will display help for the tool. Here are all the switches it supports.
 
-| Flag               | Description                                        | Example                      |
-|--------------------|----------------------------------------------------|------------------------------|
-| `-config`          | Notify configuration file                          | `notify -config config.yaml` |
-| `-silent`          | Don't print the banner                             | `notify -silent`             |
-| `-version`         | Show version of notify                             | `notify -version`            |
-| `-v`               | Show Verbose output                                | `notify -v`                  |
-| `-no-color`        | Don't Use colors in output                         | `notify -nc`                 |
-| `-data`            | File path to read data from                        | `notify -i test.txt`         |
-| `-bulk`            | Read and send data in bulk                         | `notify -bulk`               |
-| `-char-limit`      | Character limit for message (default 4000)         | `notify -cl 2000`            |
-| `-provider-config` | provider config path                               | `notify -pc provider.yaml`   |
-| `-provider`        | provider to send the notification to (optional)    | `notify -p slack,telegram`   |
-| `-id`              | id to send the notification to (optional)          | `notify -id recon,scans`     |
-| `-rate-limit`      | maximum number of HTTP requests to send per second | `notify -rl 1`               |
+| Flag               | Description                                        | Example                               |
+|--------------------|----------------------------------------------------|---------------------------------------|
+| `-bulk`            | enable bulk processing                             | `notify -bulk`                        |
+| `-char-limit`      | max character limit per message (default 4000)     | `notify -cl 2000`                     |
+| `-config`          | notify configuration file                          | `notify -config config.yaml`          |
+| `-data`            | input file to send for notify                      | `notify -i test.txt`                  |
+| `-delay`           | delay in seconds between each notification         | `notify -d 2`                         |
+| `-id`              | id to send the notification to (optional)          | `notify -id recon,scans`              |
+| `-msg-format`      | add custom formatting to message                   | `notify -mf Hey {{data}}`             |
+| `-no-color`        | disable colors in output                           | `notify -nc`                          |
+| `-provider-config` | provider config path                               | `notify -pc provider.yaml`            |
+| `-provider`        | provider to send the notification to (optional)    | `notify -p slack,telegram`            |
+| `-proxy`           | http proxy to use with notify                      | `notify -proxy http://127.0.0.1:8080` |
+| `-rate-limit`      | maximum number of HTTP requests to send per second | `notify -rl 1`                        |
+| `-silent`          | enable silent mode                                 | `notify -silent`                      |
+| `-verbose`         | enable verbose mode                                | `notify -version`                     |
+| `-version`         | display version                                    | `notify -version`                     |
 
 
 # Notify Installation
@@ -109,8 +113,7 @@ telegram:
     telegram_api_key: "XXXXXXXXXXXX"
     telegram_chat_id: "XXXXXXXX"
     telegram_format: "{{data}}"
-    # https://core.telegram.org/bots/api#formatting-options
-    telegram_parsemode: "Markdown" # None/Markdown/MarkdownV2/HTML
+    telegram_parsemode: "Markdown" # None/Markdown/MarkdownV2/HTML (https://core.telegram.org/bots/api#formatting-options)
 
 pushover:
   - id: "push"
@@ -130,6 +133,13 @@ smtp:
       - to@email.com
     smtp_format: "{{data}}"
     subject: "Email subject"
+
+googlechat:
+  - id: "gc"
+    key: "XXXXXXXX"
+    token: "XXXXXX"
+    space: "XXXXXX"
+    google_chat_format: "{{data}}"
 
 custom:
   - id: webhook
