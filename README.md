@@ -131,7 +131,7 @@ smtp:
 
 custom:
   - id: webhook
-    custom_webook_url: http://host/api/webhook
+    custom_webhook_url: http://host/api/webhook
     custom_method: GET
     custom_format: '{{data}}'
     custom_headers:
