@@ -15,7 +15,7 @@ telegram:
     telegram_format: "{{data}}"
 custom:
   - id: "custom-integration-test"
-    custom_webook_url: "${CUSTOM_WEBOOK_URL}"
+    custom_webhook_url: "${CUSTOM_WEBHOOK_URL}"
     custom_method: POST
     custom_format: '{{data}}'
     custom_headers: 
