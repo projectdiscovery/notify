@@ -38,10 +38,14 @@ func (p *Provider) Send(message, CliFormat string) error {
 	var TeamsErr error
 	for _, pr := range p.Teams {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.TeamsFormat))
-
-		teamsTokens := strings.TrimPrefix(pr.TeamsWebHookURL, "https://outlook.office.com/webhook/")
-		teamsTokens = strings.ReplaceAll(teamsTokens, "IncomingWebhook/", "")
-		url := fmt.Sprintf("teams://%s", teamsTokens)
+		webhookParts := strings.Split(pr.TeamsWebHookURL, "/webhookb2/")
+		if len(webhookParts) != 2 {
+			err := fmt.Errorf("teams: invalid webhook url for id: %s ", pr.ID)
+			TeamsErr = multierr.Append(TeamsErr, err)
+		}
+		teamsHost := strings.TrimPrefix(webhookParts[0], "https://")
+		teamsTokens := strings.ReplaceAll(webhookParts[1], "IncomingWebhook/", "")
+		url := fmt.Sprintf("teams://%s?host=%s", teamsTokens, teamsHost)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send teams notification for id: %s ", pr.ID))
