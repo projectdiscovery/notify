@@ -141,9 +141,14 @@ googlechat:
     space: "XXXXXX"
     google_chat_format: "{{data}}"
 
+teams:
+  - id: "recon"
+    teams_webhook_url: "https://<domain>.webhook.office.com/webhookb2/xx@xx/IncomingWebhook/xx"
+    teams_format: "{{data}}"
+
 custom:
   - id: webhook
-    custom_webook_url: http://host/api/webhook
+    custom_webhook_url: http://host/api/webhook
     custom_method: GET
     custom_format: '{{data}}'
     custom_headers:

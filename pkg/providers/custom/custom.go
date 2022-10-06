@@ -6,11 +6,12 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+	"go.uber.org/multierr"
+
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"github.com/projectdiscovery/notify/pkg/utils/httpreq"
 	"github.com/projectdiscovery/sliceutil"
-	"go.uber.org/multierr"
 )
 
 type Provider struct {
@@ -19,7 +20,7 @@ type Provider struct {
 
 type Options struct {
 	ID               string            `yaml:"id,omitempty"`
-	CustomWebhookURL string            `yaml:"custom_webook_url,omitempty"`
+	CustomWebhookURL string            `yaml:"custom_webhook_url,omitempty"`
 	CustomMethod     string            `yaml:"custom_method,omitempty"`
 	CustomHeaders    map[string]string `yaml:"custom_headers,omitempty"`
 	CustomFormat     string            `yaml:"custom_format,omitempty"`
