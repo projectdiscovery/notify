@@ -6,10 +6,11 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
+	"go.uber.org/multierr"
+
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"github.com/projectdiscovery/sliceutil"
-	"go.uber.org/multierr"
 )
 
 type Provider struct {
