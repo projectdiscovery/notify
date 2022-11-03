@@ -31,7 +31,9 @@ func FormatMessage(msg, format string, counter int) string {
 // 2. configFormat
 // 3. defaultFormat
 func SelectFormat(cliFormat, configFormat string) string {
-	if configFormat != "" {
+	if cliFormat != "" {
+		return cliFormat
+	} else if configFormat != "" {
 		return configFormat
 	}
 	return defaultFormat
