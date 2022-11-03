@@ -14,7 +14,8 @@ import (
 )
 
 type Provider struct {
-	Teams []*Options `yaml:"teams,omitempty"`
+	Teams   []*Options `yaml:"teams,omitempty"`
+	counter int
 }
 
 type Options struct {
@@ -32,13 +33,16 @@ func New(options []*Options, ids []string) (*Provider, error) {
 		}
 	}
 
+	provider.counter = 0
+
 	return provider, nil
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
 	var TeamsErr error
+	p.counter++
 	for _, pr := range p.Teams {
-		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.TeamsFormat))
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.TeamsFormat), p.counter)
 		webhookParts := strings.Split(pr.TeamsWebHookURL, "/webhookb2/")
 		if len(webhookParts) != 2 {
 			err := fmt.Errorf("teams: invalid webhook url for id: %s ", pr.ID)
