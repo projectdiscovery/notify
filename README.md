@@ -67,7 +67,7 @@ This will display help for the tool. Here are all the switches it supports.
 | `-proxy`           | http proxy to use with notify                      | `notify -proxy http://127.0.0.1:8080` |
 | `-rate-limit`      | maximum number of HTTP requests to send per second | `notify -rl 1`                        |
 | `-silent`          | enable silent mode                                 | `notify -silent`                      |
-| `-verbose`         | enable verbose mode                                | `notify -version`                     |
+| `-verbose`         | enable verbose mode                                | `notify -verbose`                     |
 | `-version`         | display version                                    | `notify -version`                     |
 
 
