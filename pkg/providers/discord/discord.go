@@ -23,7 +23,6 @@ type Options struct {
 	DiscordWebHookAvatarURL string `yaml:"discord_avatar,omitempty"`
 	DiscordThreads          bool   `yaml:"discord_threads,omitempty"`
 	DiscordThreadID         string `yaml:"discord_thread_id,omitempty"`
-	DiscordBotToken         string `yaml:"discord_bot_token,omitempty"`
 	DiscordFormat           string `yaml:"discord_format,omitempty"`
 }
 
@@ -54,7 +53,11 @@ func (p *Provider) Send(message, CliFormat string) error {
 		}
 
 		webhookID, webhookToken := matchedGroups["webhook_identifier"], matchedGroups["webhook_token"]
-		url := fmt.Sprintf("discord://%s@%s?splitlines=no", webhookToken, webhookID)
+		url := fmt.Sprintf("discord://%s@%s?username=%s&avatarurl=%s&splitlines=no",
+			webhookToken,
+			webhookID,
+			pr.DiscordWebHookUsername,
+			pr.DiscordWebHookAvatarURL)
 		sendErr := shoutrrr.Send(url, msg)
 		if sendErr != nil {
 			sendErr = errors.Wrap(sendErr, fmt.Sprintf("failed to send discord notification for id: %s ", pr.ID))
