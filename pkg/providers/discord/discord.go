@@ -21,6 +21,9 @@ type Options struct {
 	DiscordWebHookURL       string `yaml:"discord_webhook_url,omitempty"`
 	DiscordWebHookUsername  string `yaml:"discord_username,omitempty"`
 	DiscordWebHookAvatarURL string `yaml:"discord_avatar,omitempty"`
+	DiscordThreads          bool   `yaml:"discord_threads,omitempty"`
+	DiscordThreadID         string `yaml:"discord_thread_id,omitempty"`
+	DiscordBotToken         string `yaml:"discord_bot_token,omitempty"`
 	DiscordFormat           string `yaml:"discord_format,omitempty"`
 }
 
