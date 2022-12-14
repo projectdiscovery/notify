@@ -1,4 +1,4 @@
-FROM golang:1.19.3-alpine as build-env
+FROM golang:1.19.4-alpine as build-env
 RUN go install -v github.com/projectdiscovery/notify/cmd/notify@latest
 
 FROM alpine:latest
