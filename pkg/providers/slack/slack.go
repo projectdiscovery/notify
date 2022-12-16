@@ -15,7 +15,8 @@ import (
 )
 
 type Provider struct {
-	Slack []*Options `yaml:"slack,omitempty"`
+	Slack   []*Options `yaml:"slack,omitempty"`
+	counter int
 }
 
 type Options struct {
@@ -38,13 +39,16 @@ func New(options []*Options, ids []string) (*Provider, error) {
 		}
 	}
 
+	provider.counter = 0
+
 	return provider, nil
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
 	var SlackErr error
+	p.counter++
 	for _, pr := range p.Slack {
-		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SlackFormat))
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SlackFormat), p.counter)
 
 		if pr.SlackThreads {
 			if pr.SlackToken == "" {

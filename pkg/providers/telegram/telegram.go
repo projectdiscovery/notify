@@ -14,6 +14,7 @@ import (
 
 type Provider struct {
 	Telegram []*Options `yaml:"telegram,omitempty"`
+	counter  int
 }
 
 type Options struct {
@@ -33,13 +34,16 @@ func New(options []*Options, ids []string) (*Provider, error) {
 		}
 	}
 
+	provider.counter = 0
+
 	return provider, nil
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
 	var TelegramErr error
+	p.counter++
 	for _, pr := range p.Telegram {
-		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.TelegramFormat))
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.TelegramFormat), p.counter)
 		if pr.TelegramParseMode == "" {
 			pr.TelegramParseMode = "None"
 		}

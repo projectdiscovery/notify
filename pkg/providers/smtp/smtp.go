@@ -14,7 +14,8 @@ import (
 )
 
 type Provider struct {
-	SMTP []*Options `yaml:"smtp,omitempty"`
+	SMTP    []*Options `yaml:"smtp,omitempty"`
+	counter int
 }
 
 type Options struct {
@@ -37,13 +38,16 @@ func New(options []*Options, ids []string) (*Provider, error) {
 		}
 	}
 
+	provider.counter = 0
+
 	return provider, nil
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
 	var SmtpErr error
+	p.counter++
 	for _, pr := range p.SMTP {
-		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SMTPFormat))
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SMTPFormat), p.counter)
 
 		url := fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s&subject=%s", pr.Username, pr.Password, pr.Server, pr.FromAddress, strings.Join(pr.SMTPCC, ","), pr.Subject)
 		err := shoutrrr.Send(url, msg)
