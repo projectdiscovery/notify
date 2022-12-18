@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/logrusorgru/aurora"
+
 	"github.com/projectdiscovery/notify/internal/testutils"
 )
 

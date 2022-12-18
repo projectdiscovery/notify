@@ -3,6 +3,8 @@ package providers
 import (
 	"github.com/acarl005/stripansi"
 	"github.com/pkg/errors"
+	"go.uber.org/multierr"
+
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers/custom"
 	"github.com/projectdiscovery/notify/pkg/providers/discord"
@@ -14,7 +16,6 @@ import (
 	"github.com/projectdiscovery/notify/pkg/providers/telegram"
 	"github.com/projectdiscovery/notify/pkg/types"
 	"github.com/projectdiscovery/sliceutil"
-	"go.uber.org/multierr"
 )
 
 // ProviderOptions is configuration for notify providers

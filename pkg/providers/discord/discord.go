@@ -6,16 +6,18 @@ import (
 	"github.com/containrrr/shoutrrr"
 	"github.com/oriser/regroup"
 	"github.com/pkg/errors"
+	"go.uber.org/multierr"
+
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"github.com/projectdiscovery/sliceutil"
-	"go.uber.org/multierr"
 )
 
 var reDiscordWebhook = regroup.MustCompile(`(?P<scheme>https?):\/\/(?P<domain>(?:ptb\.|canary\.)?discord(?:app)?\.com)\/api(?:\/)?(?P<api_version>v\d{1,2})?\/webhooks\/(?P<webhook_identifier>\d{17,19})\/(?P<webhook_token>[\w\-]{68})`)
 
 type Provider struct {
 	Discord []*Options `yaml:"discord,omitempty"`
+	counter int
 }
 
 type Options struct {
@@ -37,13 +39,14 @@ func New(options []*Options, ids []string) (*Provider, error) {
 		}
 	}
 
+	provider.counter = 0
+
 	return provider, nil
 }
 func (p *Provider) Send(message, CliFormat string) error {
 	var errs []error
-
 	for _, pr := range p.Discord {
-		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.DiscordFormat))
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.DiscordFormat), p.counter)
 
 		if pr.DiscordThreads {
 			if pr.DiscordThreadID == "" {
