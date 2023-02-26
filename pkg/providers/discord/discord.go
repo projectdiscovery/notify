@@ -2,6 +2,7 @@ package discord
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/oriser/regroup"
@@ -51,7 +52,9 @@ func (p *Provider) Send(message, CliFormat string) error {
 		}
 
 		webhookID, webhookToken := matchedGroups["webhook_identifier"], matchedGroups["webhook_token"]
-		url := fmt.Sprintf("discord://%s@%s?splitlines=no", webhookToken, webhookID)
+		url := fmt.Sprintf("discord://%s@%s?splitlines=no&username=%s", webhookToken, webhookID, 
+								url.QueryEscape(pr.DiscordWebHookUsername))
+		
 		sendErr := shoutrrr.Send(url, msg)
 		if sendErr != nil {
 			sendErr = errors.Wrap(sendErr, fmt.Sprintf("failed to send discord notification for id: %s ", pr.ID))
