@@ -12,7 +12,7 @@ require (
 	github.com/projectdiscovery/fileutil v0.0.0-20220705195237-01becc2a8963
 	github.com/projectdiscovery/goflags v0.1.7
 	github.com/projectdiscovery/gologger v1.1.8
-	github.com/projectdiscovery/sliceutil v0.0.0-20220625085859-c3a4ecb669f4
+	github.com/projectdiscovery/sliceutil v0.0.1
 	go.uber.org/multierr v1.9.0
 	go.uber.org/ratelimit v0.2.0
 	gopkg.in/yaml.v2 v2.4.0
