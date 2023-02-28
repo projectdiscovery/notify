@@ -533,15 +533,14 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/posener/complete v1.1.1/go.mod h1:em0nMJCgc9GFtwrmVmEMR/ZL6WyhyjMBndrE9hABlRI=
 github.com/posener/complete v1.2.3/go.mod h1:WZIdtGGp+qx0sLrYKtIRAruyNpv6hFCicSgv7Sy7s/s=
-github.com/projectdiscovery/fileutil v0.0.0-20220705195237-01becc2a8963 h1:4o97N9ftX1J3iKlIRVMPVOVZs4qbCczJvoFF2WA40t4=
-github.com/projectdiscovery/fileutil v0.0.0-20220705195237-01becc2a8963/go.mod h1:DaY7wmLPMleyHDCD/14YApPCDtrARY4J8Eny2ZGsG/g=
+github.com/projectdiscovery/fileutil v0.0.3 h1:GSsoey4p8ZHIRxWF2VXh4mhLr+wfEkpJwvF0Dxpn/gg=
+github.com/projectdiscovery/fileutil v0.0.3/go.mod h1:GLejWd3YerG3RNYD/Hk2pJlytlYRgHdkWfWUAdCH2YQ=
 github.com/projectdiscovery/goflags v0.1.7 h1:KvMs1KnXMWRhJiJj6K+cWurTWpbDYYlo+1cyGvf1YCc=
 github.com/projectdiscovery/goflags v0.1.7/go.mod h1:yILgA7gbrHuTpIvMfikbivzoxkyxBD1Y5/PRHiGTIFk=
 github.com/projectdiscovery/gologger v1.1.8 h1:CFlCzGlqAhPqWIrAXBt1OVh5jkMs1qgoR/z4xhdzLNE=
 github.com/projectdiscovery/gologger v1.1.8/go.mod h1:bNyVaC1U/NpJtFkJltcesn01NR3K8Hg6RsLVce6yvrw=
 github.com/projectdiscovery/sliceutil v0.0.0-20220625085859-c3a4ecb669f4 h1:C04j5gVVMXqFyBIetAz92SyPRYCpkFgIwZw0L/pps9Q=
 github.com/projectdiscovery/sliceutil v0.0.0-20220625085859-c3a4ecb669f4/go.mod h1:RxDaccMjPzIuF7F8XbdGl1yOcqxN4YPiHr9xHpfCkGI=
-github.com/projectdiscovery/stringsutil v0.0.0-20220422150559-b54fb5dc6833/go.mod h1:oTRc18WBv9t6BpaN9XBY+QmG28PUpsyDzRht56Qf49I=
 github.com/projectdiscovery/stringsutil v0.0.2 h1:uzmw3IVLJSMW1kEg8eCStG/cGbYYZAja8BH3LqqJXMA=
 github.com/projectdiscovery/stringsutil v0.0.2/go.mod h1:EJ3w6bC5fBYjVou6ryzodQq37D5c6qbAYQpGmAy+DC0=
 github.com/projectdiscovery/utils v0.0.4-0.20221214110533-9f95ee986a54 h1:/fZvw6gT1fzdmMLMBBw75OrJ0Z6g7dulQrxM9FRp1qU=
