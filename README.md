@@ -133,6 +133,8 @@ smtp:
       - to@email.com
     smtp_format: "{{data}}"
     subject: "Email subject"
+    smtp_html: false
+    smtp_disable_starttls: false
 
 googlechat:
   - id: "gc"
