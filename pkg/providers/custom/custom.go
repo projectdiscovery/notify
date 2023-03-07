@@ -66,7 +66,7 @@ func (p *Provider) Send(message, CliFormat string) error {
             var buf bytes.Buffer
             err = tmpl.Execute(&buf, data)
             if err != nil {
-                err = errors.Wrap(err, fmt.Sprintf("failed to execute custom sprig template for id: %s ", pr.ID))
+                err = errors.Wrap(err, fmt.Sprintf("failed to execute custom sprig template for id: %s: %s", pr.ID, data))
                 CustomErr = multierr.Append(CustomErr, err)
                 continue
             }
@@ -75,7 +75,7 @@ func (p *Provider) Send(message, CliFormat string) error {
             // Escape the message to a JSON string
             b, err := json.Marshal(message)
             if err != nil {
-                return errors.Wrap(err, fmt.Sprintf("failed to escape message to JSON for id: %s ", pr.ID))
+                return errors.Wrap(err, fmt.Sprintf("failed to escape message to JSON for id: %s: %s", pr.ID, message))
             }
             dataJsonString := string(b)
 
@@ -87,11 +87,10 @@ func (p *Provider) Send(message, CliFormat string) error {
         }
 
         body := bytes.NewBufferString(msg)
-        gologger.Verbose().Msgf("custom body sent: %s", msg)
 
         r, err := http.NewRequest(pr.CustomMethod, pr.CustomWebhookURL, body)
         if err != nil {
-            err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s ", pr.ID))
+            err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s: %s", pr.ID, msg))
             CustomErr = multierr.Append(CustomErr, err)
             continue
         }
@@ -102,11 +101,11 @@ func (p *Provider) Send(message, CliFormat string) error {
 
         _, err = httpreq.NewClient().Do(r)
         if err != nil {
-            err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s ", pr.ID))
+            err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s: %s", pr.ID, msg))
             CustomErr = multierr.Append(CustomErr, err)
             continue
         }
-        gologger.Verbose().Msgf("custom notification sent for id: %s", pr.ID)
+        gologger.Verbose().Msgf("custom notification sent for id: %s: %s", pr.ID, msg)
     }
     return CustomErr
 }
