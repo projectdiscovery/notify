@@ -6,9 +6,11 @@ import (
 	"strings"
 	"fmt"
 	"net/http"
+	"text/template"
 
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
+	"github.com/Masterminds/sprig"
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
@@ -26,6 +28,7 @@ type Options struct {
 	CustomMethod     string            `yaml:"custom_method,omitempty"`
 	CustomHeaders    map[string]string `yaml:"custom_headers,omitempty"`
 	CustomFormat     string            `yaml:"custom_format,omitempty"`
+	CustomSprig      string            `yaml:"custom_sprig,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -45,7 +48,30 @@ func (p *Provider) Send(message, CliFormat string) error {
 
     for _, pr := range p.Custom {
         var msg string
-        if strings.Contains(pr.CustomFormat, "{{dataJsonString}}") {
+        if pr.CustomSprig != "" {
+            // Convert a string to JSON
+            var data map[string]interface{}
+            if err := json.Unmarshal([]byte(message), &data); err != nil {
+                return errors.Wrap(err, fmt.Sprintf("failed to unmarshal message to JSON for id: %s ", pr.ID))
+            }
+
+            funcMap := sprig.TxtFuncMap()
+            // Add custom functions if needed using funcMap["funcName"] = func
+            tmpl, err := template.New("sprig").Funcs(funcMap).Parse(pr.CustomSprig)
+            if err != nil {
+                err = errors.Wrap(err, fmt.Sprintf("failed to parse custom sprig template for id: %s ", pr.ID))
+                CustomErr = multierr.Append(CustomErr, err)
+                continue
+            }
+            var buf bytes.Buffer
+            err = tmpl.Execute(&buf, data)
+            if err != nil {
+                err = errors.Wrap(err, fmt.Sprintf("failed to execute custom sprig template for id: %s ", pr.ID))
+                CustomErr = multierr.Append(CustomErr, err)
+                continue
+            }
+            msg = buf.String()
+        } else if strings.Contains(pr.CustomFormat, "{{dataJsonString}}") {
             // Escape the message to a JSON string
             b, err := json.Marshal(message)
             if err != nil {
@@ -62,7 +88,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 
         body := bytes.NewBufferString(msg)
         gologger.Verbose().Msgf("custom body sent: %s", msg)
-		
+
         r, err := http.NewRequest(pr.CustomMethod, pr.CustomWebhookURL, body)
         if err != nil {
             err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s ", pr.ID))
@@ -84,4 +110,5 @@ func (p *Provider) Send(message, CliFormat string) error {
     }
     return CustomErr
 }
+
 
