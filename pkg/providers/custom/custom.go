@@ -2,6 +2,8 @@ package custom
 
 import (
 	"bytes"
+	"encoding/json"
+	"strings"
 	"fmt"
 	"net/http"
 
@@ -39,31 +41,47 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
-	var CustomErr error
+    var CustomErr error
 
-	for _, pr := range p.Custom {
+    for _, pr := range p.Custom {
+        var msg string
+        if strings.Contains(pr.CustomFormat, "{{dataJsonString}}") {
+            // Escape the message to a JSON string
+            b, err := json.Marshal(message)
+            if err != nil {
+                return errors.Wrap(err, fmt.Sprintf("failed to escape message to JSON for id: %s ", pr.ID))
+            }
+            dataJsonString := string(b)
 
-		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.CustomFormat))
-		body := bytes.NewBufferString(msg)
+            // Replace the "{{dataJsonString}}" substring in the custom format with the escaped JSON string
+            msg = strings.ReplaceAll(pr.CustomFormat, "{{dataJsonString}}", dataJsonString)
+        } else {
+            // Otherwise, use the original message
+            msg = utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.CustomFormat))
+        }
 
-		r, err := http.NewRequest(pr.CustomMethod, pr.CustomWebhookURL, body)
-		if err != nil {
-			err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s ", pr.ID))
-			CustomErr = multierr.Append(CustomErr, err)
-			continue
-		}
+        body := bytes.NewBufferString(msg)
+        gologger.Verbose().Msgf("custom body sent: %s", msg)
+		
+        r, err := http.NewRequest(pr.CustomMethod, pr.CustomWebhookURL, body)
+        if err != nil {
+            err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s ", pr.ID))
+            CustomErr = multierr.Append(CustomErr, err)
+            continue
+        }
 
-		for k, v := range pr.CustomHeaders {
-			r.Header.Set(k, v)
-		}
+        for k, v := range pr.CustomHeaders {
+            r.Header.Set(k, v)
+        }
 
-		_, err = httpreq.NewClient().Do(r)
-		if err != nil {
-			err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s ", pr.ID))
-			CustomErr = multierr.Append(CustomErr, err)
-			continue
-		}
-		gologger.Verbose().Msgf("custom notification sent for id: %s", pr.ID)
-	}
-	return CustomErr
+        _, err = httpreq.NewClient().Do(r)
+        if err != nil {
+            err = errors.Wrap(err, fmt.Sprintf("failed to send custom notification for id: %s ", pr.ID))
+            CustomErr = multierr.Append(CustomErr, err)
+            continue
+        }
+        gologger.Verbose().Msgf("custom notification sent for id: %s", pr.ID)
+    }
+    return CustomErr
 }
+
