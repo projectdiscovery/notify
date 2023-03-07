@@ -154,6 +154,24 @@ custom:
     custom_headers:
       Content-Type: application/json
       X-Api-Key: XXXXX
+      
+custom:
+  - id: webhookJson
+    custom_webhook_url: http://host/api/webhook
+    custom_method: GET
+    custom_format: '{"text":{{dataJsonString}} }'
+    custom_headers:
+      Content-Type: application/json
+      X-Api-Key: XXXXX
+
+custom:
+  - id: webhook
+    custom_webhook_url: http://host/api/webhook
+    custom_method: GET
+    custom_sprig: '{"text":"{{ .url }}"}'
+    custom_headers:
+      Content-Type: application/json
+      X-Api-Key: XXXXX
 ``` 
 
 # Running Notify
