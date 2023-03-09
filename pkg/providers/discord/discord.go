@@ -11,7 +11,7 @@ import (
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
-	"github.com/projectdiscovery/sliceutil"
+	sliceutil "github.com/projectdiscovery/utils/slice"
 )
 
 type Provider struct {
@@ -56,9 +56,9 @@ func (p *Provider) Send(message, CliFormat string) error {
 		}
 
 		webhookID, webhookToken := matchedGroups["webhook_identifier"], matchedGroups["webhook_token"]
-		url := fmt.Sprintf("discord://%s@%s?splitlines=no&username=%s", webhookToken, webhookID, 
-								url.QueryEscape(pr.DiscordWebHookUsername))
-		
+		url := fmt.Sprintf("discord://%s@%s?splitlines=no&username=%s", webhookToken, webhookID,
+			url.QueryEscape(pr.DiscordWebHookUsername))
+
 		sendErr := shoutrrr.Send(url, msg)
 		if sendErr != nil {
 			sendErr = errors.Wrap(sendErr, fmt.Sprintf("failed to send discord notification for id: %s ", pr.ID))
