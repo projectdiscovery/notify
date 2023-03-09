@@ -10,7 +10,7 @@ import (
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
-	"github.com/projectdiscovery/sliceutil"
+	sliceutil "github.com/projectdiscovery/utils/slice"
 )
 
 type Provider struct {
