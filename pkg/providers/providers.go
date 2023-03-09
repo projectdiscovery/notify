@@ -15,7 +15,7 @@ import (
 	"github.com/projectdiscovery/notify/pkg/providers/teams"
 	"github.com/projectdiscovery/notify/pkg/providers/telegram"
 	"github.com/projectdiscovery/notify/pkg/types"
-	"github.com/projectdiscovery/sliceutil"
+	sliceutil "github.com/projectdiscovery/utils/slice"
 )
 
 // ProviderOptions is configuration for notify providers
