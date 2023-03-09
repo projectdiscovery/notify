@@ -14,12 +14,13 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
-	"github.com/projectdiscovery/fileutil"
+	"gopkg.in/yaml.v2"
+
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers"
 	"github.com/projectdiscovery/notify/pkg/types"
 	"github.com/projectdiscovery/notify/pkg/utils"
-	"gopkg.in/yaml.v2"
+	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 // Runner contains the internal logic of the program

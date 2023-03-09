@@ -6,14 +6,16 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
+	"go.uber.org/multierr"
+
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
-	"github.com/projectdiscovery/sliceutil"
-	"go.uber.org/multierr"
+	sliceutil "github.com/projectdiscovery/utils/slice"
 )
 
 type Provider struct {
-	SMTP []*Options `yaml:"smtp,omitempty"`
+	SMTP    []*Options `yaml:"smtp,omitempty"`
+	counter int
 }
 
 type Options struct {
@@ -24,7 +26,7 @@ type Options struct {
 	FromAddress string   `yaml:"from_address,omitempty"`
 	SMTPCC      []string `yaml:"smtp_cc,omitempty"`
 	SMTPFormat  string   `yaml:"smtp_format,omitempty"`
-	Subject		string	 `yaml:"subject,omitempty"`
+	Subject     string   `yaml:"subject,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -36,15 +38,18 @@ func New(options []*Options, ids []string) (*Provider, error) {
 		}
 	}
 
+	provider.counter = 0
+
 	return provider, nil
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
 	var SmtpErr error
+	p.counter++
 	for _, pr := range p.SMTP {
-		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SMTPFormat))
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SMTPFormat), p.counter)
 
-		url := fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s&subject=%s", pr.Username, pr.Password, pr.Server, pr.FromAddress, strings.Join(pr.SMTPCC, ","),pr.Subject)
+		url := fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s&subject=%s", pr.Username, pr.Password, pr.Server, pr.FromAddress, strings.Join(pr.SMTPCC, ","), pr.Subject)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send smtp notification for id: %s ", pr.ID))

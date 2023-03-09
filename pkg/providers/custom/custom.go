@@ -11,11 +11,12 @@ import (
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	"github.com/projectdiscovery/notify/pkg/utils/httpreq"
-	"github.com/projectdiscovery/sliceutil"
+	sliceutil "github.com/projectdiscovery/utils/slice"
 )
 
 type Provider struct {
-	Custom []*Options `yaml:"custom,omitempty"`
+	Custom  []*Options `yaml:"custom,omitempty"`
+	counter int
 }
 
 type Options struct {
@@ -35,15 +36,16 @@ func New(options []*Options, ids []string) (*Provider, error) {
 		}
 	}
 
+	provider.counter = 0
+
 	return provider, nil
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
 	var CustomErr error
-
+	p.counter++
 	for _, pr := range p.Custom {
-
-		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.CustomFormat))
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.CustomFormat), p.counter)
 		body := bytes.NewBufferString(msg)
 
 		r, err := http.NewRequest(pr.CustomMethod, pr.CustomWebhookURL, body)
