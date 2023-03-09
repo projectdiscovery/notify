@@ -1,6 +1,6 @@
 module github.com/projectdiscovery/notify
 
-go 1.17
+go 1.19
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
@@ -9,10 +9,9 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/pkg/errors v0.9.1
-	github.com/projectdiscovery/fileutil v0.0.0-20220705195237-01becc2a8963
 	github.com/projectdiscovery/goflags v0.1.7
 	github.com/projectdiscovery/gologger v1.1.8
-	github.com/projectdiscovery/sliceutil v0.0.0-20220625085859-c3a4ecb669f4
+	github.com/projectdiscovery/utils v0.0.4-0.20221214110533-9f95ee986a54
 	go.uber.org/multierr v1.9.0
 	go.uber.org/ratelimit v0.2.0
 	gopkg.in/yaml.v2 v2.4.0
@@ -36,8 +35,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nwaples/rardecode v1.1.0 // indirect
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
-	github.com/projectdiscovery/stringsutil v0.0.2 // indirect
-	github.com/projectdiscovery/utils v0.0.4-0.20221214110533-9f95ee986a54 // indirect
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
 	github.com/ulikunitz/xz v0.5.7 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
