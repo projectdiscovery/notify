@@ -3,7 +3,7 @@ package runner
 import (
 	"bufio"
 	"crypto/tls"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -51,7 +51,7 @@ func NewRunner(options *types.Options) (*Runner, error) {
 	}
 
 	// Discard all internal logs
-	shoutrrr.SetLogger(log.New(ioutil.Discard, "", 0))
+	shoutrrr.SetLogger(log.New(io.Discard, "", 0))
 
 	prClient, err := providers.New(&providerOptions, options)
 	if err != nil {
