@@ -53,7 +53,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 		var msg string
 		if pr.CustomSprig != "" {
 			// Convert a string to JSON
-			var data map[string]interface{}
+			data := make(map[string]interface{})
 			if err := json.Unmarshal([]byte(message), &data); err != nil {
 				return errors.Wrap(err, fmt.Sprintf("failed to unmarshal message to JSON for id: %s ", pr.ID))
 			}
