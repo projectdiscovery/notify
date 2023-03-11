@@ -12,8 +12,8 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/projectdiscovery/goflags v0.1.8
 	github.com/projectdiscovery/gologger v1.1.8
-	github.com/projectdiscovery/utils v0.0.4-0.20221214110533-9f95ee986a54
-	go.uber.org/multierr v1.9.0
+	github.com/projectdiscovery/utils v0.0.14
+	go.uber.org/multierr v1.10.0
 	go.uber.org/ratelimit v0.2.0
 	gopkg.in/yaml.v2 v2.4.0
 )
