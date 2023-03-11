@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/containrrr/shoutrrr"
@@ -37,7 +37,7 @@ func NewRunner(options *types.Options) (*Runner, error) {
 		if err != nil {
 			return nil, err
 		}
-		options.ProviderConfig = path.Join(home, types.DefaultProviderConfigLocation)
+		options.ProviderConfig = filepath.Join(home, types.DefaultProviderConfigLocation)
 		gologger.Print().Msgf("Using default provider config: %s\n", options.ProviderConfig)
 	}
 
