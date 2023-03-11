@@ -86,7 +86,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 			msg = strings.ReplaceAll(pr.CustomFormat, "{{dataJsonString}}", dataJsonString)
 		} else {
 			// Otherwise, use the original message
-			msg = utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.CustomFormat))
+			msg = utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.CustomFormat), p.counter)
 		}
 
 		body := bytes.NewBufferString(msg)
