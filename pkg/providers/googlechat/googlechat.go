@@ -5,14 +5,16 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
+	"go.uber.org/multierr"
+
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
-	"github.com/projectdiscovery/sliceutil"
-	"go.uber.org/multierr"
+	sliceutil "github.com/projectdiscovery/utils/slice"
 )
 
 type Provider struct {
 	GoogleChat []*Options `yaml:"googleChat,omitempty"`
+	counter    int
 }
 
 type Options struct {
@@ -32,13 +34,16 @@ func New(options []*Options, ids []string) (*Provider, error) {
 		}
 	}
 
+	provider.counter = 0
+
 	return provider, nil
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
 	var GoogleChatErr error
+	p.counter++
 	for _, pr := range p.GoogleChat {
-		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.GoogleChatFormat))
+		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.GoogleChatFormat), p.counter)
 		url := fmt.Sprintf("googlechat://chat.googleapis.com/v1/spaces/%s/messages?key=%s&token=%s", pr.Space, pr.Key, pr.Token)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {

@@ -4,11 +4,11 @@ import (
 	"errors"
 	"os"
 
-	"github.com/projectdiscovery/fileutil"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
 	"github.com/projectdiscovery/notify/pkg/types"
+	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 // ParseOptions parses the command line flags provided by a user

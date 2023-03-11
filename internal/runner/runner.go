@@ -3,7 +3,7 @@ package runner
 import (
 	"bufio"
 	"crypto/tls"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -13,12 +13,13 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
-	"github.com/projectdiscovery/fileutil"
+	"gopkg.in/yaml.v2"
+
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers"
 	"github.com/projectdiscovery/notify/pkg/types"
 	"github.com/projectdiscovery/notify/pkg/utils"
-	"gopkg.in/yaml.v2"
+	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 // Runner contains the internal logic of the program
@@ -50,7 +51,7 @@ func NewRunner(options *types.Options) (*Runner, error) {
 	}
 
 	// Discard all internal logs
-	shoutrrr.SetLogger(log.New(ioutil.Discard, "", 0))
+	shoutrrr.SetLogger(log.New(io.Discard, "", 0))
 
 	prClient, err := providers.New(&providerOptions, options)
 	if err != nil {
