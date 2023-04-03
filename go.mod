@@ -13,7 +13,7 @@ require (
 	github.com/projectdiscovery/goflags v0.1.8
 	github.com/projectdiscovery/gologger v1.1.8
 	github.com/projectdiscovery/utils v0.0.14
-	go.uber.org/multierr v1.10.0
+	go.uber.org/multierr v1.11.0
 	go.uber.org/ratelimit v0.2.0
 	gopkg.in/yaml.v2 v2.4.0
 )
