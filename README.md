@@ -52,24 +52,25 @@ notify -h
 
 This will display help for the tool. Here are all the switches it supports.
 
-| Flag               | Description                                        | Example                               |
-|--------------------|----------------------------------------------------|---------------------------------------|
-| `-bulk`            | enable bulk processing                             | `notify -bulk`                        |
-| `-char-limit`      | max character limit per message (default 4000)     | `notify -cl 2000`                     |
-| `-config`          | notify configuration file                          | `notify -config config.yaml`          |
-| `-data`            | input file to send for notify                      | `notify -i test.txt`                  |
-| `-delay`           | delay in seconds between each notification         | `notify -d 2`                         |
-| `-id`              | id to send the notification to (optional)          | `notify -id recon,scans`              |
-| `-msg-format`      | add custom formatting to message                   | `notify -mf Hey {{data}}`             |
-| `-no-color`        | disable colors in output                           | `notify -nc`                          |
-| `-provider-config` | provider config path                               | `notify -pc provider.yaml`            |
-| `-provider`        | provider to send the notification to (optional)    | `notify -p slack,telegram`            |
-| `-proxy`           | http proxy to use with notify                      | `notify -proxy http://127.0.0.1:8080` |
-| `-rate-limit`      | maximum number of HTTP requests to send per second | `notify -rl 1`                        |
-| `-silent`          | enable silent mode                                 | `notify -silent`                      |
-| `-verbose`         | enable verbose mode                                | `notify -verbose`                     |
-| `-version`         | display version                                    | `notify -version`                     |
-
+| Flag                    | Description                                        | Example                               |
+|-------------------------|----------------------------------------------------|---------------------------------------|
+| `-bulk`                 | enable bulk processing                             | `notify -bulk`                        |
+| `-char-limit`           | max character limit per message (default 4000)     | `notify -cl 2000`                     |
+| `-config`               | notify configuration file                          | `notify -config config.yaml`          |
+| `-data`                 | input file to send for notify                      | `notify -i test.txt`                  |
+| `-delay`                | delay in seconds between each notification         | `notify -d 2`                         |
+| `-id`                   | id to send the notification to (optional)          | `notify -id recon,scans`              |
+| `-msg-format`           | add custom formatting to message                   | `notify -mf Hey {{data}}`             |
+| `-no-color`             | disable colors in output                           | `notify -nc`                          |
+| `-provider-config`      | provider config path                               | `notify -pc provider.yaml`            |
+| `-provider`             | provider to send the notification to (optional)    | `notify -p slack,telegram`            |
+| `-proxy`                | http proxy to use with notify                      | `notify -proxy http://127.0.0.1:8080` |
+| `-rate-limit`           | maximum number of HTTP requests to send per second | `notify -rl 1`                        |
+| `-silent`               | enable silent mode                                 | `notify -silent`                      |
+| `-verbose`              | enable verbose mode                                | `notify -verbose`                     |
+| `-version`              | display version                                    | `notify -version`                     |
+| `-update`               | updates to latest version                          | `notify -update`                      |
+| `-disable-update-check` | disables automatic update check                    | `notify -duc`                         |
 
 # Notify Installation
 
