@@ -9,6 +9,8 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
+	"strings"
 	"time"
 
 	"github.com/containrrr/shoutrrr"
@@ -49,6 +51,8 @@ func NewRunner(options *types.Options) (*Runner, error) {
 		file.Close()
 		return nil, errors.Wrap(parseErr, "could not parse provider config file")
 	}
+
+	Walk(providerOptions, expandEndVars)
 
 	// Discard all internal logs
 	shoutrrr.SetLogger(log.New(io.Discard, "", 0))
@@ -143,3 +147,56 @@ func (r *Runner) sendMessage(msg string) error {
 
 // Close the runner instance
 func (r *Runner) Close() {}
+
+type WalkFunc func(reflect.Value, reflect.StructField)
+
+// Walk traverses a struct and executes a callback function on each value in the struct.
+// The interface{} passed to the function should be a pointer to a struct or a struct.
+// WalkFunc is the callback function used for each value in the struct. It is passed the
+// reflect.Value and reflect.Type of the value in the struct.
+func Walk(s interface{}, callback WalkFunc) {
+	structValue := reflect.ValueOf(s)
+	if structValue.Kind() == reflect.Ptr {
+		structValue = structValue.Elem()
+	}
+	if structValue.Kind() != reflect.Struct {
+		return
+	}
+	for i := 0; i < structValue.NumField(); i++ {
+		field := structValue.Field(i)
+		fieldType := structValue.Type().Field(i)
+		if !fieldType.IsExported() {
+			continue
+		}
+		if field.Kind() == reflect.Struct {
+			Walk(field.Addr().Interface(), callback)
+		} else if field.Kind() == reflect.Ptr && field.Elem().Kind() == reflect.Struct {
+			Walk(field.Interface(), callback)
+		} else if field.Kind() == reflect.Slice {
+			for i := 0; i < field.Len(); i++ {
+				Walk(field.Index(i).Interface(), callback)
+			}
+		} else {
+			callback(field, fieldType)
+		}
+	}
+}
+
+// expandEndVars looks for values in a struct tagged with "yaml" and checks if they are prefixed with '$'.
+// If they are, it will try to retrieve the value from the environment and if it exists, it will set the
+// value of the field to that of the environment variable.
+func expandEndVars(f reflect.Value, fieldType reflect.StructField) {
+	if _, ok := fieldType.Tag.Lookup("yaml"); !ok {
+		return
+	}
+	if f.Kind() == reflect.String {
+		str := f.String()
+		if strings.HasPrefix(str, "$") {
+			env := strings.TrimPrefix(str, "$")
+			retrievedEnv := os.Getenv(strings.ToUpper(env))
+			if retrievedEnv != "" {
+				f.SetString(retrievedEnv)
+			}
+		}
+	}
+}
