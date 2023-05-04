@@ -29,7 +29,7 @@ func ParseOptions(options *types.Options) {
 	}
 
 	if !options.DisableUpdateCheck {
-		latestVersion, err := updateutils.GetVersionCheckCallback("notify")()
+		latestVersion, err := updateutils.GetToolVersionCallback("notify", version)()
 		if err != nil {
 			if options.Verbose {
 				gologger.Error().Msgf("notify version check failed: %v", err.Error())
