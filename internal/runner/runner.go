@@ -9,13 +9,12 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"time"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers"
@@ -43,18 +42,15 @@ func NewRunner(options *types.Options) (*Runner, error) {
 		gologger.Print().Msgf("Using default provider config: %s\n", options.ProviderConfig)
 	}
 
-	file, err := os.Open(options.ProviderConfig)
+	reader, err := readProviderConfig(options.ProviderConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not open provider config file")
+		return nil, err
 	}
-	if parseErr := yaml.NewDecoder(file).Decode(&providerOptions); parseErr != nil {
-		file.Close()
+
+	if parseErr := yaml.NewDecoder(reader).Decode(&providerOptions); parseErr != nil {
 		return nil, errors.Wrap(parseErr, "could not parse provider config file")
 	}
 
-	Walk(providerOptions, expandEndVars)
-
-	// Discard all internal logs
 	shoutrrr.SetLogger(log.New(io.Discard, "", 0))
 
 	prClient, err := providers.New(&providerOptions, options)
@@ -148,55 +144,43 @@ func (r *Runner) sendMessage(msg string) error {
 // Close the runner instance
 func (r *Runner) Close() {}
 
-type WalkFunc func(reflect.Value, reflect.StructField)
+func readProviderConfig(filepath string) (io.Reader, error) {
+	// Open the file
+	file, err := os.Open(filepath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
 
-// Walk traverses a struct and executes a callback function on each value in the struct.
-// The interface{} passed to the function should be a pointer to a struct or a struct.
-// WalkFunc is the callback function used for each value in the struct. It is passed the
-// reflect.Value and reflect.Type of the value in the struct.
-func Walk(s interface{}, callback WalkFunc) {
-	structValue := reflect.ValueOf(s)
-	if structValue.Kind() == reflect.Ptr {
-		structValue = structValue.Elem()
+	// Create a scanner to read the file line by line
+	scanner := bufio.NewScanner(file)
+
+	// Create a string builder to accumulate the modified data
+	var sb strings.Builder
+
+	// Iterate over each line and do variable substitution
+	for scanner.Scan() {
+		line := scanner.Text()
+		newLine := substituteEnvVars(line)
+		sb.WriteString(newLine)
+		sb.WriteString("\n")
 	}
-	if structValue.Kind() != reflect.Struct {
-		return
+	// Check for errors
+	if err := scanner.Err(); err != nil {
+		return nil, err
 	}
-	for i := 0; i < structValue.NumField(); i++ {
-		field := structValue.Field(i)
-		fieldType := structValue.Type().Field(i)
-		if !fieldType.IsExported() {
-			continue
-		}
-		if field.Kind() == reflect.Struct {
-			Walk(field.Addr().Interface(), callback)
-		} else if field.Kind() == reflect.Ptr && field.Elem().Kind() == reflect.Struct {
-			Walk(field.Interface(), callback)
-		} else if field.Kind() == reflect.Slice {
-			for i := 0; i < field.Len(); i++ {
-				Walk(field.Index(i).Interface(), callback)
-			}
-		} else {
-			callback(field, fieldType)
-		}
-	}
+
+	return strings.NewReader(sb.String()), nil
 }
 
-// expandEndVars looks for values in a struct tagged with "yaml" and checks if they are prefixed with '$'.
-// If they are, it will try to retrieve the value from the environment and if it exists, it will set the
-// value of the field to that of the environment variable.
-func expandEndVars(f reflect.Value, fieldType reflect.StructField) {
-	if _, ok := fieldType.Tag.Lookup("yaml"); !ok {
-		return
-	}
-	if f.Kind() == reflect.String {
-		str := f.String()
-		if strings.HasPrefix(str, "$") {
-			env := strings.TrimPrefix(str, "$")
-			retrievedEnv := os.Getenv(strings.ToUpper(env))
-			if retrievedEnv != "" {
-				f.SetString(retrievedEnv)
-			}
+func substituteEnvVars(line string) string {
+	for _, word := range strings.Fields(line) {
+		word = strings.Trim(word, " \"")
+		if strings.HasPrefix(word, "$") {
+			key := strings.TrimPrefix(word, "$")
+			substituteEnv := os.Getenv(key)
+			line = strings.Replace(line, word, substituteEnv, 1)
 		}
 	}
+	return line
 }
