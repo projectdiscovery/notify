@@ -15,7 +15,7 @@ require (
 	github.com/projectdiscovery/utils v0.0.26
 	go.uber.org/multierr v1.11.0
 	go.uber.org/ratelimit v0.2.0
-	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -76,5 +76,4 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/djherbis/times.v1 v1.3.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
