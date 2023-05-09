@@ -179,7 +179,9 @@ func substituteEnvVars(line string) string {
 		if strings.HasPrefix(word, "$") {
 			key := strings.TrimPrefix(word, "$")
 			substituteEnv := os.Getenv(key)
-			line = strings.Replace(line, word, substituteEnv, 1)
+			if substituteEnv != "" {
+				line = strings.Replace(line, word, substituteEnv, 1)
+			}
 		}
 	}
 	return line
