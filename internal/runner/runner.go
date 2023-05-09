@@ -175,7 +175,7 @@ func readProviderConfig(filepath string) (io.Reader, error) {
 
 func substituteEnvVars(line string) string {
 	for _, word := range strings.Fields(line) {
-		word = strings.Trim(word, " \"")
+		word = strings.Trim(word, `"`)
 		if strings.HasPrefix(word, "$") {
 			key := strings.TrimPrefix(word, "$")
 			substituteEnv := os.Getenv(key)
