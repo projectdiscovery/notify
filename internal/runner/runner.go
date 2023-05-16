@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/containrrr/shoutrrr"
@@ -42,7 +41,7 @@ func NewRunner(options *types.Options) (*Runner, error) {
 		gologger.Print().Msgf("Using default provider config: %s\n", options.ProviderConfig)
 	}
 
-	reader, err := readProviderConfig(options.ProviderConfig)
+	reader, err := fileutil.SubstituteConfigFromEnvVars(options.ProviderConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -143,46 +142,3 @@ func (r *Runner) sendMessage(msg string) error {
 
 // Close the runner instance
 func (r *Runner) Close() {}
-
-func readProviderConfig(filepath string) (io.Reader, error) {
-	// Open the file
-	file, err := os.Open(filepath)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	// Create a scanner to read the file line by line
-	scanner := bufio.NewScanner(file)
-
-	// Create a string builder to accumulate the modified data
-	var sb strings.Builder
-
-	// Iterate over each line and do variable substitution
-	for scanner.Scan() {
-		line := scanner.Text()
-		newLine := substituteEnvVars(line)
-		sb.WriteString(newLine)
-		sb.WriteString("\n")
-	}
-	// Check for errors
-	if err := scanner.Err(); err != nil {
-		return nil, err
-	}
-
-	return strings.NewReader(sb.String()), nil
-}
-
-func substituteEnvVars(line string) string {
-	for _, word := range strings.Fields(line) {
-		word = strings.Trim(word, `"`)
-		if strings.HasPrefix(word, "$") {
-			key := strings.TrimPrefix(word, "$")
-			substituteEnv := os.Getenv(key)
-			if substituteEnv != "" {
-				line = strings.Replace(line, word, substituteEnv, 1)
-			}
-		}
-	}
-	return line
-}
