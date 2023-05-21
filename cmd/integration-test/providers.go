@@ -20,7 +20,7 @@ func run(provider string) error {
 		return errIncorrectResultsCount(results)
 	}
 	for _, r := range results {
-		if !strings.Contains(r, provider) {
+		if !strings.Contains(strings.ToLower(r), strings.ToLower(provider)) {
 			return fmt.Errorf("incorrect result %s", results[0])
 		}
 	}
