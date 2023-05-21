@@ -24,7 +24,7 @@ type Options struct {
 	FromAddress string   `yaml:"from_address,omitempty"`
 	SMTPCC      []string `yaml:"smtp_cc,omitempty"`
 	SMTPFormat  string   `yaml:"smtp_format,omitempty"`
-	Subject		string	 `yaml:"subject,omitempty"`
+	Subject     string   `yaml:"subject,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -39,12 +39,16 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	return provider, nil
 }
 
+func buildUrl(o *Options) string {
+	return fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s&subject=%s", o.Username, o.Password, o.Server, o.FromAddress, strings.Join(o.SMTPCC, ","), o.Subject)
+}
+
 func (p *Provider) Send(message, CliFormat string) error {
 	var SmtpErr error
 	for _, pr := range p.SMTP {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SMTPFormat))
 
-		url := fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s&subject=%s", pr.Username, pr.Password, pr.Server, pr.FromAddress, strings.Join(pr.SMTPCC, ","),pr.Subject)
+		url := buildUrl(pr)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send smtp notification for id: %s ", pr.ID))
