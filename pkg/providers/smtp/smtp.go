@@ -2,6 +2,7 @@ package smtp
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
@@ -40,7 +41,7 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func buildUrl(o *Options) string {
-	return fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s&subject=%s", o.Username, o.Password, o.Server, o.FromAddress, strings.Join(o.SMTPCC, ","), o.Subject)
+	return fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s&subject=%s", o.Username, url.QueryEscape(o.Password), o.Server, o.FromAddress, strings.Join(o.SMTPCC, ","), o.Subject)
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
