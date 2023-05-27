@@ -13,7 +13,7 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers"
@@ -41,16 +41,15 @@ func NewRunner(options *types.Options) (*Runner, error) {
 		gologger.Print().Msgf("Using default provider config: %s\n", options.ProviderConfig)
 	}
 
-	file, err := os.Open(options.ProviderConfig)
+	reader, err := fileutil.SubstituteConfigFromEnvVars(options.ProviderConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not open provider config file")
+		return nil, err
 	}
-	if parseErr := yaml.NewDecoder(file).Decode(&providerOptions); parseErr != nil {
-		file.Close()
+
+	if parseErr := yaml.NewDecoder(reader).Decode(&providerOptions); parseErr != nil {
 		return nil, errors.Wrap(parseErr, "could not parse provider config file")
 	}
 
-	// Discard all internal logs
 	shoutrrr.SetLogger(log.New(io.Discard, "", 0))
 
 	prClient, err := providers.New(&providerOptions, options)
