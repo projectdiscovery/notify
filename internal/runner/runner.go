@@ -3,22 +3,23 @@ package runner
 import (
 	"bufio"
 	"crypto/tls"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
-	"github.com/projectdiscovery/fileutil"
+	"gopkg.in/yaml.v3"
+
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers"
 	"github.com/projectdiscovery/notify/pkg/types"
 	"github.com/projectdiscovery/notify/pkg/utils"
-	"gopkg.in/yaml.v2"
+	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 // Runner contains the internal logic of the program
@@ -36,21 +37,20 @@ func NewRunner(options *types.Options) (*Runner, error) {
 		if err != nil {
 			return nil, err
 		}
-		options.ProviderConfig = path.Join(home, types.DefaultProviderConfigLocation)
+		options.ProviderConfig = filepath.Join(home, types.DefaultProviderConfigLocation)
 		gologger.Print().Msgf("Using default provider config: %s\n", options.ProviderConfig)
 	}
 
-	file, err := os.Open(options.ProviderConfig)
+	reader, err := fileutil.SubstituteConfigFromEnvVars(options.ProviderConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not open provider config file")
+		return nil, err
 	}
-	if parseErr := yaml.NewDecoder(file).Decode(&providerOptions); parseErr != nil {
-		file.Close()
+
+	if parseErr := yaml.NewDecoder(reader).Decode(&providerOptions); parseErr != nil {
 		return nil, errors.Wrap(parseErr, "could not parse provider config file")
 	}
 
-	// Discard all internal logs
-	shoutrrr.SetLogger(log.New(ioutil.Discard, "", 0))
+	shoutrrr.SetLogger(log.New(io.Discard, "", 0))
 
 	prClient, err := providers.New(&providerOptions, options)
 	if err != nil {

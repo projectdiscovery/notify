@@ -64,6 +64,8 @@ func readConfig() {
 	set.BoolVar(&options.Version, "version", false, "display version")
 	set.BoolVarP(&options.NoColor, "no-color", "nc", false, "disable colors in output")
 	set.StringVar(&options.Proxy, "proxy", "", "HTTP Proxy to use with notify")
+	set.CallbackVarP(runner.GetUpdateCallback(), "update", "up", "update notify to latest version")
+	set.BoolVarP(&options.DisableUpdateCheck, "disable-update-check", "duc", false, "disable automatic notify update check")
 
 	_ = set.Parse()
 

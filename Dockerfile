@@ -1,7 +1,15 @@
-FROM golang:1.19.2-alpine as build-env
-RUN go install -v github.com/projectdiscovery/notify/cmd/notify@latest
+# Base
+FROM golang:1.20.3-alpine AS builder
+RUN apk add --no-cache build-base
+WORKDIR /app
+COPY . /app
+RUN go mod download
+RUN go build ./cmd/notify
 
-FROM alpine:latest
-COPY --from=build-env /go/bin/notify /usr/local/bin/notify
+# Release
+FROM alpine:3.17.3
+RUN apk -U upgrade --no-cache \
+    && apk add --no-cache bind-tools ca-certificates
+COPY --from=builder /app/notify /usr/local/bin/
 
 ENTRYPOINT ["notify"]

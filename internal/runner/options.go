@@ -4,11 +4,12 @@ import (
 	"errors"
 	"os"
 
-	"github.com/projectdiscovery/fileutil"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
 	"github.com/projectdiscovery/notify/pkg/types"
+	fileutil "github.com/projectdiscovery/utils/file"
+	updateutils "github.com/projectdiscovery/utils/update"
 )
 
 // ParseOptions parses the command line flags provided by a user
@@ -23,8 +24,19 @@ func ParseOptions(options *types.Options) {
 	showBanner()
 
 	if options.Version {
-		gologger.Info().Msgf("Current Version: %s\n", Version)
+		gologger.Info().Msgf("Current Version: %s\n", version)
 		os.Exit(0)
+	}
+
+	if !options.DisableUpdateCheck {
+		latestVersion, err := updateutils.GetToolVersionCallback("notify", version)()
+		if err != nil {
+			if options.Verbose {
+				gologger.Error().Msgf("notify version check failed: %v", err.Error())
+			}
+		} else {
+			gologger.Info().Msgf("Current notify version %v %v", version, updateutils.GetVersionDescription(version, latestVersion))
+		}
 	}
 
 	// Validate the options passed by the user and if any
