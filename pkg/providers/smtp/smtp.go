@@ -2,6 +2,7 @@ package smtp
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -46,15 +47,16 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	return provider, nil
 }
 
+func buildUrl(o *Options) string {
+	return fmt.Sprintf("smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s&subject=%s&UseHTML=%s&UseStartTLS=%s", o.Username, url.QueryEscape(o.Password), o.Server, o.FromAddress, strings.Join(o.SMTPCC, ","), o.Subject, strconv.FormatBool(o.HTML), strconv.FormatBool(!o.DisableStartTLS))
+}
+
 func (p *Provider) Send(message, CliFormat string) error {
 	var SmtpErr error
 	p.counter++
 	for _, pr := range p.SMTP {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.SMTPFormat), p.counter)
-		url := fmt.Sprintf(
-			"smtp://%s:%s@%s/?fromAddress=%s&toAddresses=%s&subject=%s&UseHTML=%s&UseStartTLS=%s",
-			pr.Username, pr.Password, pr.Server, pr.FromAddress, strings.Join(pr.SMTPCC, ","), pr.Subject, strconv.FormatBool(pr.HTML), strconv.FormatBool(!pr.DisableStartTLS),
-		)
+		url := buildUrl(pr)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send smtp notification for id: %s ", pr.ID))
