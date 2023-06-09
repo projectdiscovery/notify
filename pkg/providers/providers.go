@@ -3,13 +3,13 @@ package providers
 import (
 	"github.com/acarl005/stripansi"
 	"github.com/pkg/errors"
-	"github.com/projectdiscovery/notify/pkg/providers/gotify"
 	"go.uber.org/multierr"
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/providers/custom"
 	"github.com/projectdiscovery/notify/pkg/providers/discord"
 	"github.com/projectdiscovery/notify/pkg/providers/googlechat"
+	"github.com/projectdiscovery/notify/pkg/providers/gotify"
 	"github.com/projectdiscovery/notify/pkg/providers/pushover"
 	"github.com/projectdiscovery/notify/pkg/providers/slack"
 	"github.com/projectdiscovery/notify/pkg/providers/smtp"
