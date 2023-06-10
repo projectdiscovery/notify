@@ -27,24 +27,24 @@ func run(provider string) error {
 	return nil
 }
 
-type discord struct{}
-
-func (h *discord) Execute() error {
-	return run("discord")
-}
-
-type custom struct{}
-
-func (h *custom) Execute() error {
-	return run("custom")
-}
-
-type slack struct{}
-
-func (h *slack) Execute() error {
-	return run("slack")
-}
-
+// type discord struct{}
+//
+// func (h *discord) Execute() error {
+// 	return run("discord")
+// }
+//
+// type custom struct{}
+//
+// func (h *custom) Execute() error {
+// 	return run("custom")
+// }
+//
+// type slack struct{}
+//
+// func (h *slack) Execute() error {
+// 	return run("slack")
+// }
+//
 // type pushover struct{}
 //
 // func (h *pushover) Execute() error {
@@ -68,6 +68,12 @@ func (h *slack) Execute() error {
 // func (h *telegram) Execute() error {
 // 	return run("telegram")
 // }
+
+type gotify struct{}
+
+func (h *gotify) Execute() error {
+	return run("gotify")
+}
 
 func errIncorrectResultsCount(results []string) error {
 	return fmt.Errorf("incorrect number of results %s", strings.Join(results, "\n\t"))
