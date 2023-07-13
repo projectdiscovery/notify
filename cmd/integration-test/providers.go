@@ -27,24 +27,24 @@ func run(provider string) error {
 	return nil
 }
 
-// type discord struct{}
-//
-// func (h *discord) Execute() error {
-// 	return run("discord")
-// }
-//
-// type custom struct{}
-//
-// func (h *custom) Execute() error {
-// 	return run("custom")
-// }
-//
-// type slack struct{}
-//
-// func (h *slack) Execute() error {
-// 	return run("slack")
-// }
-//
+type discord struct{}
+
+func (h *discord) Execute() error {
+	return run("discord")
+}
+
+type custom struct{}
+
+func (h *custom) Execute() error {
+	return run("custom")
+}
+
+type slack struct{}
+
+func (h *slack) Execute() error {
+	return run("slack")
+}
+
 // type pushover struct{}
 //
 // func (h *pushover) Execute() error {
