@@ -2,6 +2,7 @@ package gotify
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
@@ -18,11 +19,13 @@ type Provider struct {
 }
 
 type Options struct {
-	ID           string `yaml:"id,omitempty"`
-	GotifyHost   string `yaml:"gotify_host,omitempty"`
-	GotifyPort   string `yaml:"gotify_port,omitempty"`
-	GotifyToken  string `yaml:"gotify_token,omitempty"`
-	GotifyFormat string `yaml:"gotify_format,omitempty"`
+	ID               string `yaml:"id,omitempty"`
+	GotifyHost       string `yaml:"gotify_host,omitempty"`
+	GotifyPort       string `yaml:"gotify_port,omitempty"`
+	GotifyToken      string `yaml:"gotify_token,omitempty"`
+	GotifyFormat     string `yaml:"gotify_format,omitempty"`
+	GotifyDisableTLS bool   `yaml:"gotify_disabletls,omitempty"`
+	GotifyTitle      string `yaml:"gotify_title,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -44,8 +47,18 @@ func (p *Provider) Send(message, CliFormat string) error {
 	p.counter++
 
 	for _, pr := range p.Gotify {
+		params := url.Values{}
+		if pr.GotifyTitle != "" {
+			params.Add("title", pr.GotifyTitle)
+		}
+		if pr.GotifyDisableTLS {
+			params.Add("disabletls", "true")
+		}
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.GotifyFormat), p.counter)
 		url := fmt.Sprintf("gotify://%s:%s/%s", pr.GotifyHost, pr.GotifyPort, pr.GotifyToken)
+		if len(params) > 0 {
+			url += "?" + params.Encode()
+		}
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send gotify notification for id: %s ", pr.ID))

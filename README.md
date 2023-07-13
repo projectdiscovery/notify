@@ -149,6 +149,15 @@ teams:
     teams_webhook_url: "https://<domain>.webhook.office.com/webhookb2/xx@xx/IncomingWebhook/xx"
     teams_format: "{{data}}"
 
+gotify:
+  - id: 'gotify'
+    gotify_host: 'XXXXXX'
+    gotify_port: '80'
+    gotify_token: 'XXXXXX'
+    gotify_format: '{{data}}'
+    gotify_disabletls: false
+    gotify_title: "recon"
+
 custom:
   - id: webhook
     custom_webhook_url: http://host/api/webhook
