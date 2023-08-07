@@ -10,7 +10,7 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/pkg/errors v0.9.1
-	github.com/projectdiscovery/goflags v0.1.11
+	github.com/projectdiscovery/goflags v0.1.13
 	github.com/projectdiscovery/gologger v1.1.10
 	github.com/projectdiscovery/utils v0.0.40
 	go.uber.org/multierr v1.11.0
