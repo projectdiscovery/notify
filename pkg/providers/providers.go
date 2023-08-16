@@ -9,6 +9,7 @@ import (
 	"github.com/projectdiscovery/notify/pkg/providers/custom"
 	"github.com/projectdiscovery/notify/pkg/providers/discord"
 	"github.com/projectdiscovery/notify/pkg/providers/googlechat"
+	"github.com/projectdiscovery/notify/pkg/providers/gotify"
 	"github.com/projectdiscovery/notify/pkg/providers/pushover"
 	"github.com/projectdiscovery/notify/pkg/providers/slack"
 	"github.com/projectdiscovery/notify/pkg/providers/smtp"
@@ -28,6 +29,7 @@ type ProviderOptions struct {
 	Telegram   []*telegram.Options   `yaml:"telegram,omitempty"`
 	GoogleChat []*googlechat.Options `yaml:"googlechat,omitempty"`
 	Custom     []*custom.Options     `yaml:"custom,omitempty"`
+	Gotify     []*gotify.Options     `yaml:"gotify,omitempty"`
 }
 
 // Provider is an interface implemented by providers
@@ -108,6 +110,15 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 		provider, err := custom.New(providerOptions.Custom, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create custom provider client")
+		}
+		client.providers = append(client.providers, provider)
+	}
+
+	if providerOptions.Gotify != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "gotify")) {
+
+		provider, err := gotify.New(providerOptions.Gotify, options.IDs)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not create gotify provider client")
 		}
 		client.providers = append(client.providers, provider)
 	}

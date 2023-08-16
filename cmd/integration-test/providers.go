@@ -69,6 +69,12 @@ func (h *slack) Execute() error {
 // 	return run("telegram")
 // }
 
+type gotify struct{}
+
+func (h *gotify) Execute() error {
+	return run("gotify")
+}
+
 func errIncorrectResultsCount(results []string) error {
 	return fmt.Errorf("incorrect number of results %s", strings.Join(results, "\n\t"))
 }

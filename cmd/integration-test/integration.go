@@ -24,6 +24,7 @@ var (
 		//		"teams":    &teams{},
 		//		"smtp":     &smtp{},
 		//		"pushover": &pushover{},
+		"gotify": &gotify{},
 	}
 )
 
