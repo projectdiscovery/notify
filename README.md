@@ -193,7 +193,7 @@ Notify supports piping output of any tool or output file and send it to configur
 ### Send notification using piped(stdin) output
 
 ```sh
-subfinder -d hackerone.com | notify
+subfinder -d hackerone.com | notify -bulk
 ```
 
 <h1 align="left">
