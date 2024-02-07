@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # setup gotify server
-bash gotify-setup.sh
+bash gotify.sh
 export $(echo "GOTIFY_APP_TOKEN=$(<gotify-app-token.txt)")
 
 rm -f final-config.yaml temp.yaml gotify-app-token.txt
