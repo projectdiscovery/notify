@@ -7,6 +7,15 @@ jobs:
   build:
     name: Test Builds
     runs-on: ubuntu-latest
+    services:
+      gotify:
+        image: ghcr.io/gotify/server
+        ports:
+          - 80:80
+        options: >-
+          -v /var/gotify/data:/app/data
+          --name gotify
+
     steps:
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -30,6 +39,7 @@ jobs:
           SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}"
           CUSTOM_WEBHOOK_URL: "${{ secrets.CUSTOM_WEBHOOK_URL }}"
         run: |
+          chmod +x gotify.sh
           chmod +x action-run.sh
           bash action-run.sh
         working-directory: cmd/integration-test/

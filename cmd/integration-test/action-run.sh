@@ -1,6 +1,10 @@
 #!/bin/bash
 
-rm -f final-config.yaml temp.yaml
+# setup gotify server
+bash gotify-setup.sh
+export $(echo "GOTIFY_APP_TOKEN=$(<gotify-app-token.txt)")
+
+rm -f final-config.yaml temp.yaml gotify-app-token.txt
 ( echo "cat <<EOF >final-config.yaml";
   cat test-config.yaml;
   echo "EOF";
