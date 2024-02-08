@@ -40,3 +40,10 @@ teams:
   - id: teams-integration-test
     teams_webhook_url: "${teams_webhook_url}"
     teams_format: "{{data}}"
+gotify:
+  - id: "gotify"
+    gotify_host: "localhost"
+    gotify_port: "80"
+    gotify_token: "${GOTIFY_APP_TOKEN}"
+    gotify_format: "{{data}}"
+    gotify_disabletls: true
