@@ -596,12 +596,12 @@ github.com/posener/complete v1.1.1/go.mod h1:em0nMJCgc9GFtwrmVmEMR/ZL6WyhyjMBndr
 github.com/posener/complete v1.2.3/go.mod h1:WZIdtGGp+qx0sLrYKtIRAruyNpv6hFCicSgv7Sy7s/s=
 github.com/projectdiscovery/blackrock v0.0.1 h1:lHQqhaaEFjgf5WkuItbpeCZv2DUIE45k0VbGJyft6LQ=
 github.com/projectdiscovery/blackrock v0.0.1/go.mod h1:ANUtjDfaVrqB453bzToU+YB4cUbvBRpLvEwoWIwlTss=
-github.com/projectdiscovery/goflags v0.1.38 h1:+StqgcGxBy0Ogyq+QjqFCwC/O2VJItgZW97rxpwbb08=
-github.com/projectdiscovery/goflags v0.1.38/go.mod h1:0FHBL7g1TKLHw04zSFsWCSU2grGB7zKKFrYKJx2H6mk=
+github.com/projectdiscovery/goflags v0.1.39 h1:Dj8UY+FJEfxzT20+kyDkeTlGs+Ys19SiXWek7x1tPTs=
+github.com/projectdiscovery/goflags v0.1.39/go.mod h1:ouB+HpJvhKZJjT8Bd13RYD6au7sQ7nGylbfad3JFy+E=
 github.com/projectdiscovery/gologger v1.1.12 h1:uX/QkQdip4PubJjjG0+uk5DtyAi1ANPJUvpmimXqv4A=
 github.com/projectdiscovery/gologger v1.1.12/go.mod h1:DI8nywPLERS5mo8QEA9E7gd5HZ3Je14SjJBH3F5/kLw=
-github.com/projectdiscovery/utils v0.0.76 h1:6azn0Zju0taw5Y9qAjpGPxyqwJf2AI4VJjtIzPBcRzQ=
-github.com/projectdiscovery/utils v0.0.76/go.mod h1:ERIYcW+h5jKIYyYkfdOpNPIUtH8Ogz4q5Wq3gx/71Zw=
+github.com/projectdiscovery/utils v0.0.77 h1:HPLNY/WgVsLaHPBW1XA5XYMkTo9VRjhbOIZs+Lfww7s=
+github.com/projectdiscovery/utils v0.0.77/go.mod h1:XkHTUln/MJaWAgber2C0o1Mqacr2s9JMRhOVBjmII7w=
 github.com/prometheus/client_golang v0.9.1/go.mod h1:7SWBe2y4D6OKWSNQJUaRYU/AaXPKyh/dDVn+NZz0KFw=
 github.com/prometheus/client_golang v1.0.0/go.mod h1:db9x61etRT2tGnBNRi70OPL5FsnadC4Ky3P0J6CfImo=
 github.com/prometheus/client_golang v1.4.0/go.mod h1:e9GMxYsXl05ICDXkRhurwBS4Q3OK1iX/F2sw+iXX5zU=
