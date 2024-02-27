@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/containrrr/shoutrrr v0.7.1
+	github.com/containrrr/shoutrrr v0.8.0
 	github.com/json-iterator/go v1.1.12
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
