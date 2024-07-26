@@ -2,7 +2,6 @@ package telegram
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
@@ -49,7 +48,6 @@ func (p *Provider) Send(message, CliFormat string) error {
 			pr.TelegramParseMode = "None"
 		}
 		url := fmt.Sprintf("telegram://%s@telegram?channels=%s&parsemode=%s", pr.TelegramAPIKey, pr.TelegramChatID, pr.TelegramParseMode)
-		msg = strings.ReplaceAll(msg, "_", "\\_")
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send telegram notification for id: %s ", pr.ID))
