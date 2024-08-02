@@ -78,10 +78,9 @@ func (r *Runner) Run() error {
 		}
 	}
 
+	http.DefaultClient.Transport = defaultTransport
 	if r.options.RateLimit > 0 {
 		http.DefaultClient.Transport = utils.NewThrottledTransport(time.Second, r.options.RateLimit, defaultTransport)
-	} else {
-		http.DefaultClient.Transport = defaultTransport
 	}
 
 	var inFile *os.File
