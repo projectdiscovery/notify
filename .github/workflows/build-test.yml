@@ -39,6 +39,9 @@ jobs:
           SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}"
           CUSTOM_WEBHOOK_URL: "${{ secrets.CUSTOM_WEBHOOK_URL }}"
         run: |
+          if [ "$GITHUB_ACTOR" == "dependabot[bot]" ]; then
+            export DEPENDABOT=true
+          fi
           chmod +x gotify.sh
           chmod +x action-run.sh
           bash action-run.sh
