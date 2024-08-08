@@ -34,7 +34,7 @@ func main() {
 
 	for name, test := range testCases {
 		// run only gotify test for dependabot
-		if isDependabot && !(name == "gotify") {
+		if isDependabot && name != "gotify" {
 			continue
 		}
 		fmt.Printf("Running test cases for \"%s\"\n", aurora.Blue(name))
