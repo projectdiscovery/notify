@@ -13,6 +13,7 @@ import (
 var (
 	providerConfig = flag.String("provider-config", "", "provider config to use for testing")
 	debug          = os.Getenv("DEBUG") == "true"
+	isDependabot   = os.Getenv("DEPENDABOT") == "true"
 	errored        = false
 	success        = aurora.Green("[✓]").String()
 	failed         = aurora.Red("[✘]").String()
@@ -32,6 +33,10 @@ func main() {
 	flag.Parse()
 
 	for name, test := range testCases {
+		// run only gotify test for dependabot
+		if isDependabot && !(name == "gotify") {
+			continue
+		}
 		fmt.Printf("Running test cases for \"%s\"\n", aurora.Blue(name))
 		err := test.Execute()
 		if err != nil {
