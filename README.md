@@ -64,7 +64,7 @@ This will display help for the tool. Here are all the switches it supports.
 | `-no-color`             | disable colors in output                           | `notify -nc`                          |
 | `-provider-config`      | provider config path                               | `notify -pc provider.yaml`            |
 | `-provider`             | provider to send the notification to (optional)    | `notify -p slack,telegram`            |
-| `-proxy`                | http proxy to use with notify                      | `notify -proxy http://127.0.0.1:8080` |
+| `-proxy`                | HTTP/SOCKSv5 proxy to use with notify              | `notify -proxy http://127.0.0.1:8080` |
 | `-rate-limit`           | maximum number of HTTP requests to send per second | `notify -rl 1`                        |
 | `-silent`               | enable silent mode                                 | `notify -silent`                      |
 | `-verbose`              | enable verbose mode                                | `notify -verbose`                     |
