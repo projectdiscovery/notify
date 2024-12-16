@@ -11,8 +11,8 @@ require (
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/pkg/errors v0.9.1
 	github.com/projectdiscovery/goflags v0.1.65
-	github.com/projectdiscovery/gologger v1.1.34
-	github.com/projectdiscovery/utils v0.4.0
+	github.com/projectdiscovery/gologger v1.1.35
+	github.com/projectdiscovery/utils v0.4.2
 	go.uber.org/multierr v1.11.0
 	go.uber.org/ratelimit v0.3.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -85,14 +85,14 @@ require (
 	github.com/yuin/goldmark-emoji v1.0.3 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zcalusic/sysinfo v1.0.2 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20230515195305-f3d0a9c9a5cc // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/term v0.24.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/term v0.27.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
