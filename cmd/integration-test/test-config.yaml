@@ -47,3 +47,7 @@ gotify:
     gotify_token: "${GOTIFY_APP_TOKEN}"
     gotify_format: "{{data}}"
     gotify_disabletls: true
+jandi:
+  - id: "jandi-integration-test"
+    jandi_webhook_url: "${JANDI_WEBHOOK_URL}"
+    jandi_format: "{{data}}"
