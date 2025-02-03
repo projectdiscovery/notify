@@ -166,8 +166,8 @@ github.com/projectdiscovery/gologger v1.1.42 h1:wTF52VEhJCtZk9GDNrlnAYBrqfm5FqXv
 github.com/projectdiscovery/gologger v1.1.42/go.mod h1:hf6vcNeKgj+BHfWQpMV4UBsfE8d+9wauWvcI31ZwuXs=
 github.com/projectdiscovery/machineid v0.0.0-20240226150047-2e2c51e35983 h1:ZScLodGSezQVwsQDtBSMFp72WDq0nNN+KE/5DHKY5QE=
 github.com/projectdiscovery/machineid v0.0.0-20240226150047-2e2c51e35983/go.mod h1:3G3BRKui7nMuDFAZKR/M2hiOLtaOmyukT20g88qRQjI=
-github.com/projectdiscovery/utils v0.4.8 h1:/Xd38fP8xc6kifZayjrhcYALenJrjO3sHO7lg+I8ZGk=
-github.com/projectdiscovery/utils v0.4.8/go.mod h1:S314NzLcXVCbLbwYCoorAJYcnZEwv7Uhw2d3aF5fJ4s=
+github.com/projectdiscovery/utils v0.4.9 h1:GzYKy5iiCWEZZPGxrtgTOnRTZYiIAiCditGufp0nhGU=
+github.com/projectdiscovery/utils v0.4.9/go.mod h1:/68d0OHGgYF4aW4X7kS1qlFlYOnZxgtFDN85iH732JI=
 github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.4.7 h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=
