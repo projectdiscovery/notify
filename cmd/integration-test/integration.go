@@ -26,6 +26,7 @@ var (
 		//		"smtp":     &smtp{},
 		//		"pushover": &pushover{},
 		"gotify": &gotify{},
+		"notion": &notion{},
 	}
 )
 

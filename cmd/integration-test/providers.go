@@ -45,34 +45,40 @@ func (h *slack) Execute() error {
 	return run("slack")
 }
 
-// type pushover struct{}
-//
-// func (h *pushover) Execute() error {
-// 	return run("pushover")
-// }
-//
-// type smtp struct{}
-//
-// func (h *smtp) Execute() error {
-// 	return run("smtp")
-// }
-//
-// type teams struct{}
-//
-// func (h *teams) Execute() error {
-// 	return run("teams")
-// }
-//
-// type telegram struct{}
-//
-// func (h *telegram) Execute() error {
-// 	return run("telegram")
-// }
+type pushover struct{}
+
+func (h *pushover) Execute() error {
+	return run("pushover")
+}
+
+type smtp struct{}
+
+func (h *smtp) Execute() error {
+	return run("smtp")
+}
+
+type teams struct{}
+
+func (h *teams) Execute() error {
+	return run("teams")
+}
+
+type telegram struct{}
+
+func (h *telegram) Execute() error {
+	return run("telegram")
+}
 
 type gotify struct{}
 
 func (h *gotify) Execute() error {
 	return run("gotify")
+}
+
+type notion struct{}
+
+func (h *notion) Execute() error {
+	return run("notion")
 }
 
 func errIncorrectResultsCount(results []string) error {
