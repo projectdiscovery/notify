@@ -46,25 +46,25 @@ func (h *slack) Execute() error {
 }
 
 // type pushover struct{}
-
+//
 // func (h *pushover) Execute() error {
 // 	return run("pushover")
 // }
-
+//
 // type smtp struct{}
-
+//
 // func (h *smtp) Execute() error {
 // 	return run("smtp")
 // }
-
+//
 // type teams struct{}
-
+//
 // func (h *teams) Execute() error {
 // 	return run("teams")
 // }
-
+//
 // type telegram struct{}
-
+//
 // func (h *telegram) Execute() error {
 // 	return run("telegram")
 // }
