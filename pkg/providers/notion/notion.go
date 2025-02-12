@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
 	"github.com/projectdiscovery/gologger"
@@ -37,7 +38,7 @@ func New(options []*Options, ids []string) (*Provider, error) {
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
-	var errs []error
+	var NotionErr error
 	for _, pr := range p.Notion {
 
 		newPage := func() Page {
@@ -50,12 +51,13 @@ func (p *Provider) Send(message, CliFormat string) error {
 		}()
 
 		if success := pr.CreatePage(newPage); success != nil {
-			err := fmt.Errorf("failed to send notion notification for id: %s", pr.ID)
-			errs = append(errs, err)
+			err := errors.Wrap(fmt.Errorf("failed to send notion notification"),
+				fmt.Sprintf("failed to send notion notification for id: %s", pr.ID))
+			NotionErr = multierr.Append(NotionErr, err)
 			continue
 		}
 
 		gologger.Verbose().Msgf("Notion notification sent for id: %s", pr.ID)
 	}
-	return multierr.Combine(errs...)
+	return NotionErr
 }

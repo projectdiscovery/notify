@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	_ "net/http"
+
 	"strings"
 )
 
@@ -24,16 +24,19 @@ func (options *Options) CreatePage(page Page) error {
 	if page.Children != nil {
 		requestBody["children"] = page.Children
 	}
+	// payload := APIRequest{
+	// 	Channel: options.SlackChannel,
+	// 	Text:    message,
+	// 	TS:      options.SlackThreadTS,
+	// }
 
 	jsonBody, err := json.Marshal(requestBody)
 	if err != nil {
-		fmt.Println("Error marshaling request body:", err)
 		return err
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
 	if err != nil {
-		fmt.Println("Error creating request:", err)
 		return err
 	}
 
@@ -44,20 +47,17 @@ func (options *Options) CreatePage(page Page) error {
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Error sending request:", err)
 		return err
 	}
 	defer res.Body.Close()
 
 	_, err = io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println("Error reading response body:", err)
 		return err
 	}
 	
 	if res.StatusCode != 200 {
-		fmt.Println("Error creating page:", res.Status)
-		return fmt.Errorf("error creating page: %s", res.Status)
+		return fmt.Errorf("error while creating notion page: %s", res.Status)
 	}
 	return nil
 }
