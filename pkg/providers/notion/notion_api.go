@@ -1,13 +1,11 @@
 package notion
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-
 	"strings"
+
+	"github.com/projectdiscovery/notify/pkg/utils/httpreq"
 )
 
 const notionApiUrl string = "https://api.notion.com/v1/"
@@ -15,50 +13,28 @@ const notionApiUrl string = "https://api.notion.com/v1/"
 func (options *Options) CreatePage(page Page) error {
 	url := strings.Join([]string{notionApiUrl, "pages/"}, "")
 	apiKey := options.NotionAPIKey
-	requestBody := map[string]interface{}{
-		"parent": map[string]string{
-			"database_id": page.ParentId,
-		},
-		"properties": page.Properties,
+	body := APIRequest{
+		Parent:     map[string]interface{}{"database_id": page.ParentId},
+		Properties: page.Properties,
+		Children:   page.Children,
 	}
-	if page.Children != nil {
-		requestBody["children"] = page.Children
-	}
-	// payload := APIRequest{
-	// 	Channel: options.SlackChannel,
-	// 	Text:    message,
-	// 	TS:      options.SlackThreadTS,
-	// }
 
-	jsonBody, err := json.Marshal(requestBody)
+	headers := http.Header{
+		"Content-Type":  {"application/json"},
+		"Notion-Version": {"2022-02-22"},
+		"Authorization": {fmt.Sprintf("Bearer %s", apiKey)},
+	}
+
+	var response *APIResponse
+
+	err := httpreq.NewClient().Post(url, &body, headers, &response)
 	if err != nil {
 		return err
 	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
-	if err != nil {
-		return err
+	if response.Object != "page" {
+		return fmt.Errorf("error while sending notion message: %s ", response.Message)
 	}
 
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Notion-Version", "2022-02-22")
-	req.Header.Add("Authorization", "Bearer "+apiKey)
-
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	_, err = io.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-	
-	if res.StatusCode != 200 {
-		return fmt.Errorf("error while creating notion page: %s", res.Status)
-	}
 	return nil
 }
 
