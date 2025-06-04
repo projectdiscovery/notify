@@ -6,11 +6,13 @@ import (
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
-
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	sliceutil "github.com/projectdiscovery/utils/slice"
 )
+
+// shoutrrrSendFunc is a package-level variable to allow mocking in tests.
+var shoutrrrSendFunc = shoutrrr.Send
 
 type Provider struct {
 	Telegram []*Options `yaml:"telegram,omitempty"`
@@ -21,6 +23,7 @@ type Options struct {
 	ID                string `yaml:"id,omitempty"`
 	TelegramAPIKey    string `yaml:"telegram_api_key,omitempty"`
 	TelegramChatID    string `yaml:"telegram_chat_id,omitempty"`
+	TelegramThreadID  string `yaml:"telegram_thread_id,omitempty"`
 	TelegramFormat    string `yaml:"telegram_format,omitempty"`
 	TelegramParseMode string `yaml:"telegram_parsemode,omitempty"`
 }
@@ -47,8 +50,12 @@ func (p *Provider) Send(message, CliFormat string) error {
 		if pr.TelegramParseMode == "" {
 			pr.TelegramParseMode = "None"
 		}
-		url := fmt.Sprintf("telegram://%s@telegram?channels=%s&parsemode=%s", pr.TelegramAPIKey, pr.TelegramChatID, pr.TelegramParseMode)
-		err := shoutrrr.Send(url, msg)
+		telegramChatID := pr.TelegramChatID
+		if pr.TelegramThreadID != "" {
+			telegramChatID = fmt.Sprintf("%s:%s", pr.TelegramChatID, pr.TelegramThreadID)
+		}
+		url := fmt.Sprintf("telegram://%s@telegram?channels=%s&parsemode=%s", pr.TelegramAPIKey, telegramChatID, pr.TelegramParseMode)
+		err := shoutrrrSendFunc(url, msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send telegram notification for id: %s ", pr.ID))
 			TelegramErr = multierr.Append(TelegramErr, err)
