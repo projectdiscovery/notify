@@ -76,6 +76,12 @@ func (p *Provider) Send(message, CliFormat string) error {
 				Path:   slackTokens,
 			}
 
+			query := url.Query()
+			if pr.SlackUsername != "" {
+				query.Set("username", pr.SlackUsername)
+			}
+			url.RawQuery = query.Encode()
+
 			err := shoutrrr.Send(url.String(), msg)
 			if err != nil {
 				err = errors.Wrap(err,
@@ -85,7 +91,6 @@ func (p *Provider) Send(message, CliFormat string) error {
 			}
 		}
 		gologger.Verbose().Msgf("Slack notification sent for id: %s", pr.ID)
-
 	}
 	return SlackErr
 }
