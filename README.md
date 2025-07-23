@@ -88,12 +88,14 @@ slack:
     slack_channel: "recon"
     slack_username: "test"
     slack_format: "{{data}}"
+    slack_icon_emoji: ":ghost:"
     slack_webhook_url: "https://hooks.slack.com/services/XXXXXX"
 
   - id: "vulns"
     slack_channel: "vulns"
     slack_username: "test"
     slack_format: "{{data}}"
+    slack_icon_emoji: ":ghost:"
     slack_webhook_url: "https://hooks.slack.com/services/XXXXXX"
 
 discord:
