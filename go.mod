@@ -2,8 +2,6 @@ module github.com/projectdiscovery/notify
 
 go 1.24.0
 
-toolchain go1.24.2
-
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
@@ -12,7 +10,7 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/oriser/regroup v0.0.0-20210730155327-fca8d7531263
 	github.com/pkg/errors v0.9.1
-	github.com/projectdiscovery/goflags v0.1.64
+	github.com/projectdiscovery/goflags v0.1.74
 	github.com/projectdiscovery/gologger v1.1.54
 	github.com/projectdiscovery/utils v0.5.0
 	go.uber.org/multierr v1.11.0
