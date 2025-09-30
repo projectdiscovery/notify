@@ -12,7 +12,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/projectdiscovery/goflags v0.1.74
 	github.com/projectdiscovery/gologger v1.1.55
-	github.com/projectdiscovery/utils v0.5.0
+	github.com/projectdiscovery/utils v0.6.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/ratelimit v0.3.0
 	gopkg.in/yaml.v3 v3.0.1
