@@ -24,7 +24,9 @@ func (c *Client) Get(url string, response interface{}) error {
 	if err != nil {
 		return fmt.Errorf("error creating request: %v", err)
 	}
-	defer res.Body.Close()
+	defer func() {
+		_ = res.Body.Close()
+	}()
 	if err := jsoniter.NewDecoder(res.Body).Decode(&response); err != nil {
 		return fmt.Errorf("error trying to unmarshal the response: %v", err)
 	}
