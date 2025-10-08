@@ -75,6 +75,12 @@ func (h *gotify) Execute() error {
 	return run("gotify")
 }
 
+type notion struct{}
+
+func (h *notion) Execute() error {
+	return run("notion")
+}
+
 func errIncorrectResultsCount(results []string) error {
 	return fmt.Errorf("incorrect number of results %s", strings.Join(results, "\n\t"))
 }

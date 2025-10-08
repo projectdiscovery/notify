@@ -47,3 +47,8 @@ gotify:
     gotify_token: "${GOTIFY_APP_TOKEN}"
     gotify_format: "{{data}}"
     gotify_disabletls: true
+notion:
+  - id: "notion"
+    notion_api_key: "${notion_api_key}"
+    notion_database_id: "${notion_database_id}"
+    notion_in_page_title: "${notion_in_page_title}" # optional
