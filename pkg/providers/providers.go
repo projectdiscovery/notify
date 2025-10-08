@@ -15,6 +15,7 @@ import (
 	"github.com/projectdiscovery/notify/pkg/providers/smtp"
 	"github.com/projectdiscovery/notify/pkg/providers/teams"
 	"github.com/projectdiscovery/notify/pkg/providers/telegram"
+	"github.com/projectdiscovery/notify/pkg/providers/jandi"
 	"github.com/projectdiscovery/notify/pkg/types"
 	sliceutil "github.com/projectdiscovery/utils/slice"
 )
@@ -30,6 +31,7 @@ type ProviderOptions struct {
 	GoogleChat []*googlechat.Options `yaml:"googlechat,omitempty"`
 	Custom     []*custom.Options     `yaml:"custom,omitempty"`
 	Gotify     []*gotify.Options     `yaml:"gotify,omitempty"`
+	Jandi      []*jandi.Options      `yaml:"jandi,omitempty"`
 }
 
 // Provider is an interface implemented by providers
@@ -119,6 +121,15 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 		provider, err := gotify.New(providerOptions.Gotify, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create gotify provider client")
+		}
+		client.providers = append(client.providers, provider)
+	}
+
+	if providerOptions.Jandi != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "jandi")) {
+
+		provider, err := jandi.New(providerOptions.Jandi, options.IDs)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not create jandi provider client")
 		}
 		client.providers = append(client.providers, provider)
 	}
