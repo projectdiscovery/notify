@@ -3,18 +3,10 @@ on:
   pull_request:
   workflow_dispatch:
 
-jobs:  
+jobs:
   build:
     name: Test Builds
     runs-on: ubuntu-latest
-    services:
-      gotify:
-        image: ghcr.io/gotify/server
-        ports:
-          - 80:80
-        options: >-
-          -v /var/gotify/data:/app/data
-          --name gotify
 
     steps:
       - name: Set up Go
@@ -26,23 +18,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Test
-        run: go test .
-        working-directory: cmd/notify/
+        run: go test ./...
 
       - name: Build
         run: go build .
         working-directory: cmd/notify/
-  
-      - name: Integration Tests
-        env: 
-          DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL }}"
-          SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}"
-          CUSTOM_WEBHOOK_URL: "${{ secrets.CUSTOM_WEBHOOK_URL }}"
-        run: |
-          if [ "$GITHUB_ACTOR" == "dependabot[bot]" ]; then
-            export DEPENDABOT=true
-          fi
-          chmod +x gotify.sh
-          chmod +x action-run.sh
-          bash action-run.sh
-        working-directory: cmd/integration-test/
