@@ -113,6 +113,7 @@ telegram:
   - id: "tel"
     telegram_api_key: "XXXXXXXXXXXX"
     telegram_chat_id: "XXXXXXXX"
+    telegram_thread_id: "YYYYYYYYYY" # Optional: The message thread ID to send messages to (https://www.shoutrrr.com/services/telegram/#message-threads)
     telegram_format: "{{data}}"
     telegram_parsemode: "Markdown" # None/Markdown/MarkdownV2/HTML (https://core.telegram.org/bots/api#formatting-options)
 
