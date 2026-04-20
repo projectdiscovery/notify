@@ -1,7 +1,9 @@
 package teams
 
 import (
+	"bytes"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/containrrr/shoutrrr"
@@ -43,19 +45,41 @@ func (p *Provider) Send(message, CliFormat string) error {
 	p.counter++
 	for _, pr := range p.Teams {
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.TeamsFormat), p.counter)
-		webhookParts := strings.Split(pr.TeamsWebHookURL, "/webhookb2/")
-		if len(webhookParts) != 2 {
-			err := fmt.Errorf("teams: invalid webhook url for id: %s ", pr.ID)
-			TeamsErr = multierr.Append(TeamsErr, err)
-		}
-		teamsHost := strings.TrimPrefix(webhookParts[0], "https://")
-		teamsTokens := strings.ReplaceAll(webhookParts[1], "IncomingWebhook/", "")
-		url := fmt.Sprintf("teams://%s?host=%s", teamsTokens, teamsHost)
-		err := shoutrrr.Send(url, msg)
-		if err != nil {
-			err = errors.Wrap(err, fmt.Sprintf("failed to send teams notification for id: %s ", pr.ID))
-			TeamsErr = multierr.Append(TeamsErr, err)
-			continue
+		provider := strings.Split(pr.TeamsWebHookURL, "/")[3]
+
+		// Deprecated method
+		if provider == "webhookb2" {
+			webhookParts := strings.Split(pr.TeamsWebHookURL, "/webhookb2/")
+			if len(webhookParts) != 2 {
+				err := fmt.Errorf("teams: invalid webhook url for id: %s ", pr.ID)
+				TeamsErr = multierr.Append(TeamsErr, err)
+			}
+			teamsHost := strings.TrimPrefix(webhookParts[0], "https://")
+			teamsTokens := strings.ReplaceAll(webhookParts[1], "IncomingWebhook/", "")
+			url := fmt.Sprintf("teams://%s?host=%s", teamsTokens, teamsHost)
+			err := shoutrrr.Send(url, msg)
+			if err != nil {
+				err = errors.Wrap(err, fmt.Sprintf("failed to send webhook teams notification for id: %s", pr.ID))
+				TeamsErr = multierr.Append(TeamsErr, err)
+				continue
+			}
+
+			// New Power Automate method
+		} else if provider == "workflows" {
+			htmlMessage := strings.ReplaceAll(msg, "\n", "<br>")
+			payload := fmt.Sprintf(`{"text": "%s"}`, htmlMessage)
+			resp, err := http.Post(pr.TeamsWebHookURL, "application/json", bytes.NewBuffer([]byte(payload)))
+			if err != nil {
+				err = errors.Wrap(err, fmt.Sprintf("failed to send workflow teams notification for id: %s", pr.ID))
+				TeamsErr = multierr.Append(TeamsErr, err)
+				continue
+			}
+			defer resp.Body.Close()
+			if resp.StatusCode != http.StatusAccepted {
+				err = errors.Errorf("failed to send workflow teams notification for id: %s, got status code: %d", pr.ID, resp.StatusCode)
+				TeamsErr = multierr.Append(TeamsErr, err)
+				continue
+			}
 		}
 		gologger.Verbose().Msgf("teams notification sent for id: %s", pr.ID)
 	}
