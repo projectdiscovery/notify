@@ -47,7 +47,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 		if pr.TelegramParseMode == "" {
 			pr.TelegramParseMode = "None"
 		}
-		url := fmt.Sprintf("telegram://%s@telegram?channels=%s&parsemode=%s", pr.TelegramAPIKey, pr.TelegramChatID, pr.TelegramParseMode)
+		url := fmt.Sprintf("telegram://%s@telegram?channels=%s&parsemode=%s&preview=No", pr.TelegramAPIKey, pr.TelegramChatID, pr.TelegramParseMode)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send telegram notification for id: %s ", pr.ID))
