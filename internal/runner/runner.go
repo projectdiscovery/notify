@@ -41,6 +41,31 @@ func NewRunner(options *types.Options) (*Runner, error) {
 		gologger.Print().Msgf("Using default provider config: %s\n", options.ProviderConfig)
 	}
 
+	// If the default config file does not exist yet, create the directory and
+	// write an empty/commented template so the user knows what to fill in.
+	// This avoids a fatal error on first run (e.g. fresh Windows install).
+	if _, statErr := os.Stat(options.ProviderConfig); os.IsNotExist(statErr) {
+		if mkdirErr := os.MkdirAll(filepath.Dir(options.ProviderConfig), 0700); mkdirErr != nil {
+			return nil, errors.Wrap(mkdirErr, "could not create provider config directory")
+		}
+		defaultConfig := `# notify provider configuration
+# Fill in your provider details below. Full documentation:
+# https://docs.projectdiscovery.io/tools/notify/provider-config
+#
+# Example:
+# slack:
+#   - id: "my-slack"
+#     slack_webhook_url: "https://hooks.slack.com/services/..."
+#     slack_username: "notify"
+#     slack_format: "{{data}}"
+`
+		if writeErr := os.WriteFile(options.ProviderConfig, []byte(defaultConfig), 0600); writeErr != nil {
+			gologger.Warning().Msgf("Could not create default provider config at %s: %s\n", options.ProviderConfig, writeErr)
+		} else {
+			gologger.Info().Msgf("Created default provider config at %s — please add your provider credentials.\n", options.ProviderConfig)
+		}
+	}
+
 	reader, err := fileutil.SubstituteConfigFromEnvVars(options.ProviderConfig)
 	if err != nil {
 		return nil, err
