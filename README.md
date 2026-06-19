@@ -88,12 +88,14 @@ slack:
     slack_channel: "recon"
     slack_username: "test"
     slack_format: "{{data}}"
+    slack_icon_emoji: ":ghost:"
     slack_webhook_url: "https://hooks.slack.com/services/XXXXXX"
 
   - id: "vulns"
     slack_channel: "vulns"
     slack_username: "test"
     slack_format: "{{data}}"
+    slack_icon_emoji: ":ghost:"
     slack_webhook_url: "https://hooks.slack.com/services/XXXXXX"
 
 discord:
@@ -112,7 +114,7 @@ discord:
 telegram:
   - id: "tel"
     telegram_api_key: "XXXXXXXXXXXX"
-    telegram_chat_id: "XXXXXXXX"
+    telegram_chat_id: "XXXXXXXX" # Optional topic id XXXXXXXX:Y
     telegram_format: "{{data}}"
     telegram_parsemode: "Markdown" # None/Markdown/MarkdownV2/HTML (https://core.telegram.org/bots/api#formatting-options)
 
