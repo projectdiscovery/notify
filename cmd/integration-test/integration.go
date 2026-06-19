@@ -17,28 +17,43 @@ var (
 	errored        = false
 	success        = aurora.Green("[✓]").String()
 	failed         = aurora.Red("[✘]").String()
-	testCases      = map[string]testutils.TestCase{
-		"discord": &discord{},
-		"slack":   &slack{},
-		"custom":  &custom{},
-		//		"telegram": &telegram{},
-		//		"teams":    &teams{},
-		//		"smtp":     &smtp{},
-		//		"pushover": &pushover{},
-		"gotify": &gotify{},
+	testCases      = map[string]providerTest{
+		"discord": {test: &discord{}, requiredEnv: "DISCORD_WEBHOOK_URL"},
+		"slack":   {test: &slack{}, requiredEnv: "SLACK_WEBHOOK_URL"},
+		"custom":  {test: &custom{}, requiredEnv: "CUSTOM_WEBHOOK_URL"},
+		//		"telegram": {test: &telegram{}, requiredEnv: "..."},
+		//		"teams":    {test: &teams{}, requiredEnv: "..."},
+		//		"smtp":     {test: &smtp{}, requiredEnv: "..."},
+		//		"pushover": {test: &pushover{}, requiredEnv: "..."},
+		"gotify": {test: &gotify{}},
 	}
 )
+
+// providerTest pairs a test case with the env var that must be set for it to
+// run. Tests whose required secret is missing are skipped, which lets fork PRs
+// (that don't receive repository secrets) stay green while full coverage runs
+// on internal branches where the secrets are available.
+type providerTest struct {
+	test        testutils.TestCase
+	requiredEnv string
+}
 
 func main() {
 	flag.Parse()
 
-	for name, test := range testCases {
+	for name, tc := range testCases {
 		// run only gotify test for dependabot
 		if isDependabot && name != "gotify" {
 			continue
 		}
+		// skip provider tests whose required webhook secret is unavailable
+		// (e.g. PRs from forks, which GitHub does not expose secrets to).
+		if tc.requiredEnv != "" && os.Getenv(tc.requiredEnv) == "" {
+			fmt.Printf("Skipping test cases for \"%s\": %s not set\n", aurora.Blue(name), tc.requiredEnv)
+			continue
+		}
 		fmt.Printf("Running test cases for \"%s\"\n", aurora.Blue(name))
-		err := test.Execute()
+		err := tc.test.Execute()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%s Test \"%s\" failed: %s\n", failed, name, err)
 			errored = true
