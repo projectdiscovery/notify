@@ -75,6 +75,12 @@ func (h *gotify) Execute() error {
 	return run("gotify")
 }
 
+// type rocketchat struct{}
+//
+// func (h *rocketchat) Execute() error {
+// 	return run("rocketchat")
+// }
+
 func errIncorrectResultsCount(results []string) error {
 	return fmt.Errorf("incorrect number of results %s", strings.Join(results, "\n\t"))
 }
