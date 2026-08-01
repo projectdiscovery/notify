@@ -36,7 +36,7 @@ Notify is a Go-based assistance package that enables you to stream the output of
 
 - Supports for Slack / Discord / Telegram
 - Supports for Pushover / Email
-- Supports for Microsoft Teams / Google Chat
+- Supports for Microsoft Teams / Google Chat / Rocket.Chat
 - Supports for File / Pipe input
 - Supports Line by Line / Bulk Post
 - Supports using Single / Multiple providers
@@ -160,6 +160,15 @@ gotify:
     gotify_disabletls: false
     gotify_title: "recon"
 
+rocketchat:
+  - id: "soc"
+    rocketchat_webhook_url: "https://chat.example.com/hooks/XXXXXXXX"
+    rocketchat_channel: "#alertas-seguranca"
+    rocketchat_username: "ProjectDiscovery"
+    rocketchat_avatar: "https://example.com/avatar.png"
+    rocketchat_emoji: ":ghost:"
+    rocketchat_format: "{{data}}"
+
 custom:
   - id: webhook
     custom_webhook_url: http://host/api/webhook
@@ -265,5 +274,6 @@ Notify flags can be configured at default config (`$HOME/.config/notify/config.y
 - [Creating Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
 - [Creating Telegram bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
 - [Creating Pushover Token](https://github.com/containrrr/shoutrrr/blob/main/docs/services/pushover.md)
+- [Creating Rocket.Chat Incoming Webhook](https://docs.rocket.chat/docs/integrations#incoming-webhook-script)
 
 Notify is made with 🖤 by the [projectdiscovery](https://projectdiscovery.io) team.

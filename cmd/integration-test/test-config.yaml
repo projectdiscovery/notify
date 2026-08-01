@@ -47,3 +47,9 @@ gotify:
     gotify_token: "${GOTIFY_APP_TOKEN}"
     gotify_format: "{{data}}"
     gotify_disabletls: true
+rocketchat:
+  - id: "rocketchat-integration-test"
+    rocketchat_webhook_url: "${ROCKETCHAT_WEBHOOK_URL}"
+    rocketchat_channel: "random"
+    rocketchat_username: "test"
+    rocketchat_format: "{{data}}"
