@@ -1,11 +1,15 @@
 package rocketchat
 
 import (
+	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
+	"unicode/utf8"
 )
 
 func TestNewFiltersByID(t *testing.T) {
@@ -141,6 +145,36 @@ func TestSendNonSuccessStatus(t *testing.T) {
 	}
 }
 
+func TestSendWithClientHonorsContext(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		<-r.Context().Done()
+	}))
+	defer server.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+	defer cancel()
+
+	err := sendWithClient(ctx, &http.Client{}, server.URL, WebhookPayload{Text: "message"})
+	if err == nil {
+		t.Fatal("expected context cancellation error")
+	}
+}
+
+func TestSendWithClientReportsBodyCloseError(t *testing.T) {
+	client := &http.Client{Transport: roundTripperFunc(func(*http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Status:     "200 OK",
+			Body:       closeErrorBody{},
+		}, nil
+	})}
+
+	err := sendWithClient(context.Background(), client, "http://example.com", WebhookPayload{Text: "message"})
+	if err == nil || !strings.Contains(err.Error(), "close") {
+		t.Fatalf("expected response body close error, got %v", err)
+	}
+}
+
 func TestSendSplitsLargeMessages(t *testing.T) {
 	var payloads []WebhookPayload
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -220,4 +254,35 @@ func TestSplitMessage(t *testing.T) {
 			t.Fatal("rejoined chunks do not match original message")
 		}
 	})
+
+	t.Run("does not split UTF-8 characters", func(t *testing.T) {
+		msg := strings.Repeat("é", 60)
+		chunks := splitMessage(msg, 50)
+		if len(chunks) != 2 {
+			t.Fatalf("expected 2 chunks, got %d", len(chunks))
+		}
+		for _, chunk := range chunks {
+			if !utf8.ValidString(chunk) {
+				t.Fatalf("chunk is not valid UTF-8: %q", chunk)
+			}
+			if len([]rune(chunk)) > 50 {
+				t.Errorf("chunk exceeds rune limit: %d", len([]rune(chunk)))
+			}
+		}
+		if strings.Join(chunks, "") != msg {
+			t.Fatal("rejoined chunks do not match original message")
+		}
+	})
 }
+
+type roundTripperFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripperFunc) RoundTrip(r *http.Request) (*http.Response, error) {
+	return f(r)
+}
+
+type closeErrorBody struct{}
+
+func (closeErrorBody) Read([]byte) (int, error) { return 0, io.EOF }
+
+func (closeErrorBody) Close() error { return io.ErrUnexpectedEOF }
