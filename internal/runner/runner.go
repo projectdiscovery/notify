@@ -32,7 +32,8 @@ type Runner struct {
 func NewRunner(options *types.Options) (*Runner, error) {
 	var providerOptions providers.ProviderOptions
 
-	if options.ProviderConfig == "" {
+	usingDefaultPath := options.ProviderConfig == ""
+	if usingDefaultPath {
 		home, err := os.UserHomeDir()
 		if err != nil {
 			return nil, err
@@ -41,13 +42,46 @@ func NewRunner(options *types.Options) (*Runner, error) {
 		gologger.Print().Msgf("Using default provider config: %s\n", options.ProviderConfig)
 	}
 
+	if _, statErr := os.Stat(options.ProviderConfig); os.IsNotExist(statErr) {
+		if !usingDefaultPath {
+			// User explicitly specified a config path that does not exist — surface an error.
+			return nil, errors.Errorf("provider config file not found: %s", options.ProviderConfig)
+		}
+		// Default path does not exist yet: create directory and write a commented template
+		// so the user knows what to fill in. Avoids a fatal error on first run.
+		if mkdirErr := os.MkdirAll(filepath.Dir(options.ProviderConfig), 0700); mkdirErr != nil {
+			return nil, errors.Wrap(mkdirErr, "could not create provider config directory")
+		}
+		defaultConfig := `# notify provider configuration
+# Fill in your provider details below. Full documentation:
+# https://docs.projectdiscovery.io/tools/notify/provider-config
+#
+# Example:
+# slack:
+#   - id: "my-slack"
+#     slack_webhook_url: "https://hooks.slack.com/services/..."
+#     slack_username: "notify"
+#     slack_format: "{{data}}"
+`
+		if writeErr := os.WriteFile(options.ProviderConfig, []byte(defaultConfig), 0600); writeErr != nil {
+			gologger.Warning().Msgf("Could not create default provider config at %s: %s\n", options.ProviderConfig, writeErr)
+		} else {
+			gologger.Info().Msgf("Created default provider config at %s — please add your provider credentials.\n", options.ProviderConfig)
+		}
+	}
+
 	reader, err := fileutil.SubstituteConfigFromEnvVars(options.ProviderConfig)
 	if err != nil {
 		return nil, err
 	}
 
+	// Decode may return io.EOF when the config file is empty or contains only comments.
+	// In that case providerOptions remains zero-valued, which is safe — the providers
+	// client will simply have no channels configured.
 	if parseErr := yaml.NewDecoder(reader).Decode(&providerOptions); parseErr != nil {
-		return nil, errors.Wrap(parseErr, "could not parse provider config file")
+		if !errors.Is(parseErr, io.EOF) {
+			return nil, errors.Wrap(parseErr, "could not parse provider config file")
+		}
 	}
 
 	shoutrrr.SetLogger(log.New(io.Discard, "", 0))
