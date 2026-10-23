@@ -1,6 +1,6 @@
 module github.com/projectdiscovery/notify
 
-go 1.25.0
+go 1.26.10
 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
