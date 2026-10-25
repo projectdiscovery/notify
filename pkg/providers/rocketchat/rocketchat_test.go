@@ -146,10 +146,16 @@ func TestSendNonSuccessStatus(t *testing.T) {
 }
 
 func TestSendWithClientHonorsContext(t *testing.T) {
+	release := make(chan struct{})
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		<-r.Context().Done()
+		select {
+		case <-r.Context().Done():
+		case <-release:
+		}
 	}))
 	defer server.Close()
+	// The server does not always observe the client abort, so unblock the handler before Close waits on it.
+	defer close(release)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
 	defer cancel()
