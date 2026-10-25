@@ -5,10 +5,10 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
-	"go.uber.org/multierr"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/notify/pkg/utils"
 	sliceutil "github.com/projectdiscovery/utils/slice"
+	"go.uber.org/multierr"
 )
 
 // shoutrrrSendFunc is a package-level variable to allow mocking in tests.

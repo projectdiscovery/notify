@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -13,9 +14,14 @@ type Client struct {
 	httpClient *http.Client
 }
 
+const defaultTimeout = 10 * time.Second
+
 func NewClient() *Client {
 	return &Client{
-		httpClient: http.DefaultClient,
+		httpClient: &http.Client{
+			Transport: http.DefaultClient.Transport,
+			Timeout:   defaultTimeout,
+		},
 	}
 }
 

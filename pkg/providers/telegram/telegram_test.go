@@ -26,8 +26,8 @@ func TestTelegramSendURLWithThreadID(t *testing.T) {
 	}
 
 	tests := []struct {
-		name               string
-		options            Options
+		name                string
+		options             Options
 		expectedChatIDInURL string
 	}{
 		{
