@@ -23,6 +23,8 @@ type Options struct {
 	TelegramChatID    string `yaml:"telegram_chat_id,omitempty"`
 	TelegramFormat    string `yaml:"telegram_format,omitempty"`
 	TelegramParseMode string `yaml:"telegram_parsemode,omitempty"`
+	// TelegramPreview enables link previews. Previews stay off unless this is set.
+	TelegramPreview bool `yaml:"telegram_preview,omitempty"`
 }
 
 func New(options []*Options, ids []string) (*Provider, error) {
@@ -39,6 +41,14 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	return provider, nil
 }
 
+func telegramURL(pr *Options) string {
+	preview := "No"
+	if pr.TelegramPreview {
+		preview = "Yes"
+	}
+	return fmt.Sprintf("telegram://%s@telegram?channels=%s&parsemode=%s&preview=%s", pr.TelegramAPIKey, pr.TelegramChatID, pr.TelegramParseMode, preview)
+}
+
 func (p *Provider) Send(message, CliFormat string) error {
 	var TelegramErr error
 	p.counter++
@@ -47,7 +57,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 		if pr.TelegramParseMode == "" {
 			pr.TelegramParseMode = "None"
 		}
-		url := fmt.Sprintf("telegram://%s@telegram?channels=%s&parsemode=%s&preview=No", pr.TelegramAPIKey, pr.TelegramChatID, pr.TelegramParseMode)
+		url := telegramURL(pr)
 		err := shoutrrr.Send(url, msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send telegram notification for id: %s ", pr.ID))
