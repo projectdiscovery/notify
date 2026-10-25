@@ -1,8 +1,16 @@
 package gotify
 
 import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net"
+	"net/http"
 	"net/url"
+	"strings"
+	"time"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
@@ -42,6 +50,77 @@ func New(options []*Options, ids []string) (*Provider, error) {
 	return provider, nil
 }
 
+type gotifyPayload struct {
+	Message  string `json:"message"`
+	Title    string `json:"title,omitempty"`
+	Priority int    `json:"priority,omitempty"`
+}
+
+var gotifyHTTPClient = &http.Client{Timeout: 10 * time.Second}
+
+func isLegacyGotifyToken(token string) bool {
+	if len(token) != 15 || token[0] != 'A' {
+		return false
+	}
+	const tokenChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_"
+	for _, c := range token {
+		if !strings.ContainsRune(tokenChars, c) {
+			return false
+		}
+	}
+	return true
+}
+
+func sendGotifyDirect(pr *Options, msg string) error {
+	scheme := "https"
+	if pr.GotifyDisableTLS {
+		scheme = "http"
+	}
+	hostPort := pr.GotifyHost
+	if pr.GotifyPort != "" {
+		hostPort = net.JoinHostPort(pr.GotifyHost, pr.GotifyPort)
+	}
+	endpoint := fmt.Sprintf("%s://%s/message", scheme, hostPort)
+
+	payload := gotifyPayload{
+		Message: msg,
+		Title:   pr.GotifyTitle,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return errors.Wrap(err, "failed to marshal gotify payload")
+	}
+
+	req, err := http.NewRequest(http.MethodPost, endpoint, bytes.NewReader(body))
+	if err != nil {
+		return errors.Wrap(err, "failed to create gotify request")
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Gotify-Key", pr.GotifyToken)
+
+	client := gotifyHTTPClient
+	if pr.GotifyDisableTLS {
+		client = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+			Timeout: 10 * time.Second,
+		}
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "failed to send gotify request")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		respBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("gotify server returned HTTP %d: %s", resp.StatusCode, strings.TrimSpace(string(respBody)))
+	}
+	return nil
+}
+
 func (p *Provider) Send(message, CliFormat string) error {
 	var GotifyErr error
 	p.counter++
@@ -55,11 +134,23 @@ func (p *Provider) Send(message, CliFormat string) error {
 			params.Add("disabletls", "true")
 		}
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.GotifyFormat), p.counter)
-		url := fmt.Sprintf("gotify://%s:%s/%s", pr.GotifyHost, pr.GotifyPort, pr.GotifyToken)
-		if len(params) > 0 {
-			url += "?" + params.Encode()
+
+		var err error
+		if isLegacyGotifyToken(pr.GotifyToken) {
+			url := fmt.Sprintf("gotify://%s:%s/%s", pr.GotifyHost, pr.GotifyPort, pr.GotifyToken)
+			if len(params) > 0 {
+				url += "?" + params.Encode()
+			}
+			err = shoutrrr.Send(url, msg)
+			if err != nil && strings.Contains(err.Error(), "invalid gotify token") {
+				err = sendGotifyDirect(pr, msg)
+			}
+		} else {
+			// Gotify 3 tokens (e.g. gtfya.*) are rejected by shoutrrr v0.8.0 which expects legacy 15-char tokens starting with 'A'.
+			// Direct REST API POST sends directly to the Gotify server.
+			err = sendGotifyDirect(pr, msg)
 		}
-		err := shoutrrr.Send(url, msg)
+
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send gotify notification for id: %s ", pr.ID))
 			GotifyErr = multierr.Append(GotifyErr, err)
