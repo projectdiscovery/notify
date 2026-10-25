@@ -12,6 +12,7 @@ import (
 	"github.com/projectdiscovery/notify/pkg/providers/gotify"
 	"github.com/projectdiscovery/notify/pkg/providers/notion"
 	"github.com/projectdiscovery/notify/pkg/providers/pushover"
+	"github.com/projectdiscovery/notify/pkg/providers/rocketchat"
 	"github.com/projectdiscovery/notify/pkg/providers/slack"
 	"github.com/projectdiscovery/notify/pkg/providers/smtp"
 	"github.com/projectdiscovery/notify/pkg/providers/teams"
@@ -32,6 +33,7 @@ type ProviderOptions struct {
 	Custom     []*custom.Options     `yaml:"custom,omitempty"`
 	Gotify     []*gotify.Options     `yaml:"gotify,omitempty"`
 	Notion     []*notion.Options     `yaml:"notion,omitempty"`
+	Rocketchat []*rocketchat.Options `yaml:"rocketchat,omitempty"`
 }
 
 // Provider is an interface implemented by providers
@@ -130,6 +132,15 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 		provider, err := notion.New(providerOptions.Notion, options.IDs)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not create notion provider client")
+		}
+		client.providers = append(client.providers, provider)
+	}
+
+	if providerOptions.Rocketchat != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "rocketchat")) {
+
+		provider, err := rocketchat.New(providerOptions.Rocketchat, options.IDs)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not create rocketchat provider client")
 		}
 		client.providers = append(client.providers, provider)
 	}
