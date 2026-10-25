@@ -1,10 +1,13 @@
 package gotify
 
 import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"fmt"
-	"net/url"
+	"net/http"
+	"time"
 
-	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
@@ -47,19 +50,8 @@ func (p *Provider) Send(message, CliFormat string) error {
 	p.counter++
 
 	for _, pr := range p.Gotify {
-		params := url.Values{}
-		if pr.GotifyTitle != "" {
-			params.Add("title", pr.GotifyTitle)
-		}
-		if pr.GotifyDisableTLS {
-			params.Add("disabletls", "true")
-		}
 		msg := utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.GotifyFormat), p.counter)
-		url := fmt.Sprintf("gotify://%s:%s/%s", pr.GotifyHost, pr.GotifyPort, pr.GotifyToken)
-		if len(params) > 0 {
-			url += "?" + params.Encode()
-		}
-		err := shoutrrr.Send(url, msg)
+		err := pr.send(msg)
 		if err != nil {
 			err = errors.Wrap(err, fmt.Sprintf("failed to send gotify notification for id: %s ", pr.ID))
 			GotifyErr = multierr.Append(GotifyErr, err)
@@ -69,4 +61,62 @@ func (p *Provider) Send(message, CliFormat string) error {
 	}
 
 	return GotifyErr
+}
+
+// defaultTitle is the title shoutrrr used, kept so existing setups see no change.
+const defaultTitle = "Shoutrrr notification"
+
+type messageRequest struct {
+	Message  string `json:"message"`
+	Title    string `json:"title"`
+	Priority int    `json:"priority"`
+}
+
+type errorResponse struct {
+	Error       string `json:"error"`
+	Description string `json:"errorDescription"`
+}
+
+// send talks to the Gotify API directly because shoutrrr only accepts the
+// legacy 15-char tokens and rejects the "gtfya." tokens issued by Gotify 3.
+func (o *Options) send(msg string) error {
+	title := o.GotifyTitle
+	if title == "" {
+		title = defaultTitle
+	}
+	body, err := json.Marshal(messageRequest{Message: msg, Title: title})
+	if err != nil {
+		return err
+	}
+
+	scheme := "https"
+	if o.GotifyDisableTLS {
+		scheme = "http"
+	}
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s://%s:%s/message", scheme, o.GotifyHost, o.GotifyPort), bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	// A header keeps the token out of URLs, which end up in proxy and server logs.
+	req.Header.Set("X-Gotify-Key", o.GotifyToken)
+
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+		// Gotify's default config redirects HTTP to HTTPS, so with TLS disabled the
+		// redirect target is usually unverifiable; shoutrrr skipped verification too.
+		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: o.GotifyDisableTLS}},
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		var e errorResponse
+		_ = json.NewDecoder(resp.Body).Decode(&e)
+		return fmt.Errorf("gotify responded with %s: %s %s", resp.Status, e.Error, e.Description)
+	}
+	return nil
 }
