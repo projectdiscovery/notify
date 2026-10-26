@@ -56,7 +56,22 @@ type gotifyPayload struct {
 	Priority int    `json:"priority,omitempty"`
 }
 
-var gotifyHTTPClient = &http.Client{Timeout: 10 * time.Second}
+// gotifyCheckRedirect follows redirects on the configured host, including
+// HTTP to HTTPS, and stops before the Gotify token is sent to another host.
+func gotifyCheckRedirect(req *http.Request, via []*http.Request) error {
+	if len(via) == 0 || req.URL == nil || via[0].URL == nil {
+		return nil
+	}
+	if !strings.EqualFold(req.URL.Hostname(), via[0].URL.Hostname()) {
+		return http.ErrUseLastResponse
+	}
+	return nil
+}
+
+var gotifyHTTPClient = &http.Client{
+	Timeout:       10 * time.Second,
+	CheckRedirect: gotifyCheckRedirect,
+}
 
 func isLegacyGotifyToken(token string) bool {
 	if len(token) != 15 || token[0] != 'A' {
@@ -104,7 +119,8 @@ func sendGotifyDirect(pr *Options, msg string) error {
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
-			Timeout: 10 * time.Second,
+			Timeout:       10 * time.Second,
+			CheckRedirect: gotifyCheckRedirect,
 		}
 	}
 
@@ -118,6 +134,8 @@ func sendGotifyDirect(pr *Options, msg string) error {
 		respBody, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("gotify server returned HTTP %d: %s", resp.StatusCode, strings.TrimSpace(string(respBody)))
 	}
+	// Drain the success body so the connection can be reused.
+	_, _ = io.Copy(io.Discard, resp.Body)
 	return nil
 }
 

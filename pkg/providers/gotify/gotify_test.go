@@ -126,3 +126,79 @@ func TestIsLegacyGotifyToken(t *testing.T) {
 		t.Fatal("expected Ahwbsdy to not be legacy token")
 	}
 }
+
+func TestGotifyCheckRedirect(t *testing.T) {
+	viaReq, err := http.NewRequest(http.MethodPost, "https://gotify.example/message", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	via := []*http.Request{viaReq}
+
+	sameHost, err := http.NewRequest(http.MethodGet, "http://Gotify.Example/message", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := gotifyCheckRedirect(sameHost, via); err != nil {
+		t.Fatalf("same host redirect was rejected: %v", err)
+	}
+
+	otherHost, err := http.NewRequest(http.MethodGet, "https://attacker.example/message", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := gotifyCheckRedirect(otherHost, via); err != http.ErrUseLastResponse {
+		t.Fatalf("cross-host redirect returned %v", err)
+	}
+}
+
+func TestSendGotifyDirect_FollowsSameHostRedirect(t *testing.T) {
+	var receivedToken string
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/message" {
+			http.Redirect(w, r, "/delivered", http.StatusFound)
+			return
+		}
+		receivedToken = r.Header.Get("X-Gotify-Key")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"id":1}`))
+	}))
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = sendGotifyDirect(&Options{
+		GotifyHost:       u.Hostname(),
+		GotifyPort:       u.Port(),
+		GotifyToken:      "gtfya.token",
+		GotifyDisableTLS: true,
+	}, "hello")
+	if err != nil {
+		t.Fatalf("same-host redirect failed: %v", err)
+	}
+	if receivedToken != "gtfya.token" {
+		t.Fatalf("token was not forwarded to the same host, got %q", receivedToken)
+	}
+}
+
+func TestSendGotifyDirect_StopsCrossHostRedirect(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "http://attacker.example/message", http.StatusFound)
+	}))
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = sendGotifyDirect(&Options{
+		GotifyHost:       u.Hostname(),
+		GotifyPort:       u.Port(),
+		GotifyToken:      "gtfya.secret",
+		GotifyDisableTLS: true,
+	}, "hello")
+	if err == nil || !strings.Contains(err.Error(), "302") {
+		t.Fatalf("expected the cross-host redirect to stop with HTTP 302, got %v", err)
+	}
+}
