@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
@@ -21,6 +22,7 @@ type Options struct {
 	ID                string `yaml:"id,omitempty"`
 	TelegramAPIKey    string `yaml:"telegram_api_key,omitempty"`
 	TelegramChatID    string `yaml:"telegram_chat_id,omitempty"`
+	TelegramThreadID  string `yaml:"telegram_thread_id,omitempty"`
 	TelegramFormat    string `yaml:"telegram_format,omitempty"`
 	TelegramParseMode string `yaml:"telegram_parsemode,omitempty"`
 	// TelegramPreview enables link previews. Previews stay off unless this is set.
@@ -46,7 +48,11 @@ func telegramURL(pr *Options) string {
 	if pr.TelegramPreview {
 		preview = "Yes"
 	}
-	return fmt.Sprintf("telegram://%s@telegram?channels=%s&parsemode=%s&preview=%s", pr.TelegramAPIKey, pr.TelegramChatID, pr.TelegramParseMode, preview)
+	channel := pr.TelegramChatID
+	if pr.TelegramThreadID != "" && !strings.Contains(pr.TelegramChatID, ":") {
+		channel = fmt.Sprintf("%s:%s", pr.TelegramChatID, pr.TelegramThreadID)
+	}
+	return fmt.Sprintf("telegram://%s@telegram?channels=%s&parsemode=%s&preview=%s", pr.TelegramAPIKey, channel, pr.TelegramParseMode, preview)
 }
 
 func (p *Provider) Send(message, CliFormat string) error {
