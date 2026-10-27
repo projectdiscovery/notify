@@ -27,6 +27,13 @@ var (
 		//		"pushover": &pushover{},
 		"gotify": &gotify{},
 	}
+	// Fork pull requests do not receive repository secrets. Skip those
+	// providers instead of failing the job. Gotify uses the local server.
+	providerEnv = map[string]string{
+		"discord": "DISCORD_WEBHOOK_URL",
+		"slack":   "SLACK_WEBHOOK_URL",
+		"custom":  "CUSTOM_WEBHOOK_URL",
+	}
 )
 
 func main() {
@@ -35,6 +42,10 @@ func main() {
 	for name, test := range testCases {
 		// run only gotify test for dependabot
 		if isDependabot && name != "gotify" {
+			continue
+		}
+		if key, ok := providerEnv[name]; ok && os.Getenv(key) == "" {
+			fmt.Printf("Skipping %s because %s is unset\n", name, key)
 			continue
 		}
 		fmt.Printf("Running test cases for \"%s\"\n", aurora.Blue(name))
