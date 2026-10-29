@@ -60,11 +60,17 @@ func (p *Provider) Send(message, CliFormat string) error {
 
 			funcMap := sprig.TxtFuncMap()
 			// Add custom functions if needed using funcMap["funcName"] = func
+			funcMap[jsonEscapeFunc] = escapeJSONString
 			tmpl, err := template.New("sprig").Funcs(funcMap).Parse(pr.CustomSprig)
 			if err != nil {
 				err = errors.Wrap(err, fmt.Sprintf("failed to parse custom sprig template for id: %s ", pr.ID))
 				CustomErr = multierr.Append(CustomErr, err)
 				continue
+			}
+			// values come from the input line: escape the ones written
+			// inside a JSON string so they cannot add fields
+			if isJSONBody(pr.CustomHeaders, pr.CustomSprig) {
+				escapeTemplateJSONStrings(tmpl)
 			}
 			var buf bytes.Buffer
 			err = tmpl.Execute(&buf, data)
@@ -86,7 +92,13 @@ func (p *Provider) Send(message, CliFormat string) error {
 			msg = strings.ReplaceAll(pr.CustomFormat, "{{dataJsonString}}", dataJsonString)
 		} else {
 			// Otherwise, use the original message
-			msg = utils.FormatMessage(message, utils.SelectFormat(CliFormat, pr.CustomFormat), p.counter)
+			format := utils.SelectFormat(CliFormat, pr.CustomFormat)
+			if isJSONBody(pr.CustomHeaders, format) {
+				// {{data}} inside a JSON string is escaped
+				msg = utils.FormatMessageWith(message, format, p.counter, replaceDataJSON)
+			} else {
+				msg = utils.FormatMessage(message, format, p.counter)
+			}
 		}
 
 		body := bytes.NewBufferString(msg)

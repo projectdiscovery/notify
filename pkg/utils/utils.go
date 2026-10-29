@@ -16,6 +16,14 @@ const (
 
 // FormatMessage formats the message according to the format string
 func FormatMessage(msg, format string, counter int) string {
+	return FormatMessageWith(msg, format, counter, func(format, msg string) string {
+		return strings.ReplaceAll(format, defaultFormat, msg)
+	})
+}
+
+// FormatMessageWith formats the message like FormatMessage, but uses
+// replaceData to put msg in place of {{data}}.
+func FormatMessageWith(msg, format string, counter int, replaceData func(format, msg string) string) string {
 	ts := time.Now()
 
 	format = dateTimeHelper(msg, format, ts)
@@ -23,7 +31,7 @@ func FormatMessage(msg, format string, counter int) string {
 	format = timeHelper(msg, format, ts)
 	format = countHelper(msg, format, counter)
 
-	return strings.ReplaceAll(format, defaultFormat, msg)
+	return replaceData(format, msg)
 }
 
 // SelectFormat returns the format string in the following order of precedence:
