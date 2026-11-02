@@ -198,6 +198,8 @@ custom:
       X-Api-Key: XXXXX
 ``` 
 
+For a custom provider with a JSON body (a JSON `Content-Type` header, or a format that starts with `{` or `[`), `{{data}}` and `custom_sprig` values written inside a JSON string are JSON-escaped, so scanner output cannot add or change fields. `{{data}}` outside a string (for example `custom_format: '{{data}}'` to forward JSON lines) is sent as is.
+
 # Running Notify
 
 Notify supports piping output of any tool or output file and send it to configured provider/s (e.g, discord, slack channel) as notification.
