@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/stretchr/testify/require"
 )
@@ -52,6 +53,16 @@ func TestRocketChatSendWebhook(t *testing.T) {
 	require.Equal(t, "NotifyBot", receivedPayloads[0].Alias)
 }
 
+func TestRocketChatShoutrrrURLIncludesChannelAndUsername(t *testing.T) {
+	got, err := rocketchatShoutrrrURL(&Options{
+		RocketChatWebhookURL: "rocketchat://chat.example.com/tokenA/tokenB",
+		Channel:              "#security-alerts",
+		Username:             "NotifyBot",
+	})
+	require.NoError(t, err)
+	require.Equal(t, "rocketchat://NotifyBot@chat.example.com/tokenA/tokenB/security-alerts", got)
+}
+
 func TestRocketChatSplitMessage(t *testing.T) {
 	part1 := strings.Repeat("A", 3000)
 	part2 := strings.Repeat("B", 3000)
@@ -61,4 +72,12 @@ func TestRocketChatSplitMessage(t *testing.T) {
 	require.Len(t, chunks, 2)
 	require.Equal(t, part1, chunks[0])
 	require.Equal(t, part2, chunks[1])
+
+	accented := strings.Repeat("A", 3999) + "é" + strings.Repeat("B", 10)
+	chunks = splitMessage(accented, 4000)
+	require.NotEmpty(t, chunks)
+	for _, chunk := range chunks {
+		require.True(t, utf8.ValidString(chunk))
+	}
+	require.Equal(t, accented, strings.Join(chunks, ""))
 }

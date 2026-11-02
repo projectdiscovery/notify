@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/pkg/errors"
@@ -76,7 +79,11 @@ func sendRocketChat(pr *Options, msg string) error {
 	chunks := splitMessage(msg, maxMessageLength)
 	for _, chunk := range chunks {
 		if strings.HasPrefix(pr.RocketChatWebhookURL, "rocketchat://") {
-			if err := shoutrrr.Send(pr.RocketChatWebhookURL, chunk); err != nil {
+			dest, err := rocketchatShoutrrrURL(pr)
+			if err != nil {
+				return errors.Wrapf(err, "failed to build rocketchat url for id: %s", pr.ID)
+			}
+			if err := shoutrrr.Send(dest, chunk); err != nil {
 				return errors.Wrapf(err, "failed to send shoutrrr rocketchat notification for id: %s", pr.ID)
 			}
 			continue
@@ -97,7 +104,8 @@ func sendRocketChat(pr *Options, msg string) error {
 		if err != nil {
 			return errors.Wrapf(err, "failed to send rocketchat notification for id: %s", pr.ID)
 		}
-		defer resp.Body.Close()
+		_, _ = io.Copy(io.Discard, resp.Body)
+		_ = resp.Body.Close()
 
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 			return fmt.Errorf("rocketchat: unexpected status code %d for id: %s", resp.StatusCode, pr.ID)
@@ -120,6 +128,9 @@ func splitMessage(msg string, limit int) []string {
 		}
 		if splitIndex <= 0 {
 			splitIndex = limit
+			for splitIndex > 0 && !utf8.RuneStart(msg[splitIndex]) {
+				splitIndex--
+			}
 		}
 
 		chunks = append(chunks, msg[:splitIndex])
@@ -131,4 +142,24 @@ func splitMessage(msg string, limit int) []string {
 	}
 
 	return chunks
+}
+
+// rocketchatShoutrrrURL copies channel and username into a rocketchat:// URL.
+// Shoutrrr reads the username from the userinfo and the channel from the path segment after the two tokens.
+func rocketchatShoutrrrURL(pr *Options) (string, error) {
+	u, err := url.Parse(pr.RocketChatWebhookURL)
+	if err != nil {
+		return "", err
+	}
+	if pr.Username != "" && u.User.Username() == "" {
+		u.User = url.User(pr.Username)
+	}
+	if pr.Channel != "" {
+		channel := strings.TrimPrefix(pr.Channel, "#")
+		parts := strings.Split(strings.Trim(u.Path, "/"), "/")
+		if len(parts) == 2 && parts[0] != "" && parts[1] != "" {
+			u.Path = "/" + parts[0] + "/" + parts[1] + "/" + channel
+		}
+	}
+	return u.String(), nil
 }
