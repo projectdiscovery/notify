@@ -2,7 +2,6 @@ package runner
 
 import (
 	"bufio"
-	"crypto/tls"
 	"io"
 	"log"
 	"net/http"
@@ -68,13 +67,9 @@ func (r *Runner) Run() error {
 		if err != nil || proxyurl == nil {
 			gologger.Warning().Msgf("supplied proxy '%s' is not valid", r.options.Proxy)
 		} else {
-			defaultTransport = &http.Transport{
-				Proxy:             http.ProxyURL(proxyurl),
-				ForceAttemptHTTP2: true,
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: true,
-				},
-			}
+			// keep certificate verification: provider requests carry tokens
+			defaultTransport = defaultTransport.Clone()
+			defaultTransport.Proxy = http.ProxyURL(proxyurl)
 		}
 	}
 
