@@ -104,7 +104,7 @@ func (p *Provider) Send(message, CliFormat string) error {
 				SlackErr = multierr.Append(SlackErr, err)
 				continue
 			}
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			if resp.StatusCode >= 400 {
 				err = errors.Wrap(fmt.Errorf("received non-success status: %s", resp.Status), fmt.Sprintf("failed to send slack notification for id: %s", pr.ID))
 				SlackErr = multierr.Append(SlackErr, err)
