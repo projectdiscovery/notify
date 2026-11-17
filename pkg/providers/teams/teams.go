@@ -121,7 +121,7 @@ func sendWorkflow(pr *Options, msg string) error {
 	if err != nil {
 		return errors.Wrapf(err, "failed to send workflow teams notification for id: %s", pr.ID)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	_, _ = io.Copy(io.Discard, resp.Body)
 	if resp.StatusCode != http.StatusAccepted {
 		return errors.Errorf("failed to send workflow teams notification for id: %s, got status code: %d", pr.ID, resp.StatusCode)
