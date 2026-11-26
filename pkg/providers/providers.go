@@ -1,6 +1,8 @@
 package providers
 
 import (
+	"strings"
+
 	"github.com/acarl005/stripansi"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
@@ -34,6 +36,21 @@ type ProviderOptions struct {
 	RocketChat []*rocketchat.Options `yaml:"rocketchat,omitempty"`
 }
 
+// supportedProviders lists the provider names that -provider/-p accepts.  Each
+// one matches a top-level key of the provider config file.
+var supportedProviders = []string{
+	"slack",
+	"discord",
+	"pushover",
+	"smtp",
+	"teams",
+	"telegram",
+	"googlechat",
+	"custom",
+	"gotify",
+	"rocketchat",
+}
+
 // Provider is an interface implemented by providers
 type Provider interface {
 	Send(message, CliFormat string) error
@@ -48,6 +65,15 @@ type Client struct {
 func New(providerOptions *ProviderOptions, options *types.Options) (*Client, error) {
 
 	client := &Client{providerOptions: providerOptions, options: options}
+
+	// A name that does not belong to any provider group used to be ignored
+	// silently, so "notify -p slackk" exited successfully without sending
+	// anything at all.
+	for _, name := range options.Providers {
+		if !sliceutil.Contains(supportedProviders, name) {
+			return nil, errors.Errorf("unknown provider %q (available: %s)", name, strings.Join(supportedProviders, ", "))
+		}
+	}
 
 	if providerOptions.Slack != nil && (len(options.Providers) == 0 || sliceutil.Contains(options.Providers, "slack")) {
 
@@ -132,6 +158,12 @@ func New(providerOptions *ProviderOptions, options *types.Options) (*Client, err
 			return nil, errors.Wrap(err, "could not create rocketchat provider client")
 		}
 		client.providers = append(client.providers, provider)
+	}
+
+	// The names are valid but none of them is present in the provider config
+	// file, which would otherwise run without sending anything.
+	if len(options.Providers) > 0 && len(client.providers) == 0 {
+		return nil, errors.Errorf("none of the requested providers (%s) are configured in the provider config file", strings.Join(options.Providers, ", "))
 	}
 
 	return client, nil
